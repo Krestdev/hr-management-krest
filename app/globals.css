@@ -135,4 +135,7 @@
   body {
     @apply bg-background text-foreground font-sans;
   }
+  h1 {
+    @apply text-[clamp(24px,2.5vw,32px)] leading-[120%] tracking-[-0.02rem] font-semibold;
+  }
 }
