@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import LocalFont from "next/font/local";
 import "./globals.css";
+import Providers from "@/context/providers";
 
 const fontSans = LocalFont({
   src: "./helvetica.ttf",
@@ -32,7 +33,9 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontMono.variable} antialiased`}
       >
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

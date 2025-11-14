@@ -1,15 +1,16 @@
 'use client'
-import React from 'react'
-import { useForm } from 'react-hook-form';
-import { zodResolver } from "@hookform/resolvers/zod"
-import z from "zod"
+import OnViewAnimation from '@/components/onViewAnimation';
+import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
-import OnViewAnimation from '@/components/onViewAnimation';
 import useKizunaStore from '@/context/store';
-import { useRouter } from 'next/navigation';
+import UserQuery from '@/queries/users';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from '@tanstack/react-query';
+import { ArrowRight } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import z from "zod";
 
 const formSchema = z.object({
     email:z.email({message: "Ce champ est obligatoire"}),
@@ -18,7 +19,7 @@ const formSchema = z.object({
 
 function LoginForm() {
     const { login } = useKizunaStore();
-    const router = useRouter();
+    const userQuery = new UserQuery();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -26,8 +27,20 @@ function LoginForm() {
             password: ""
         }
     });
+    const signIn = useMutation({
+        mutationFn: (data:{email:string;password:string})=>{
+            return userQuery.login(data);
+        },
+        onSuccess: (data)=>{
+            login(data.user, data.token);
+            toast.success("Connexion réussie !")
+        },
+        onError: (error)=>{
+            toast.error(error.message)
+        }
+    })
     function onSubmit(values:z.infer<typeof formSchema>){
-        console.log(values);
+        signIn.mutate(values);
     }
   return (
     <Form {...form}>
@@ -51,7 +64,7 @@ function LoginForm() {
                         <FormMessage/>
                     </FormItem>
                 )} />
-                <Button type="submit" variant={"primary"}>{"Se connecter"}<ArrowRight/></Button>
+                <Button type="submit" variant={"primary"} disabled={signIn.isPending} isLoading={signIn.isPending}>{"Se connecter"}{!signIn.isPending && <ArrowRight/>}</Button>
             </form>
         </OnViewAnimation>
     </Form>

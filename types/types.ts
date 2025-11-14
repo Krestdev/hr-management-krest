@@ -1,3 +1,4 @@
+
 export type Employee = {
   firstName: string;
   lastName: string;
@@ -55,4 +56,5 @@ export interface User extends Employee {
   id: number;
   updatedAt?: Date;
   createdAt: Date;
+  photo?:string;
 }
