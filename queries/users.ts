@@ -1,14 +1,15 @@
 import api from "@/context/api";
-import { User } from "@/types/types";
+import { Employee } from "@/types/types";
 
 export default class UserQuery {
-  route = "/auth";
+  route = "/employees";
 
-  login = async (
-    data: { email: string; password: string }
-  ): Promise<{ user: User; token: string }> => {
+  login = async (data: {
+    email: string;
+    password: string;
+  }): Promise<{ user: Employee; token: string }> => {
     try {
-      const response = await api.post(`${this.route}/login`, data);
+      const response = await api.post(`/auth/login`, data);
       return response.data;
     } catch (error: any) {
       const message =
@@ -17,6 +18,19 @@ export default class UserQuery {
         "Une erreur s'est produite";
 
       // On propage une erreur propre
+      throw new Error(message);
+    }
+  };
+  getAll = async (): Promise<Array<Employee>> => {
+    try {
+      const response = await api.get(this.route);
+      return response.data;
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message ??
+        error.message ??
+        "Une erreur s'est produite";
+
       throw new Error(message);
     }
   };

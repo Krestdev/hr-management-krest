@@ -1,16 +1,16 @@
-import { User } from "@/types/types";
+import { Employee } from "@/types/types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 interface store {
-    user?: User;
+    user?: Employee;
     token?: string;
     isHydrated:boolean;
 }
 
 interface actions {
     logout: ()=>void;
-    login: (user:User, token:string)=>void;
+    login: (user:Employee, token:string)=>void;
     setIsHydrated:(v:boolean)=>void;
 }
 

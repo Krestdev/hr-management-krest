@@ -1,5 +1,11 @@
 
 export type Employee = {
+  id: number;
+  updatedAt?: Date;
+  createdAt: Date;
+  photo?:string;
+  password?:string;
+  //Form
   firstName: string;
   lastName: string;
   email: string;
@@ -51,10 +57,39 @@ export type Employee = {
   leaveDays: number; // droit de congé annuel
   attachments?: File[] | string[]; // fichiers joints (contrat, etc.)
 };
+export type HolidayRequestStatus =
+  | "PENDING_MANAGER"   // en attente du supérieur
+  | "PENDING_HR"        // validé sup, en attente RH
+  | "ACCEPTED"
+  | "REJECTED";
 
-export interface User extends Employee {
+  export interface HolidayType {
   id: number;
-  updatedAt?: Date;
+  label: string; // affichage UI
+  code: string;  // identifiant technique (ex: "ANNUAL")
+  requiresDocument?: boolean;
+  subtractFromBalance: boolean; // impact sur solde ?
+  maxDaysPerYear?: number;
+}
+
+export interface HolidayRequest {
+  id: number;
+  userId: number;
+  typeId: number;
+  startDate: Date;
+  endDate: Date;
+  requestedDays: number;
+  status: HolidayRequestStatus;
+  justificationFile?: string;
+  reason?: string;
   createdAt: Date;
-  photo?:string;
+  updatedAt: Date;
+}
+
+export interface EmployeeLeaveBalance {
+  userId: number;
+  year: number;
+  earnedDays: number; // acquis
+  usedDays: number; // consommés
+  remainingDays: number; // solde
 }
