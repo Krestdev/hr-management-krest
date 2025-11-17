@@ -38,7 +38,7 @@ function NavigationBreadcrumb() {
                   </BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink asChild>
-                    <Link href={href}>{formattedSegment}</Link>
+                    <Link href={href} className="first-letter:uppercase">{formattedSegment}</Link>
                   </BreadcrumbLink>
                 )}
               </BreadcrumbItem>

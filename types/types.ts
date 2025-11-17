@@ -5,6 +5,7 @@ export type Employee = {
   createdAt: Date;
   photo?:string;
   password?:string;
+  role:"MANAGER"| "HR" | "USER"
   //Form
   firstName: string;
   lastName: string;

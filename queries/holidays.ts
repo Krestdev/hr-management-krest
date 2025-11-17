@@ -47,7 +47,7 @@ export default class HolidaysQuery {
   /**
    * Récupération des statistiques RH
    */
-  getStats = async () => {
+  getStats = async ():Promise<{totalRequests:number;pendingRequests:number;acceptedRequests:number;rejectedRequests:number}> => {
     try {
       const response = await api.get(`${this.route}/stats`);
       return response.data; // { total, pending, accepted, rejected, byType: [...] }
@@ -65,11 +65,11 @@ export default class HolidaysQuery {
    */
   getBalance = async (
     userId: number,
-    year: number
+    year?: number
   ): Promise<EmployeeLeaveBalance> => {
     try {
       const response = await api.get(
-        `${this.route}/balance?userId=${userId}&year=${year}`
+        `${this.route}/balance?userId=${userId}${!!year ? `&year=${year}` : ""}`
       );
       return response.data.balance;
     } catch (error: any) {

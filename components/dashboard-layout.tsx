@@ -10,7 +10,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="bg-[#f5f5f5] flex-1">
+      <main className="bg-[#f5f5f5] flex-1 @container/main">
         <div className="h-15 w-full px-4 bg-white flex justify-between items-center border-b">
           <div className="flex items-center gap-2">
             <SidebarTrigger />
