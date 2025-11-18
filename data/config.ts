@@ -1,11 +1,12 @@
 import {
-  DashboardSquare02Icon,
-  UserGroupIcon,
   CalendarUserIcon,
   ComputerUserIcon,
+  DashboardSquare02Icon,
   File01Icon,
   File02Icon,
+  FolderLibraryIcon,
   Notification01Icon,
+  UserGroupIcon,
   UserSquareIcon
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIconProps } from "@hugeicons/react";
@@ -84,4 +85,9 @@ export const BASE_ROUTES: Array<sidebarLinkProps> = [
     title: "Notifications",
     icon: Notification01Icon,
   },
+  {
+    href: "/tableau-de-bord/documents",
+    title: "Documents",
+    icon: FolderLibraryIcon,
+  }
 ];

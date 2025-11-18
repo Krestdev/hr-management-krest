@@ -25,6 +25,7 @@ import { getInitials } from "@/lib/utils"
 export function AppSidebar() {
   const path = usePathname();
   const { user, logout } = useKizunaStore();
+  const navigation = user?.role === "USER" ? BASE_ROUTES.filter((r)=>r.isAdmin === true) : BASE_ROUTES
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="h-15 justify-center">
@@ -34,7 +35,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {BASE_ROUTES.map(({href, title, icon}) => (
+              {navigation.map(({href, title, icon}) => (
                 <SidebarMenuItem key={title}>
                   <SidebarMenuButton asChild tooltip={title} isActive={path === href}>
                     <Link href={href}>
