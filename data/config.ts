@@ -1,5 +1,6 @@
 import {
   CalendarUserIcon,
+  CheckListIcon,
   ComputerUserIcon,
   DashboardSquare02Icon,
   File01Icon,
@@ -56,6 +57,12 @@ export const BASE_ROUTES: Array<sidebarLinkProps> = [
     icon: File02Icon,
     isAdmin: true,
   },
+  {
+    href: "/tableau-de-bord/documents",
+    title: "Documents",
+    icon: FolderLibraryIcon,
+    isAdmin: true,
+  },
 
   // ----------------------------
   // Employé (staff)
@@ -68,7 +75,7 @@ export const BASE_ROUTES: Array<sidebarLinkProps> = [
   {
     href: "/tableau-de-bord/mes-presences",
     title: "Mes présences",
-    icon: ComputerUserIcon,
+    icon: CheckListIcon,
   },
   {
     href: "/tableau-de-bord/mes-bulletins",
@@ -86,8 +93,8 @@ export const BASE_ROUTES: Array<sidebarLinkProps> = [
     icon: Notification01Icon,
   },
   {
-    href: "/tableau-de-bord/documents",
-    title: "Documents",
+    href: "/tableau-de-bord/mes-documents",
+    title: "Mes documents",
     icon: FolderLibraryIcon,
   }
 ];

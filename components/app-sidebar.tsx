@@ -25,7 +25,7 @@ import { getInitials } from "@/lib/utils"
 export function AppSidebar() {
   const path = usePathname();
   const { user, logout } = useKizunaStore();
-  const navigation = user?.role === "USER" ? BASE_ROUTES.filter((r)=>r.isAdmin === true) : BASE_ROUTES
+  const navigation = user?.role === "USER" ? BASE_ROUTES.filter((r)=>r.isAdmin !== true) : BASE_ROUTES
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="h-15 justify-center">

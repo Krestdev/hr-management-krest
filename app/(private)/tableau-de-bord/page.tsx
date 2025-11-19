@@ -64,6 +64,9 @@ function Page() {
             </DropdownMenuItem>
           </StatisticCard>
         }
+        { user?.role === "USER" && userHolidays.isSuccess &&
+        <StatisticCard variant={"grey"} title="Congés utilisés" value={userHolidays.data.usedDays} advanced={{value: `sur ${userHolidays.data.earnedDays} jour(s)`}}/>
+        }
         { user?.role === "USER" && 
         <StatisticCard title="Dernier bulletin disponible" value={"Septembre 2025"} advanced={{value: "13 Bulletins"}}>
           <DropdownMenuItem>
@@ -118,7 +121,7 @@ function Page() {
           {/**Quick links END */}
           <div className="card-1 bg-accent relative">
             <div className="card-1-header z-1">
-              <h3 className="text-white flex items-center gap-2"><span className="card-1-icon bg-white text-accent"><HugeiconsIcon icon={FolderLibraryIcon} size={20} strokeWidth={2}/></span>{"Documents"}</h3>
+              <h3 className="text-white flex items-center gap-2"><span className="card-1-icon bg-white text-accent"><HugeiconsIcon icon={FolderLibraryIcon} size={20} strokeWidth={2}/></span>{"Mes Documents"}</h3>
             </div>
             <div className="text-white">
               <p className="text-[clamp(28px,2vw,40px)] font-semibold">{"12"}</p>
@@ -150,7 +153,7 @@ function Page() {
         <div className="card-1-header">
           <h3 className="flex items-center gap-2">
             <span className="card-1-icon bg-accent"><HugeiconsIcon icon={Calendar03Icon} size={20} strokeWidth={2}/></span>
-            {"Demandes de congés en attente"}
+            {"Historique de présence"}
           </h3>
         </div>
         <Empty>
@@ -158,8 +161,8 @@ function Page() {
             <EmptyMedia variant={"icon"}>
               <HugeiconsIcon icon={Calendar02Icon} />
             </EmptyMedia>
-            <EmptyTitle>{"Aucune Demande d'Absence"}</EmptyTitle>
-            <EmptyDescription>{"Vous n'avez pas de demande d'absence en attente de traitement."}</EmptyDescription>
+            <EmptyTitle>{"Aucune donnée disponible"}</EmptyTitle>
+            <EmptyDescription>{"Vous n'avez pas encore d'historique de présence."}</EmptyDescription>
           </EmptyHeader>
         </Empty>
       </div>
