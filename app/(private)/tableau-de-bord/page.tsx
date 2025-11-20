@@ -34,7 +34,7 @@ function Page() {
   return (
     <div className="flex flex-col gap-4 sm:gap-6">
       <header className="flex flex-col">
-          <h2>{`Bonjour ${user?.firstName},`}</h2>
+          <h2>{`Bonjour ${user?.firstName} 👋,`}</h2>
           <p className="text-neutral-600 text-sm">{"Bienvenue sur votre tableau de bord"}</p>
       </header>
       <section className="w-full grid grid-cols-1 gap-5 @min-[640px]/main:grid-cols-2 @min-[1024px]/main:grid-cols-3 @min-[1280px]/main:grid-cols-4">

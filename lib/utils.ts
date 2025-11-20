@@ -27,3 +27,8 @@ export function getInitials(name?: string): string {
 
   return initials.toUpperCase();
 }
+
+export function formatDate(value: string | Date) {
+  const d = value instanceof Date ? value : new Date(value);
+  return d.toLocaleDateString("fr-FR");
+}

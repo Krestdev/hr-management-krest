@@ -80,4 +80,20 @@ export default class HolidaysQuery {
       throw new Error(message);
     }
   };
+  sendRequest = async (
+    data: Omit<HolidayRequest, "id" | "requestedDays" | "status">
+  ):Promise<HolidayRequest> => {
+    try {
+      const response = await api.post(
+        `${this.route}/requests`, data
+      );
+      return response.data;
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message ??
+        error.message ??
+        "Une erreur est survenue pendant l'enregistrement de votre requête";
+      throw new Error(message);
+    }
+  }
 }

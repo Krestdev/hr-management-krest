@@ -77,6 +77,7 @@ export interface HolidayRequest {
   id: number;
   userId: number;
   typeId: number;
+  typeLabel?: string;
   startDate: Date;
   endDate: Date;
   requestedDays: number;
@@ -84,7 +85,7 @@ export interface HolidayRequest {
   justificationFile?: string;
   reason?: string;
   createdAt: Date;
-  updatedAt: Date;
+  updatedAt?: Date;
 }
 
 export interface EmployeeLeaveBalance {

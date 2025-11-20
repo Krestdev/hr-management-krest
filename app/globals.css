@@ -27,6 +27,7 @@
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
+  --color-accent-dark: var(--accent-dark);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -74,6 +75,7 @@
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.7456 0.1655 65.3);
+  --accent-dark : oklch(0.6357 0.1431 64.56);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
@@ -161,5 +163,8 @@
   }
   .card-1-icon {
     @apply size-8 flex justify-center items-center rounded-full text-white bg-destructive;
+  }
+  .card-1-header2 {
+    @apply flex flex-wrap gap-3 items-center justify-between;
   }
 }
