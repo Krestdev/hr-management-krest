@@ -148,7 +148,7 @@ function Page() {
       </div>
       {/**Awaiting leave requests for RH & ADMIN */}
       {
-        user?.role !== user ?
+        user?.role === "USER" ?
       <div className="card-1 @min-[960px]/main:col-span-2">
         <div className="card-1-header">
           <h3 className="flex items-center gap-2">
@@ -171,7 +171,7 @@ function Page() {
         <div className="card-1-header">
           <h3 className="flex items-center gap-2">
             <span className="card-1-icon bg-accent"><HugeiconsIcon icon={Calendar03Icon} size={20} strokeWidth={2}/></span>
-            {"Historique des congés"}
+            {"Demandes de congés en attente"}
           </h3>
         </div>
         <Empty>
@@ -180,7 +180,7 @@ function Page() {
               <HugeiconsIcon icon={Calendar02Icon} />
             </EmptyMedia>
             <EmptyTitle>{"Aucun congé"}</EmptyTitle>
-            <EmptyDescription>{"Vous n'avez pas de demande d'absence enregistrée."}</EmptyDescription>
+            <EmptyDescription>{"Vous n'avez pas de demande d'absence en attente."}</EmptyDescription>
           </EmptyHeader>
         </Empty>
       </div>

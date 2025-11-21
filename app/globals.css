@@ -167,4 +167,10 @@
   .card-1-header2 {
     @apply flex flex-wrap gap-3 items-center justify-between;
   }
+  .filter-group {
+    @apply flex flex-col @min-[768px]/main:flex-row @min-[768px]/:items-center gap-2;
+  }
+  .filters {
+    @apply flex flex-wrap items-center gap-3;
+  }
 }

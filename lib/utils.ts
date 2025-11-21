@@ -1,3 +1,4 @@
+import { PresenceFlag } from "@/types/types";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -32,3 +33,12 @@ export function formatDate(value: string | Date) {
   const d = value instanceof Date ? value : new Date(value);
   return d.toLocaleDateString("fr-FR");
 }
+
+export const PRESENCE_FLAGS: { value: PresenceFlag; label: string }[] = [
+  { value: "PRESENT", label: "Présent" },
+  { value: "LATE", label: "Retard" },
+  { value: "ABSENT", label: "Absent" },
+  { value: "EXCEPTIONAL", label: "Exceptionnelle" },
+  { value: "FIELD", label: "Terrain" },
+  { value: "ON_LEAVE", label: "Congé" },
+];

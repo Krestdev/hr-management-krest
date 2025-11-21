@@ -95,3 +95,28 @@ export interface EmployeeLeaveBalance {
   usedDays: number; // consommés
   remainingDays: number; // solde
 }
+
+export type PresenceFlag =
+  | "PRESENT"
+  | "LATE"
+  | "ABSENT"
+  | "EXCEPTIONAL"
+  | "FIELD"
+  | "ON_LEAVE";
+
+export interface PresenceRecord {
+  id: number;
+  userId: number;
+
+  date: Date;
+
+  flags: PresenceFlag[]; // plusieurs états possibles
+
+  checkIn?: string;
+
+  justificationFile?: string;
+  comment?: string;
+
+  createdAt: Date;
+  updatedAt?: Date;
+}

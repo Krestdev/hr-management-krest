@@ -10,17 +10,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import useKizunaStore from '@/context/store'
 import { formatDate } from '@/lib/utils'
 import HolidaysQuery from '@/queries/holidays'
-import { HolidayRequest } from '@/types/types'
-import { MoreHorizontalIcon, PlusSignSquareIcon, SearchVisualIcon, ViewIcon } from '@hugeicons/core-free-icons'
+import { HolidayRequest, HolidayType } from '@/types/types'
+import { CancelSquareIcon, MoreHorizontalIcon, PencilEdit02Icon, PlusSignSquareIcon, SearchVisualIcon, ViewIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useQuery } from '@tanstack/react-query'
 import { VariantProps } from 'class-variance-authority'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import Link from 'next/link'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { DateRange } from "react-day-picker"
 import ViewLeaveRequest from './view'
+import EditLeaveRequest from './edit'
+import CancelLeaveRequest from './cancel'
+import Header from '@/components/header'
 
 export function formatStatusLabel(status: HolidayRequest["status"]) {
   switch (status) {
@@ -55,6 +58,10 @@ export function badgeStatusVariant(status: HolidayRequest["status"]): VariantPro
 function Page() {
     const { user } = useKizunaStore();
     const holidaysQuery = new HolidaysQuery();
+    const holidaysType = useQuery({
+      queryKey: ["leaveTypes"],
+      queryFn: holidaysQuery.getTypes,
+    });
     const { data, isSuccess } = useQuery({
         queryKey: ["leave-requests", user?.id],
         queryFn: async()=>holidaysQuery.getRequestsByUser(user?.id ?? 0),
@@ -66,19 +73,36 @@ function Page() {
     const [cancel, setCancel] = useState<boolean>(false);
     const [activeReq, setActiveReq] = useState<HolidayRequest>();
     const [statusFilter, setStatusFilter] = useState<string>("all");
+    const [typeFilter, setTypeFilter] = useState<string>("all");
     const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: undefined,
     to: undefined,
   });
+    const [types, setTypes] = useState<Array<HolidayType>>([]);
+
+    useEffect(()=>{
+      if(holidaysType.isSuccess){
+        setTypes(holidaysType.data);
+      }
+    },[holidaysType.isSuccess, holidaysType.data, setTypes]);
 
   function resetFilters(){
     setStatusFilter("all");
     setDateRange(undefined);
+    setTypeFilter("all");
   }
 
   function handleView(req: HolidayRequest){
     setActiveReq(req);
     setView(true);
+  }
+  function handleEdit(req: HolidayRequest){
+    setActiveReq(req);
+    setEdit(true);
+  }
+  function handleCancel(req: HolidayRequest){
+    setActiveReq(req);
+    setCancel(true);
   }
 
     const filteredRequests = useMemo(() => {
@@ -107,24 +131,44 @@ function Page() {
         matchDate = start >= from && start <= to;
       }
 
-      return matchStatus && matchDate;
+      const matchType = 
+        typeFilter === "all" ? true : String(request.typeId) === typeFilter
+
+      return matchStatus && matchDate && matchType;
     })
     // optionnel : tri par date de début décroissante
     .sort(
       (a, b) =>
         new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
     );
-}, [isSuccess, data, statusFilter, dateRange]);
+}, [isSuccess, data, statusFilter, dateRange, typeFilter]);
 
     if(isSuccess)
   return (
-    <div>
-        <div className="card-1">
+    <div className="grid gap-4 sm:gap-6">
+      <Header variant={"grey"} title="Mes Congés" />
+        <div className="card-1 w-full overflow-x-auto">
             <div className="card-1-header2">
                 <h3>{"Historique des congés"}</h3>
                 {/**Filtres */}
-                <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center gap-2">
+                <div className="filters">
+                    <div className="filter-group">
+                        <Label htmlFor='type'>{"Type"}</Label>
+                        <Select name="type" value={typeFilter} onValueChange={(value)=>setTypeFilter(value)} >
+                            <SelectTrigger className="min-w-32">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">{"Tous"}</SelectItem>
+                                {
+                                  types.map((type)=>(
+                                    <SelectItem key={type.id} value={String(type.id)}>{type.label}</SelectItem>
+                                  ))
+                                }
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="filter-group">
                         <Label htmlFor='status'>{"Statut"}</Label>
                         <Select name="status" value={statusFilter} onValueChange={(value)=>setStatusFilter(value)} >
                             <SelectTrigger className="min-w-32">
@@ -138,7 +182,7 @@ function Page() {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="filter-group">
                         <Label htmlFor="date">{"Période"}</Label>
                         <DateRangePicker
                         date={dateRange}
@@ -232,8 +276,8 @@ function Page() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuItem onClick={()=>handleView(request)}><HugeiconsIcon icon={ViewIcon}/>{"Voir"}</DropdownMenuItem>
-                        <DropdownMenuItem>{"Modifier"}</DropdownMenuItem>
-                        <DropdownMenuItem>{"Annuler"}</DropdownMenuItem>
+                        <DropdownMenuItem onClick={()=>handleEdit(request)} disabled={request.status !== "PENDING_HR"}><HugeiconsIcon icon={PencilEdit02Icon} />{"Modifier"}</DropdownMenuItem>
+                        <DropdownMenuItem variant="destructive" onClick={()=>handleCancel(request)} disabled={request.status === "REJECTED" || request.status === "PENDING_MANAGER"}><HugeiconsIcon icon={CancelSquareIcon} />{"Annuler"}</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
@@ -243,6 +287,8 @@ function Page() {
         </Table>
         </div>
         { activeReq && <ViewLeaveRequest isOpen={view} openChange={setView} request={activeReq}/>}
+        { activeReq && <EditLeaveRequest isOpen={edit} openChange={setEdit} request={activeReq}/>}
+        { activeReq && <CancelLeaveRequest isOpen={cancel} openChange={setCancel} request={activeReq}/>}
     </div>
   )
 }

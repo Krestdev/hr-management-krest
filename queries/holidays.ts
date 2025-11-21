@@ -1,8 +1,10 @@
 // @/queries/holidays.ts
 import api from "@/context/api";
+import { demoHolidayTypes } from "@/data/temp";
 import {
   HolidayRequest,
   EmployeeLeaveBalance,
+  HolidayType,
 } from "@/types/types";
 
 export default class HolidaysQuery {
@@ -88,6 +90,52 @@ export default class HolidaysQuery {
         `${this.route}/requests`, data
       );
       return response.data;
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message ??
+        error.message ??
+        "Une erreur est survenue pendant l'enregistrement de votre requête";
+      throw new Error(message);
+    }
+  };
+  editRequest = async (
+    data: {
+      request:Omit<HolidayRequest, "id" | "status" | "requestedDays">,
+      id: number
+    }
+  ):Promise<HolidayRequest> => {
+    try {
+      const response = await api.put(
+        `${this.route}/requests`, data
+      );
+      return response.data;
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message ??
+        error.message ??
+        "Une erreur est survenue pendant l'enregistrement de votre requête";
+      throw new Error(message);
+    }
+  };
+  cancelRequest = async (
+    id: number
+  ):Promise<{success: boolean}> => {
+    try {
+      const response = await api.post(
+        `${this.route}/requests/cancel`, id
+      );
+      return response.data;
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message ??
+        error.message ??
+        "Une erreur est survenue pendant l'enregistrement de votre requête";
+      throw new Error(message);
+    }
+  };
+  getTypes = async():Promise<Array<HolidayType>>=>{
+    try {
+      return demoHolidayTypes;
     } catch (error: any) {
       const message =
         error.response?.data?.message ??

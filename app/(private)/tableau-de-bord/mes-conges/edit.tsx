@@ -1,100 +1,124 @@
-'use client'
-import Header from '@/components/header'
-import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import useKizunaStore from '@/context/store'
-import { demoHolidayTypes } from '@/data/temp'
-import HolidaysQuery from '@/queries/holidays'
-import { HolidayRequest } from '@/types/types'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
-import { CalendarIcon } from 'lucide-react'
-import React from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import z from 'zod'
+"use client";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import useKizunaStore from "@/context/store";
+import { demoHolidayTypes } from "@/data/temp";
+import HolidaysQuery from "@/queries/holidays";
+import { HolidayRequest } from "@/types/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { CalendarIcon } from "lucide-react";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import z from "zod";
+
+type Props = {
+  isOpen: boolean;
+  openChange: React.Dispatch<React.SetStateAction<boolean>>;
+  request: HolidayRequest;
+};
 
 const formSchema = z.object({
-    typeId: z.string({message: "Choisissez un type"}).refine((val)=> !!Number(val)),
-    startDate: z
-    .string({ message: "Veuillez définir une date de début" })
-    .refine((val) => {
+  typeId: z
+    .string({ message: "Choisissez un type" })
+    .refine((val) => !!Number(val)),
+  startDate: z.string({ message: "Veuillez définir une date de début" }).refine(
+    (val) => {
       const d = new Date(val);
       return !isNaN(d.getTime());
-    }, { message: "Date de début invalide" }),
-    endDate: z
-    .string({ message: "Veuillez définir une date de fin" })
-    .refine((val) => {
+    },
+    { message: "Date de début invalide" }
+  ),
+  endDate: z.string({ message: "Veuillez définir une date de fin" }).refine(
+    (val) => {
       const d = new Date(val);
       return !isNaN(d.getTime());
-    }, { message: "Date de début invalide" }),
-    justificationFile: z.any(),
-    reason: z.string().optional(),
-    isAnnual: z.boolean(),
+    },
+    { message: "Date de début invalide" }
+  ),
+  justificationFile: z.any(),
+  reason: z.string().optional(),
+  isAnnual: z.boolean(),
 });
 
-function Page() {
+function EditLeaveRequest({ isOpen, openChange, request }: Props) {
     const { user } = useKizunaStore();
     const [startView, setStartView] = React.useState<boolean>(false);
     const [endView, setEndView] = React.useState<boolean>(false);
-    const holidayRequest = new HolidaysQuery(); 
-    const sendLeaveRequest = useMutation({
-        mutationKey: ["leave-requests"],
-        mutationFn: async(data:Omit<HolidayRequest, "id" | "status" | "requestedDays">)=>holidayRequest.sendRequest(data),
+    const holidayQuery = new HolidaysQuery();
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            typeId: String(request.typeId),
+            startDate: new Date (request.startDate).toISOString().slice(0,10),
+            endDate: new Date(request.endDate).toISOString().slice(0,10),
+            justificationFile: request.justificationFile,
+            reason: request.reason,
+            isAnnual: true
+        }
+    });
+    const editRequest = useMutation({
+        mutationFn: (data:{request: Omit<HolidayRequest, "id" | "requestedDays" | "status">, id:number})=>holidayQuery.editRequest(data),
         onSuccess: ()=>{
-            toast.success("Votre demande d'absence a été soumise avec succès !");
-            form.reset();
+            toast.success("Votre requête a été mise à jour avec succès !");
+            openChange(false);
         },
         onError: (error)=>{
             toast.error(error.message);
         }
-    });
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            typeId: "",
-            startDate: "",
-            endDate: "",
-            justificationFile: undefined,
-            reason: "",
-            isAnnual: false
-        }
-    });
+    })
     function onSubmit(values: z.infer<typeof formSchema>){
-        sendLeaveRequest.mutate({typeId: Number(values.typeId), startDate: new Date(values.startDate), endDate: new Date(values.endDate), justificationFile: values.justificationFile, reason: values.reason, createdAt: new Date(), userId: user?.id ?? 0})
-        //console.log(values);
-    }
+            editRequest.mutate(
+                {
+                    request:{typeId:Number(values.typeId), startDate: new Date(values.startDate), endDate: new Date(values.endDate), justificationFile: values.justificationFile, reason: values.reason, createdAt: new Date(), userId: user?.id ?? 0}, 
+                    id: request.id})
+            //console.log(values);
+        }
   return (
-    <div className="flex flex-col gap-4 sm:gap-6">
-        <Header variant={"accent"} title="Créer une demande d'absence" />
-        <div className="card-1">
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-col-1 gap-4 max-w-lg">
-                    <FormField control={form.control} name="typeId" render={({field})=>(
-                        <FormItem>
-                            <FormLabel>{"Type d'absence"}</FormLabel>
-                            <FormControl>
-                                <Select defaultValue={field.value} onValueChange={field.onChange}>
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Sélectionner un type"/>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {demoHolidayTypes.map((type)=>(
+    <Dialog open={isOpen} onOpenChange={openChange}>
+      <DialogContent>
+        <DialogHeader className="bg-accent">
+          <DialogTitle className="text-white">{"Modifier ma demande"}</DialogTitle>
+          <DialogDescription className="text-neutral-100">
+            {"Change les informations relatives à ma demande"}
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+                <FormField control={form.control} name="typeId" render={({field})=>(
+                    <FormItem>
+                        <FormLabel>{"Type d'absence"}</FormLabel>
+                        <FormControl>
+                            <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Sélectionner un type"/>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {demoHolidayTypes.map((type)=>(
                                             <SelectItem key={type.id} value={String(type.id)}>{type.label}</SelectItem>
                                         ))}
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )} />
-                    <FormField control={form.control} name="startDate" render={({field})=>(
+                                </SelectContent>
+                            </Select>
+                        </FormControl>
+                        <FormMessage/>
+                    </FormItem>
+                )} />
+                <FormField control={form.control} name="startDate" render={({field})=>(
                         <FormItem>
                             <FormLabel>{"Date de début"}</FormLabel>
                             <FormControl>
@@ -231,12 +255,15 @@ function Page() {
                             <FormMessage/>
                         </FormItem>
                     )} />
-                    <Button type="submit" disabled={sendLeaveRequest.isPending} isLoading={sendLeaveRequest.isPending}>{"Soumettre"}</Button>
-                </form>
-            </Form>
-        </div>
-    </div>
-  )
+                    <DialogFooter>
+                        <Button type="submit" isLoading={editRequest.isPending} disabled={editRequest.isPending}>{"Modifier"}</Button>
+                        <Button type="reset" variant={"outline"} onClick={(e)=>{e.preventDefault(); form.reset(); openChange(prev=>!prev)}} disabled={editRequest.isPending}>{"Annuler"}</Button>
+                    </DialogFooter>
+            </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
-export default Page
+export default EditLeaveRequest;
