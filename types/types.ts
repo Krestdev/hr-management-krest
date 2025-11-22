@@ -120,3 +120,14 @@ export interface PresenceRecord {
   createdAt: Date;
   updatedAt?: Date;
 }
+
+//bulletin de paie
+export type Payslip = {
+  id: number;
+  month: number; // 1-12
+  year: number;
+  downloads: number;
+  fileUrl: string;
+  createdAt: Date; // pour le filtrage
+};
+

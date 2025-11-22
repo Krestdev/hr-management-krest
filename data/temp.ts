@@ -1,4 +1,4 @@
-import { Employee, EmployeeLeaveBalance, HolidayRequest, HolidayType } from "@/types/types";
+import { Employee, EmployeeLeaveBalance, HolidayRequest, HolidayType, Payslip } from "@/types/types";
 
 // --- Base d'utilisateurs fictifs ---
 export const demoUsers: Array<Employee> = [
@@ -431,5 +431,72 @@ export const demoHolidayRequests: HolidayRequest[] = [
     requestedDays: 2,
     status: "PENDING_HR",
     createdAt: new Date("2025-09-25"),
+  },
+];
+
+export const demoPayslips: Payslip[] = [
+  {
+    id: 1,
+    month: 12,
+    year: 2024,
+    downloads: 3,
+    fileUrl: "/uploads/bulletins/2024-12.pdf",
+    createdAt: new Date("2024-12-05"),
+  },
+  {
+    id: 2,
+    month: 11,
+    year: 2024,
+    downloads: 2,
+    fileUrl: "/uploads/bulletins/2024-11.pdf",
+    createdAt: new Date("2024-11-05"),
+  },
+  {
+    id: 3,
+    month: 10,
+    year: 2024,
+    downloads: 1,
+    fileUrl: "/uploads/bulletins/2024-10.pdf",
+    createdAt: new Date("2024-10-05"),
+  },
+  {
+    id: 4,
+    month: 9,
+    year: 2024,
+    downloads: 4,
+    fileUrl: "/uploads/bulletins/2024-09.pdf",
+    createdAt: new Date("2024-09-05"),
+  },
+  {
+    id: 5,
+    month: 8,
+    year: 2024,
+    downloads: 3,
+    fileUrl: "/uploads/bulletins/2024-08.pdf",
+    createdAt: new Date("2024-08-05"),
+  },
+  {
+    id: 6,
+    month: 7,
+    year: 2024,
+    downloads: 2,
+    fileUrl: "/uploads/bulletins/2024-07.pdf",
+    createdAt: new Date("2024-07-05"),
+  },
+  {
+    id: 7,
+    month: 6,
+    year: 2024,
+    downloads: 1,
+    fileUrl: "/uploads/bulletins/2024-06.pdf",
+    createdAt: new Date("2024-06-05"),
+  },
+  {
+    id: 8,
+    month: 5,
+    year: 2024,
+    downloads: 0,
+    fileUrl: "/uploads/bulletins/2024-05.pdf",
+    createdAt: new Date("2024-05-05"),
   },
 ];
