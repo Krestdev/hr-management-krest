@@ -38,12 +38,12 @@ function NotificationItem({id,status, statusType, type="DEFAULT", description, c
 
   return (
     <div className={cn(
-      "px-4 py-2 flex flex-col gap-2 items-center transition-all duration-200 ease-out group", 
+      "max-w-3xl w-full rounded-lg min-h-16 px-4 py-2 flex flex-col justify-center gap-2 transition-all duration-200 ease-out group", 
       status === "UNREAD" ? "bg-white hover:bg-neutral-50" :
       "bg-neutral-100")}>
       <div className="flex justify-between gap-3 items-center">
         <div className="flex items-center gap-2">
-          <span className={cn("size-8 flex items-center justify-center", iconStyle(statusType))}>
+          <span className={cn("size-8 flex items-center justify-center rounded-md", iconStyle(statusType))}>
             <HugeiconsIcon icon={getIcon(type)} size={20}/>
           </span>
           <p className="text-slate-600 text-sm">{description}</p>
@@ -57,9 +57,9 @@ function NotificationItem({id,status, statusType, type="DEFAULT", description, c
           </Button>
         </div>
       </div>
-      <div className="flex items-center gap-1.5">
-        <Button size={"sm"} variant={"default"}>{"Marquer comme lu"}</Button>
-      </div>
+      {/* <div className="flex items-center gap-1.5">
+        <Button size={"sm"} variant={"outline"}>{"Marquer comme lu"}</Button>
+      </div> */}
     </div>
   )
 }
