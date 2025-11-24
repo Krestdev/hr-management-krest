@@ -24,6 +24,8 @@ import ViewLeaveRequest from './view'
 import EditLeaveRequest from './edit'
 import CancelLeaveRequest from './cancel'
 import Header from '@/components/header'
+import LoadingComponent from '@/components/loading-comp'
+import ErrorComponent from '@/components/error-comp'
 
 export function formatStatusLabel(status: HolidayRequest["status"]) {
   switch (status) {
@@ -62,7 +64,7 @@ function Page() {
       queryKey: ["leaveTypes"],
       queryFn: holidaysQuery.getTypes,
     });
-    const { data, isSuccess } = useQuery({
+    const { data, isSuccess, isLoading, isError } = useQuery({
         queryKey: ["leave-requests", user?.id],
         queryFn: async()=>holidaysQuery.getRequestsByUser(user?.id ?? 0),
         enabled: !!user,
@@ -142,6 +144,13 @@ function Page() {
         new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
     );
 }, [isSuccess, data, statusFilter, dateRange, typeFilter]);
+
+    if(isLoading){
+      return <LoadingComponent/>
+    }
+    if(isError){
+      return <ErrorComponent/>
+    }
 
     if(isSuccess)
   return (

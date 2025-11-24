@@ -131,3 +131,12 @@ export type Payslip = {
   createdAt: Date; // pour le filtrage
 };
 
+export type Notification = {
+  id: number;
+  statusType: "info"|"success"|"warning"|"error";
+  type?: "DEFAULT"| "LEAVE_REQUEST" | "IS_AWAY";
+  status: "UNREAD"| "READ";
+  description: string;
+  createdAt: string;
+  updatedAt?: string;
+}

@@ -34,4 +34,17 @@ export default class UserQuery {
       throw new Error(message);
     }
   };
+  getUser = async (id:number):Promise<{success:boolean; user:Employee}> => {
+    try {
+      const response = await api.get(`${this.route}/${id}`);
+      return response.data;
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message ??
+        error.message ??
+        "Une erreur s'est produite";
+
+      throw new Error(message);
+    }
+  }
 }

@@ -1,5 +1,4 @@
 "use client";
-
 import { DateRangePicker } from "@/components/dateRagePicker";
 import Header from "@/components/header";
 import { Label } from "@/components/ui/label";
@@ -16,16 +15,19 @@ import { DateRange } from "react-day-picker";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Calendar02Icon,
-  Download04Icon,
-  EyeIcon,
 } from "@hugeicons/core-free-icons";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
 import { demoPayslips } from "@/data/temp";
 import PaySlipCard from "@/components/pay-slip";
+import { useQuery } from "@tanstack/react-query";
+import LoadingComponent from "@/components/loading-comp";
+import ErrorComponent from "@/components/error-comp";
 
 
 function Page() {
+  const {data, isLoading, isSuccess, isError} = useQuery({
+    queryKey: ["payslips"],
+    queryFn: async () =>demoPayslips
+  });
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: undefined,
     to: undefined,
@@ -36,20 +38,29 @@ function Page() {
   }
 
   const filteredPayslips = useMemo(() => {
-    if (!dateRange?.from && !dateRange?.to) return demoPayslips;
+    if(!data || !isSuccess) return [];
+    if (!dateRange?.from && !dateRange?.to) return data;
 
     const from = dateRange.from;
     const to = dateRange.to;
 
-    return demoPayslips.filter((p) => {
+    return data.filter((p) => {
       const d = p.createdAt;
       if (from && !to) return d >= from;
       if (!from && to) return d <= to;
       if (from && to) return d >= from && d <= to;
       return true;
     });
-  }, [dateRange]);
+  }, [dateRange, data, isSuccess]);
 
+  if(isLoading){
+    return (
+      <LoadingComponent/>
+    )
+  }
+  if(isError){
+    return <ErrorComponent/>
+  }
   return (
     <div className="grid gap-4 sm:gap-6">
       <Header variant={"primary"} title="Mes Bulletins de Paie" />
