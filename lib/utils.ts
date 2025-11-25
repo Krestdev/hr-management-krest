@@ -42,3 +42,19 @@ export const PRESENCE_FLAGS: { value: PresenceFlag; label: string }[] = [
   { value: "FIELD", label: "Terrain" },
   { value: "ON_LEAVE", label: "Congé" },
 ];
+
+export function getYearsOfService(startDate: Date | string): number {
+  const start = typeof startDate === "string" ? new Date(startDate) : startDate;
+  const now = new Date();
+  const diff = now.getTime() - start.getTime();
+  const years = diff / (1000 * 60 * 60 * 24 * 365.25);
+  return Math.max(0, years);
+}
+
+export function formatSalary(amount: number): string {
+  return new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: "XAF",
+    maximumFractionDigits: 0,
+  }).format(amount);
+}

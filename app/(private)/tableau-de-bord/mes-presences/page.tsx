@@ -83,7 +83,7 @@ function Page() {
   return (
     <div className="grid gap-4 sm:gap-6">
         <Header variant={"primary"} title="Mes Présences"/>
-        <div className="card-1 w-full overflow-x-auto">
+        <div className="card-1">
             <div className="card-1-header2">
                 <h3>{"Présences"}</h3>
                 <div className="filters">

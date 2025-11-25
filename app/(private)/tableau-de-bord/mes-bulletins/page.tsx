@@ -68,8 +68,8 @@ function Page() {
       <div className="card-1">
         <div className="card-1-header2">
           <h3>{"Liste"}</h3>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
+          <div className="filters">
+            <div className="filter-group">
               <Label htmlFor="date">{"Période"}</Label>
               <DateRangePicker
                 date={dateRange}

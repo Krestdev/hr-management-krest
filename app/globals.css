@@ -156,7 +156,7 @@
     @apply flex flex-col gap-1 items-center;
   }
   .card-1 {
-    @apply px-6 py-4 flex flex-col gap-4 rounded-xl bg-white shadow-2xs border border-neutral-200;
+    @apply w-full overflow-x-auto px-6 py-4 flex flex-col gap-4 rounded-xl bg-white shadow-2xs border border-neutral-200;
   }
   .card-1-header {
     @apply w-full flex flex-col gap-0.5 pb-3 border-b border-neutral-200;

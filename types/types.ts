@@ -136,6 +136,7 @@ export type Notification = {
   statusType: "info"|"success"|"warning"|"error";
   type?: "DEFAULT"| "LEAVE_REQUEST" | "IS_AWAY";
   status: "UNREAD"| "READ";
+  title: string;
   description: string;
   createdAt: string;
   updatedAt?: string;
