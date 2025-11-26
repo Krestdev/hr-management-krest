@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getInitials } from "@/lib/utils";
+import { formatSeniority, getInitials } from "@/lib/utils";
 import { Employee } from "@/types/types";
 import { format } from "date-fns";
 import React from "react";
@@ -153,6 +153,10 @@ function ViewProfile({ isOpen, openChange, employee, users }: Props) {
             <div className="flex flex-col gap-0.5">
               <span className="text-slate-600">{"Contrat"}</span>
               <span className="font-medium">{employee.contractType}</span>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-slate-600">{"Ancienneté"}</span>
+              <span className="font-medium">{formatSeniority(employee.startDate)}</span>
             </div>
             <div className="flex flex-col gap-0.5">
               <span className="text-slate-600">{"Date de début"}</span>

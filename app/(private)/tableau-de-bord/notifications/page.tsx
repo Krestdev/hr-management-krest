@@ -22,6 +22,7 @@ import { DateRange } from "react-day-picker";
 import { DateRangePicker } from "@/components/dateRagePicker";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 function Page() {
   const { data, isSuccess, isLoading, isError, error } = useQuery({
@@ -91,7 +92,8 @@ function Page() {
   };
 
   const resetFilters = () => {
-    
+    setTypeFilter("all");
+    setDateRange(undefined);
   }
 
   const all = filteredData;
@@ -156,6 +158,7 @@ function Page() {
                   onChange={setDateRange}
                   className="min-w-40"/>
             </div>
+            <Button onClick={resetFilters} variant={"outline"}>{"Réinitialiser"}</Button>
           </div>
         </div>
         <Tabs defaultValue="all">

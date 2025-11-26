@@ -51,6 +51,17 @@ export function getYearsOfService(startDate: Date | string): number {
   return Math.max(0, years);
 }
 
+export function formatSeniority(startDate: Date | string): string {
+const years = getYearsOfService(startDate);
+
+if (years < 1) return "Moins d'un an";
+if (years < 2) return "1 an";
+if (years < 3) return "2 ans";
+if (years < 5) return `${Math.floor(years)} ans`;
+if (years < 10) return "Entre 5 et 10 ans";
+return "Plus de 10 ans";
+}
+
 export function formatSalary(amount: number): string {
   return new Intl.NumberFormat("fr-FR", {
     style: "currency",
@@ -58,3 +69,4 @@ export function formatSalary(amount: number): string {
     maximumFractionDigits: 0,
   }).format(amount);
 }
+

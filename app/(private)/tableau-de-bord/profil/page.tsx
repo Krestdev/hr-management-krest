@@ -3,7 +3,7 @@ import Header from '@/components/header'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import useKizunaStore from '@/context/store'
-import { getInitials } from '@/lib/utils';
+import { formatSeniority, getInitials, getYearsOfService } from '@/lib/utils';
 import UserQuery from '@/queries/users';
 import { Edit03Icon, FileAttachmentIcon, Profile02Icon, UserAccountIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
@@ -148,6 +148,12 @@ function Page() {
             <span className="text-slate-600">{"Contrat"}</span>
             <span className="font-medium">
               {user?.contractType}
+            </span>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-slate-600">{"Ancienneté"}</span>
+            <span className="font-medium">
+              { user?.startDate && formatSeniority(user.startDate)}
             </span>
           </div>
           <div className="flex flex-col gap-0.5">

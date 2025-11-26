@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import useKizunaStore from '@/context/store'
-import { formatSalary, getYearsOfService } from '@/lib/utils'
+import { formatSalary, formatSeniority, getYearsOfService } from '@/lib/utils'
 import UserQuery from '@/queries/users'
 import { AddSquareIcon, UserAccountIcon, UserBlock02Icon, UserEdit01Icon, UserGroupIcon, UserRemove01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -19,39 +19,17 @@ import { EllipsisIcon } from 'lucide-react'
 import React, { useEffect, useMemo, useState } from 'react'
 import ViewProfile from './view-profile'
 import { Employee } from '@/types/types'
+import EditProfile from './edit-profile'
 
-type LengthOfService = "all" | "less1" | "1to3" | "3to5" | "5to10" | "over10";
+type LengthOfService = "under" | "over" | "equal";
 
 
-function formatSeniority(startDate: Date | string): string {
-const years = getYearsOfService(startDate);
-
-if (years < 1) return "Moins d'un an";
-if (years < 2) return "1 an";
-if (years < 3) return "2 ans";
-if (years < 5) return `${Math.floor(years)} ans`;
-if (years < 10) return "Entre 5 et 10 ans";
-return "Plus de 10 ans";
-}
-
-function matchYearsFilter(startDate: Date | string, filter: LengthOfService): boolean {
-if (filter === "all") return true;
-const years = getYearsOfService(startDate);
-
-switch (filter) {
-  case "less1":
-    return years < 1;
-  case "1to3":
-    return years >= 1 && years < 3;
-  case "3to5":
-    return years >= 3 && years < 5;
-  case "5to10":
-    return years >= 5 && years < 10;
-  case "over10":
-    return years >= 10;
-  default:
-    return true;
-}
+function matchYearsFilter(startDate: Date | string, filterType: LengthOfService, filter:number): boolean {
+const years = Math.floor(getYearsOfService(startDate));
+//console.log(years);
+if(filterType === "equal") return years === filter;
+if(filterType === "over") return years > filter;
+return years < filter ;
 }
 
 function Page() {
@@ -101,12 +79,14 @@ function Page() {
 
   const [searchValue, setSearchValue] = useState<string>("");
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
-  const [years, setYears] = useState<LengthOfService>("all");
+  const [yearsFilter, setYearsFilter] = useState<LengthOfService>("over");
+  const [years, setYears] = useState<number>(0);
 
   function resetFilters(){
     setSearchValue("");
     setDepartmentFilter("all");
-    setYears("all");
+    setYearsFilter("over");
+    setYears(0);
   }
 
   const filteredData = useMemo(() => {
@@ -125,14 +105,14 @@ function Page() {
           employee.department === departmentFilter;
 
         // filtre ancienneté
-        const matchYears = matchYearsFilter(employee.startDate, years);
+        const matchYears = matchYearsFilter(employee.startDate, yearsFilter, years);
 
         return matchSearch && matchDepartment && matchYears;
       })
       .sort((a, b) =>
         a.lastName.localeCompare(b.lastName, "fr", { sensitivity: "base" })
       );
-  }, [isSuccess, data, searchValue, departmentFilter, years]);
+  }, [isSuccess, data, searchValue, departmentFilter, yearsFilter, years]);
 
   if(isLoading){
     return <LoadingComponent/>
@@ -185,21 +165,19 @@ function Page() {
               <Label htmlFor="years">{"Ancienneté"}</Label>
               <Select
                 name="years"
-                value={years}
-                onValueChange={(val) => setYears(val as LengthOfService)}
+                value={yearsFilter}
+                onValueChange={(val) => setYearsFilter(val as LengthOfService)}
               >
                 <SelectTrigger className="min-w-32">
-                  <SelectValue placeholder="Tous" />
+                  <SelectValue placeholder="Sélectionner" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{"Tous"}</SelectItem>
-                  <SelectItem value="less1">{"Moins d'1 an"}</SelectItem>
-                  <SelectItem value="1to3">{"1 à 3 ans"}</SelectItem>
-                  <SelectItem value="3to5">{"3 à 5 ans"}</SelectItem>
-                  <SelectItem value="5to10">{"5 à 10 ans"}</SelectItem>
-                  <SelectItem value="over10">{"Plus de 10 ans"}</SelectItem>
+                  <SelectItem value="over">{"Plus de"}</SelectItem>
+                  <SelectItem value="under">{"Moins de"}</SelectItem>
+                  <SelectItem value="equal">{"Egal à"}</SelectItem>
                 </SelectContent>
               </Select>
+              <Input type="number" value={years} onChange={(e)=>{setYears(Number(e.target.value))}} placeholder='ex 1' className="w-20" />
             </div>
           </div>
         </div>
@@ -261,18 +239,18 @@ function Page() {
                         <DropdownMenuItem onClick={()=>viewSelected(employee)}>
                           <HugeiconsIcon icon={UserAccountIcon} />{"Voir le profil"}
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={()=>editSelected(employee)}>
                           <HugeiconsIcon icon={UserEdit01Icon} />{"Modifier le profil"}
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={()=>{}}>
                           <HugeiconsIcon icon={AddSquareIcon} />{"Ajouter le DIPE"}
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={()=>suspendSelected(employee)}>
                           <HugeiconsIcon icon={UserBlock02Icon} />{"Suspendre"}
                         </DropdownMenuItem>
                         {
                           user?.role === "MANAGER" &&
-                          <DropdownMenuItem variant="destructive">
+                          <DropdownMenuItem variant="destructive" onClick={()=>deleteSelected(employee)}>
                           <HugeiconsIcon icon={UserRemove01Icon} />{"Supprimer"}
                         </DropdownMenuItem>
                         }
@@ -286,8 +264,11 @@ function Page() {
         </Table>
       </div>
       {
-        selected &&
+        selected && 
+        <>
         <ViewProfile isOpen={openProfile} openChange={setOpenProfile} employee={selected} users={data}/>
+        <EditProfile isOpen={viewEdit} openChange={setViewEdit} employee={selected} users={data}/>
+        </>
       }
     </div>
   )
