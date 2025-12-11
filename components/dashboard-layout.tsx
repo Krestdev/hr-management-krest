@@ -4,9 +4,11 @@ import { AppSidebar } from "@/components/app-sidebar"
 import NavigationBreadcrumb from "./breadcrumb-main"
 import { Button } from "./ui/button"
 import useKizunaStore from "@/context/store"
+import { useRouter } from "next/navigation"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { logout } = useKizunaStore();
+  const router = useRouter();
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -16,7 +18,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <SidebarTrigger />
             <NavigationBreadcrumb/>
           </div>
-          <Button onClick={()=>logout()}>{"Déconnexion"}</Button>
+          <Button onClick={()=>{logout(); router.push("/")}}>{"Déconnexion"}</Button>
         </div>
         <div className="flex-1 p-6">
           {children}

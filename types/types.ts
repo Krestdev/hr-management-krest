@@ -18,7 +18,7 @@ export type Employee = {
   phone: string;
   maritalStatus: "Célibataire" | "Marié"; // | "Divorcé" | "Veuf"
   childrenCount: number;
-  emergencyContact: string;
+  emergencyContact?: string;
   // -----------------------------
   // 2️⃣ Informations administratives
   // -----------------------------
@@ -36,7 +36,7 @@ export type Employee = {
   department: string; // département / service
   supervisorId?: number | null; // employé supérieur hiérarchique
   category: string; // catégorie professionnelle
-  level: string; // grade
+  level: string; // Échelon
   startDate: Date; // date d'entrée
   endDate?: Date; // date de fin (si CDD)
   contractType: "CDI" | "CDD" | "Stage" | "Prestation" | "Essai";

@@ -139,7 +139,7 @@ function Page() {
             </span>
           </div>
           <div className="flex flex-col gap-0.5">
-            <span className="text-slate-600">{"Grade"}</span>
+            <span className="text-slate-600">{"Echelon"}</span>
             <span className="font-medium">
               {user?.level}
             </span>

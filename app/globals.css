@@ -173,4 +173,7 @@
   .filters {
     @apply flex flex-wrap items-center gap-3;
   }
+  .custom-label {
+    @apply absolute right-0 bottom-0 text-sm min-w-14 px-3 gap-1 inline-flex items-center h-10 bg-primary-500 text-primary-50 justify-center rounded-r-md;
+  }
 }

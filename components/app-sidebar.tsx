@@ -14,7 +14,7 @@ import Link from "next/link"
 import { BASE_ROUTES } from "@/data/config"
 import { HugeiconsIcon } from "@hugeicons/react"
 import Logo from "./logo"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { MoreVerticalIcon } from "@hugeicons/core-free-icons"
@@ -23,6 +23,7 @@ import { getInitials } from "@/lib/utils"
 
 export function AppSidebar() {
   const path = usePathname();
+  const router = useRouter();
   const { user, logout } = useKizunaStore();
   const navigation = user?.role === "USER" ? BASE_ROUTES.filter((r)=>r.isAdmin !== true) : BASE_ROUTES
   return (
@@ -67,7 +68,7 @@ export function AppSidebar() {
               <HugeiconsIcon icon={MoreVerticalIcon}/>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem onClick={()=>logout()} variant="destructive" className="cursor-pointer">{"Se déconnecter"}</DropdownMenuItem>
+              <DropdownMenuItem onClick={()=>{logout(); router.push("/")}} variant="destructive" className="cursor-pointer">{"Se déconnecter"}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

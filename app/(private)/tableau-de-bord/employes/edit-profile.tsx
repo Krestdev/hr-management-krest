@@ -1,4 +1,5 @@
 'use client'
+import EmployeeForm from '@/components/employee-form';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Employee } from '@/types/types';
 import React from 'react'
@@ -13,12 +14,14 @@ type Props = {
 function EditProfile({isOpen, openChange, employee, users}:Props) {
   return (
     <Dialog open={isOpen} onOpenChange={openChange}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-3xl">
             <DialogHeader>
                 <DialogTitle>{"Modifier le profil"}</DialogTitle>
                 <DialogDescription/>
             </DialogHeader>
-            <div className="grid gap-4 @container"></div>
+            <div className="grid gap-4">
+              <EmployeeForm employee={employee} users={users} />
+            </div>
         </DialogContent>
     </Dialog>
   )
