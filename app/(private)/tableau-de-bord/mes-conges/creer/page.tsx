@@ -14,6 +14,7 @@ import HolidaysQuery from '@/queries/holidays'
 import { HolidayRequest } from '@/types/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
+import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import React from 'react'
 import { useForm } from 'react-hook-form'
@@ -137,7 +138,7 @@ function Page() {
                                             captionLayout="dropdown"
                                             onSelect={(date) => {
                                                 if (!date) return;
-                                                const value = date.toISOString().slice(0, 10); // "YYYY-MM-DD"
+                                                const value = format(date, "yyyy-MM-dd")
                                                 field.onChange(value);
                                                 setStartView(false);
                                             }}
@@ -192,7 +193,7 @@ function Page() {
                                             captionLayout="dropdown"
                                             onSelect={(date) => {
                                                 if (!date) return;
-                                                const value = date.toISOString().slice(0, 10); // "YYYY-MM-DD"
+                                                const value = format(date, "yyyy-MM-dd")
                                                 field.onChange(value);
                                                 setStartView(false);
                                             }}
