@@ -1,11 +1,12 @@
+import { string } from "zod";
 
 export type Employee = {
   id: number;
   updatedAt?: Date;
   createdAt: Date;
-  photo?:string;
-  password?:string;
-  role:"MANAGER"| "HR" | "USER"
+  photo?: string;
+  password?: string;
+  role: "MANAGER" | "HR" | "USER";
   //Form
   firstName: string;
   lastName: string;
@@ -56,18 +57,19 @@ export type Employee = {
     | string;
   workLocationName?: string; // si lieu = "Autre"
   leaveDays: number; // droit de congé annuel
+  autorizedLeaves: number[]; // type de congés autorisés
   attachments?: File[] | string[]; // fichiers joints (contrat, etc.)
 };
 export type HolidayRequestStatus =
-  | "PENDING_MANAGER"   // en attente du supérieur
-  | "PENDING_HR"        // validé sup, en attente RH
+  | "PENDING_MANAGER" // en attente du supérieur
+  | "PENDING_HR" // validé sup, en attente RH
   | "ACCEPTED"
   | "REJECTED";
 
-  export interface HolidayType {
+export interface HolidayType {
   id: number;
   label: string; // affichage UI
-  code: string;  // identifiant technique (ex: "ANNUAL")
+  code: string; // identifiant technique (ex: "ANNUAL")
   requiresDocument?: boolean;
   subtractFromBalance: boolean; // impact sur solde ?
   maxDaysPerYear?: number;
@@ -98,10 +100,12 @@ export interface EmployeeLeaveBalance {
 
 export type PresenceFlag =
   | "PRESENT"
-  | "LATE"
-  | "ABSENT"
   | "EXCEPTIONAL"
+  | "VALID"
+  | "ABSENT"
+  | "LATE"
   | "FIELD"
+  | "EXCUSED"
   | "ON_LEAVE";
 
 export interface PresenceRecord {
@@ -133,11 +137,87 @@ export type Payslip = {
 
 export type Notification = {
   id: number;
-  statusType: "info"|"success"|"warning"|"error";
-  type?: "DEFAULT"| "LEAVE_REQUEST" | "IS_AWAY";
-  status: "UNREAD"| "READ";
+  statusType: "info" | "success" | "warning" | "error";
+  type?: "DEFAULT" | "LEAVE_REQUEST" | "IS_AWAY";
+  status: "UNREAD" | "READ";
   title: string;
   description: string;
   createdAt: string;
   updatedAt?: string;
-}
+};
+
+export type Files = {
+  id: number;
+  title: string;
+  url: string;
+  userId: number;
+  createdAt: string;
+  updatedAt?: string;
+};
+
+type Montant = {
+  montant: number;
+  type: "INDEMNITE" | "PRIME" | "AVANTAGE";
+  est_taxable: boolean;
+  est_cotisable: boolean;
+};
+
+export type Salarial = {
+  id: number;
+  userId: number;
+  salaire_base: Montant;
+  indem_transport: Montant;
+  indem_representation: Montant;
+  prime_outil: Montant;
+  prime_responsable: Montant;
+  prime_gestion: Montant;
+  logement: Montant;
+  nourriture: Montant;
+  vehicule: Montant;
+  domestique: Montant;
+  electricite: Montant;
+  eau: Montant;
+  carburant: Montant;
+  telephone: Montant;
+  gardiennage: Montant;
+  internet: Montant;
+};
+
+export type LeavesType = {
+  id: number;
+  label: string;
+  value: number;
+  code:
+    | "ANNUAL"
+    | "SICK"
+    | "ERRAND"
+    | "MATERNITY"
+    | "PATERNITY"
+    | "MARRIAGE"
+    | "BREAST-FEEDING"
+    | "BEREAVEMENT";
+  createdAt: Date;
+  updatedAt?: Date;
+};
+
+export type Leaves = {
+  id: number;
+  userId: number;
+  status: "PENDING" | "APPROVED" | "REJECTED" | "COMPLETED" | "IN PROGRESS";
+  type: LeavesType["code"];
+  days: number;
+  reason: string;
+  startDate: Date;
+  endDate: Date;
+  createdAt: Date;
+  updatedAt?: Date;
+};
+
+export type Presence = {
+  id: number;
+  userId: number;
+  date: string;
+  statut: PresenceFlag[];
+  createdAt: string;
+  updatedAt?: string;
+};

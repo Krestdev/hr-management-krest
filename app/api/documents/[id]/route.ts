@@ -1,4 +1,4 @@
-import { demoUsers } from "@/data/temp";
+import { filesData } from "@/data/temp";
 import { NextRequest, NextResponse } from "next/server";
 
 type Params = {
@@ -14,24 +14,24 @@ export async function GET(
   const { id } = await params;
   const numericId = Number(id);
 
-  if (isNaN(numericId)) {
+  if (Number.isNaN(numericId)) {
     return NextResponse.json(
       { success: false, message: "ID invalide" },
       { status: 400 }
     );
   }
 
-  const employee = demoUsers.find((e) => e.id === numericId);
+  const doc = filesData.find((f) => f.id === numericId);
 
-  if (!employee) {
+  if (!doc) {
     return NextResponse.json(
-      { success: false, message: "Employé introuvable" },
+      { success: false, message: "Document introuvable" },
       { status: 404 }
     );
   }
 
   return NextResponse.json({
     success: true,
-    user: employee,
+    item: doc,
   });
 }

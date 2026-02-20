@@ -1,4 +1,16 @@
-import { Employee, EmployeeLeaveBalance, HolidayRequest, HolidayType, Payslip, Notification } from "@/types/types";
+import {
+  Employee,
+  EmployeeLeaveBalance,
+  HolidayRequest,
+  HolidayType,
+  Payslip,
+  Notification,
+  Files,
+  Salarial,
+  Leaves,
+  LeavesType,
+  Presence,
+} from "@/types/types";
 
 // --- Base d'utilisateurs fictifs ---
 export const demoUsers: Array<Employee> = [
@@ -38,6 +50,7 @@ export const demoUsers: Array<Employee> = [
     attachments: [],
     createdAt: new Date(),
     photo: "/samples/admin.png",
+    autorizedLeaves: [1, 2, 3],
   },
   {
     id: 2,
@@ -75,6 +88,7 @@ export const demoUsers: Array<Employee> = [
     attachments: [],
     createdAt: new Date(),
     photo: "/samples/user.png",
+    autorizedLeaves: [1, 4, 5],
   },
   {
     id: 3,
@@ -112,20 +126,49 @@ export const demoUsers: Array<Employee> = [
     attachments: [],
     createdAt: new Date(),
     photo: "/samples/rh.png",
+    autorizedLeaves: [1, 2, 3, 4, 5],
   },
 ];
 
-
-
 export const demoHolidayTypes: HolidayType[] = [
   { id: 1, label: "Congés annuels", code: "ANNUAL", subtractFromBalance: true },
-  { id: 2, label: "Congés paternité", code: "PATERNITY", subtractFromBalance: true },
-  { id: 3, label: "Congés maternité", code: "MATERNITY", subtractFromBalance: true },
+  {
+    id: 2,
+    label: "Congés paternité",
+    code: "PATERNITY",
+    subtractFromBalance: true,
+  },
+  {
+    id: 3,
+    label: "Congés maternité",
+    code: "MATERNITY",
+    subtractFromBalance: true,
+  },
   { id: 4, label: "Congés maladie", code: "SICK", subtractFromBalance: true },
-  { id: 5, label: "Évènements familiaux", code: "FAMILY", subtractFromBalance: true },
-  { id: 6, label: "Formations & études", code: "TRAINING", subtractFromBalance: false },
-  { id: 7, label: "Congés sans solde", code: "UNPAID", subtractFromBalance: false },
-  { id: 8, label: "Congés administratifs", code: "ADMIN", subtractFromBalance: false },
+  {
+    id: 5,
+    label: "Évènements familiaux",
+    code: "FAMILY",
+    subtractFromBalance: true,
+  },
+  {
+    id: 6,
+    label: "Formations & études",
+    code: "TRAINING",
+    subtractFromBalance: false,
+  },
+  {
+    id: 7,
+    label: "Congés sans solde",
+    code: "UNPAID",
+    subtractFromBalance: false,
+  },
+  {
+    id: 8,
+    label: "Congés administratifs",
+    code: "ADMIN",
+    subtractFromBalance: false,
+  },
 ];
 
 // quelques soldes exemple (pour tes cartes : Total, Consommés, Solde)
@@ -508,7 +551,8 @@ export const demoNotifications: Notification[] = [
     type: "LEAVE_REQUEST",
     status: "UNREAD",
     title: "Demande d'absence",
-    description: "Votre demande d’absence du 12/11/2025 au 14/11/2025 a été acceptée.",
+    description:
+      "Votre demande d’absence du 12/11/2025 au 14/11/2025 a été acceptée.",
     createdAt: "2025-11-14T08:15:00Z",
   },
   {
@@ -517,7 +561,8 @@ export const demoNotifications: Notification[] = [
     type: "LEAVE_REQUEST",
     status: "UNREAD",
     title: "Demande d'absence",
-    description: "Votre demande d’absence du 10/11/2025 au 12/11/2025 a été rejetée.",
+    description:
+      "Votre demande d’absence du 10/11/2025 au 12/11/2025 a été rejetée.",
     createdAt: "2025-11-13T15:40:00Z",
   },
   {
@@ -526,7 +571,8 @@ export const demoNotifications: Notification[] = [
     type: "LEAVE_REQUEST",
     status: "UNREAD",
     title: "Demande d'absence",
-    description: "Une nouvelle demande d’absence a été soumise pour vérification.",
+    description:
+      "Une nouvelle demande d’absence a été soumise pour vérification.",
     createdAt: "2025-11-13T10:10:00Z",
   },
   {
@@ -535,7 +581,8 @@ export const demoNotifications: Notification[] = [
     type: "LEAVE_REQUEST",
     status: "READ",
     title: "Demande d'absence",
-    description: "Votre demande d’absence est en attente de validation de votre manager.",
+    description:
+      "Votre demande d’absence est en attente de validation de votre manager.",
     createdAt: "2025-11-12T09:22:00Z",
   },
   {
@@ -634,7 +681,267 @@ export const demoNotifications: Notification[] = [
     type: "DEFAULT",
     status: "UNREAD",
     title: "Document",
-    description: "Un nouveau document administratif est disponible dans votre profil.",
+    description:
+      "Un nouveau document administratif est disponible dans votre profil.",
     createdAt: "2025-11-02T09:00:00Z",
   },
 ];
+
+export const filesData: Files[] = [
+  {
+    id: 1,
+    title: "Contrat de travail",
+    url: "/files/contrat-travail.pdf",
+    userId: 1,
+    createdAt: "2025-02-10T09:30:00Z",
+    updatedAt: "2025-02-12T14:20:00Z",
+  },
+  {
+    id: 2,
+    title: "Rapport mensuel",
+    url: "/files/rapport-mensuel.pdf",
+    userId: 1,
+    createdAt: "2025-01-28T16:45:00Z",
+  },
+  {
+    id: 3,
+    title: "Facture fournisseur",
+    url: "/files/facture-fournisseur.pdf",
+    userId: 2,
+    createdAt: "2025-02-01T11:10:00Z",
+  },
+  {
+    id: 4,
+    title: "Planning RH",
+    url: "/files/planning-rh.xlsx",
+    userId: 3,
+    createdAt: "2025-02-05T08:00:00Z",
+    updatedAt: "2025-02-06T10:15:00Z",
+  },
+  {
+    id: 5,
+    title: "Ndongo Blaise",
+    url: "/files/ndongo-blaise-cv.pdf",
+    userId: 3,
+    createdAt: "2025-02-14T13:00:00Z",
+  },
+];
+
+const m = (
+  montant: number,
+  type: "INDEMNITE" | "PRIME" | "AVANTAGE",
+  est_taxable: boolean,
+  est_cotisable: boolean,
+) => ({
+  montant,
+  type,
+  est_taxable,
+  est_cotisable,
+});
+
+export const salarialData: Salarial[] = [
+  {
+    id: 1,
+    userId: 1,
+    salaire_base: m(250000, "PRIME", true, true),
+    indem_transport: m(20000, "INDEMNITE", false, false),
+    indem_representation: m(15000, "INDEMNITE", false, false),
+    prime_outil: m(10000, "PRIME", true, true),
+    prime_responsable: m(30000, "PRIME", true, true),
+    prime_gestion: m(25000, "PRIME", true, true),
+    logement: m(60000, "AVANTAGE", true, false),
+    nourriture: m(25000, "AVANTAGE", true, false),
+    vehicule: m(50000, "AVANTAGE", true, false),
+    domestique: m(20000, "AVANTAGE", true, false),
+    electricite: m(15000, "AVANTAGE", true, false),
+    eau: m(8000, "AVANTAGE", true, false),
+    carburant: m(30000, "AVANTAGE", true, false),
+    telephone: m(10000, "AVANTAGE", true, false),
+    gardiennage: m(12000, "AVANTAGE", true, false),
+    internet: m(10000, "AVANTAGE", true, false),
+  },
+  {
+    id: 2,
+    userId: 2,
+    salaire_base: m(180000, "PRIME", true, true),
+    indem_transport: m(15000, "INDEMNITE", false, false),
+    indem_representation: m(10000, "INDEMNITE", false, false),
+    prime_outil: m(5000, "PRIME", true, true),
+    prime_responsable: m(0, "PRIME", true, true),
+    prime_gestion: m(0, "PRIME", true, true),
+    logement: m(30000, "AVANTAGE", true, false),
+    nourriture: m(15000, "AVANTAGE", true, false),
+    vehicule: m(0, "AVANTAGE", true, false),
+    domestique: m(0, "AVANTAGE", true, false),
+    electricite: m(8000, "AVANTAGE", true, false),
+    eau: m(5000, "AVANTAGE", true, false),
+    carburant: m(15000, "AVANTAGE", true, false),
+    telephone: m(8000, "AVANTAGE", true, false),
+    gardiennage: m(0, "AVANTAGE", true, false),
+    internet: m(6000, "AVANTAGE", true, false),
+  },
+];
+
+export const leavesData: Leaves[] = [
+  {
+    id: 1,
+    userId: 1,
+    days: 5,
+    status: "COMPLETED",
+    startDate: new Date("2025-01-01"),
+    endDate: new Date("2025-01-05"),
+    createdAt: new Date("2025-01-01"),
+    reason: "Maladies je dois aller à l'hopital",
+    type: "ANNUAL",
+  },
+  {
+    id: 2,
+    userId: 1,
+    days: 3,
+    status: "REJECTED",
+    startDate: new Date("2025-02-01"),
+    endDate: new Date("2025-02-03"),
+    createdAt: new Date("2025-02-01"),
+    reason: "Je dois aller à l'hopital",
+    type: "ANNUAL",
+  },
+  {
+    id: 3,
+    userId: 2,
+    days: 2,
+    status: "APPROVED",
+    startDate: new Date("2025-03-01"),
+    endDate: new Date("2025-03-02"),
+    createdAt: new Date("2025-03-01"),
+    reason: "Congé annuelle",
+    type: "ANNUAL",
+  },
+  {
+    id: 5,
+    userId: 2,
+    days: 2,
+    status: "IN PROGRESS",
+    startDate: new Date("2026-02-16"),
+    endDate: new Date("2026-02-20"),
+    createdAt: new Date("2025-03-01"),
+    reason: "Congé annuelle",
+    type: "ANNUAL",
+  },
+  {
+    id: 4,
+    userId: 3,
+    days: 1,
+    status: "PENDING",
+    startDate: new Date("2026-04-01"),
+    endDate: new Date("2026-04-01"),
+    createdAt: new Date("2026-04-01"),
+    reason: "Congé annuelle",
+    type: "ANNUAL",
+  },
+];
+
+export const leavesTypeData: LeavesType[] = [
+  {
+    id: 1,
+    label: "Congé annuelle",
+    code: "ANNUAL",
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2025-01-01"),
+    value: 24,
+  },
+  {
+    id: 2,
+    label: "Congé maladie",
+    code: "SICK",
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2025-01-01"),
+    value: 3,
+  },
+  {
+    id: 3,
+    label: "Congé de maternité",
+    code: "MATERNITY",
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2025-01-01"),
+    value: 90,
+  },
+  {
+    id: 4,
+    label: "Congé de paternité",
+    code: "PATERNITY",
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2025-01-01"),
+    value: 3,
+  },
+  {
+    id: 5,
+    label: "Congé de mariage",
+    code: "MARRIAGE",
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2025-01-01"),
+    value: 3,
+  },
+  {
+    id: 6,
+    label: "Congé de deuil",
+    code: "BEREAVEMENT",
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2025-01-01"),
+    value: 3,
+  },
+  {
+    id: 7,
+    label: "Congé d'allaitement",
+    code: "BREAST-FEEDING",
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2025-01-01"),
+    value: 3,
+  },
+  {
+    id: 8,
+    label: "Congé de commission",
+    code: "ERRAND",
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2025-01-01"),
+    value: 1,
+  },
+];
+
+export const presencesData: Presence[] = [
+  {
+    id: 1,
+    userId: 1,
+    date: "2026-02-15T00:00:00.000Z",
+    statut: ["PRESENT", "VALID"],
+    createdAt: "2026-02-15T08:00:00.000Z",
+  },
+  {
+    id: 2,
+    userId: 1,
+    date: "2026-02-16T00:00:00.000Z",
+    statut: ["LATE"],
+    createdAt: "2026-02-16T08:00:00.000Z",
+  },
+  {
+    id: 3,
+    userId: 2,
+    date: "2026-02-16T00:00:00.000Z",
+    statut: ["ON_LEAVE"],
+    createdAt: "2026-02-16T08:00:00.000Z",
+  },
+  {
+    id: 4,
+    userId: 3,
+    date: "2026-02-16T00:00:00.000Z",
+    statut: ["ABSENT", "EXCUSED"],
+    createdAt: "2026-02-16T08:00:00.000Z",
+  },
+  {
+    id: 5,
+    userId: 2,
+    date: "2026-02-17T00:00:00.000Z",
+    statut: ["FIELD"],
+    createdAt: "2026-02-17T08:00:00.000Z",
+  },
+];
+

@@ -18,7 +18,9 @@ function NavigationBreadcrumb() {
   const pathSegments = pathname.split("/").filter((segment) => segment);
 
   const formatSegment = (segment: string) => {
-    return segment.split("-").join(" ");
+    return decodeURIComponent(segment) // décode %20, %C3%A9, etc.
+      .split("-")
+      .join(" ");
   };
 
   // Rien à afficher pour "/"
@@ -45,10 +47,7 @@ function NavigationBreadcrumb() {
                     </BreadcrumbPage>
                   ) : (
                     <BreadcrumbLink asChild>
-                      <Link
-                        href={href}
-                        className="first-letter:uppercase"
-                      >
+                      <Link href={href} className="first-letter:uppercase">
                         {formattedSegment}
                       </Link>
                     </BreadcrumbLink>
@@ -63,9 +62,7 @@ function NavigationBreadcrumb() {
           <>
             {/* Ellipsis qui pointe vers le parent de l’avant-dernier, ou la racine si besoin */}
             <BreadcrumbItem>
-              <BreadcrumbLink
-                asChild
-              >
+              <BreadcrumbLink asChild>
                 <Link
                   href={
                     "/" +
@@ -75,7 +72,7 @@ function NavigationBreadcrumb() {
                   }
                   className="first-letter:uppercase"
                 >
-                  <BreadcrumbEllipsis className="size-4"/>
+                  <BreadcrumbEllipsis className="size-4" />
                 </Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
@@ -85,12 +82,7 @@ function NavigationBreadcrumb() {
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
                 <Link
-                  href={
-                    "/" +
-                    pathSegments
-                      .slice(0, length - 1)
-                      .join("/")
-                  }
+                  href={"/" + pathSegments.slice(0, length - 1).join("/")}
                   className="first-letter:uppercase"
                 >
                   {formatSegment(pathSegments[length - 2])}

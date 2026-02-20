@@ -49,9 +49,7 @@ export default function Component() {
                   </StepperTitle>
                   <div>
                     <Badge
-                      variant="primary"
-                      size="sm"
-                      appearance="light"
+                      variant="default"
                       className="hidden group-data-[state=active]/step:inline-flex"
                     >
                       In Progress
@@ -59,8 +57,6 @@ export default function Component() {
 
                     <Badge
                       variant="success"
-                      size="sm"
-                      appearance="light"
                       className="hidden group-data-[state=completed]/step:inline-flex"
                     >
                       Completed
@@ -68,7 +64,6 @@ export default function Component() {
 
                     <Badge
                       variant="secondary"
-                      size="sm"
                       className="hidden group-data-[state=inactive]/step:inline-flex text-muted-foreground"
                     >
                       Pending

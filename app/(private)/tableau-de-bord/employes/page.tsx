@@ -1,43 +1,97 @@
-'use client'
-import ErrorComponent from '@/components/error-comp'
-import Header from '@/components/header'
-import LoadingComponent from '@/components/loading-comp'
-import { Button } from '@/components/ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import useKizunaStore from '@/context/store'
-import { formatSalary, formatSeniority, getYearsOfService } from '@/lib/utils'
-import UserQuery from '@/queries/users'
-import { AddSquareIcon, UserAccountIcon, UserBlock02Icon, UserEdit01Icon, UserGroupIcon, UserRemove01Icon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { useQuery } from '@tanstack/react-query'
-import { EllipsisIcon } from 'lucide-react'
-import React, { useEffect, useMemo, useState } from 'react'
-import ViewProfile from './view-profile'
-import { Employee } from '@/types/types'
-import EditProfile from './edit-profile'
+"use client";
+import ErrorComponent from "@/components/error-comp";
+import Header from "@/components/header";
+import LoadingComponent from "@/components/loading-comp";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import useKizunaStore from "@/context/store";
+import { formatSalary, formatSeniority, getYearsOfService } from "@/lib/utils";
+import UserQuery from "@/queries/users";
+import {
+  AddSquareIcon,
+  PlusSignSquareIcon,
+  UserAccountIcon,
+  UserBlock02Icon,
+  UserEdit01Icon,
+  UserGroupIcon,
+  UserRemove01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { useQuery } from "@tanstack/react-query";
+import { EllipsisIcon } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import ViewProfile from "./view-profile";
+import { Employee } from "@/types/types";
+import EditProfile from "./edit-profile";
+import Link from "next/link";
+import WarningModal from "@/components/WarningModal";
+import { toast } from "sonner";
+import AddDipe from "./add-dipe";
+import SalarialQuery from "@/queries/salarials";
 
 type LengthOfService = "under" | "over" | "equal";
 
-
-function matchYearsFilter(startDate: Date | string, filterType: LengthOfService, filter:number): boolean {
-const years = Math.floor(getYearsOfService(startDate));
-//console.log(years);
-if(filterType === "equal") return years === filter;
-if(filterType === "over") return years > filter;
-return years < filter ;
+function matchYearsFilter(
+  startDate: Date | string,
+  filterType: LengthOfService,
+  filter: number,
+): boolean {
+  const years = Math.floor(getYearsOfService(startDate));
+  //console.log(years);
+  if (filterType === "equal") return years === filter;
+  if (filterType === "over") return years > filter;
+  return years < filter;
 }
 
 function Page() {
   const { user } = useKizunaStore();
   const usersQuery = new UserQuery();
+  const dipeQuery = new SalarialQuery();
+
   const { data, isSuccess, isLoading, isError, error } = useQuery({
     queryKey: ["employees"],
-    queryFn: usersQuery.getAll
+    queryFn: usersQuery.getAll,
+  });
+
+  const {
+    data: salarialData,
+    isSuccess: isSuccessSalarial,
+    isLoading: isLoadingSalarial,
+    isError: isErrorSalarial,
+    error: errorSalarial,
+  } = useQuery({
+    queryKey: ["salarials"],
+    queryFn: dipeQuery.getAll,
   });
 
   const [departments, setDepartments] = useState<Array<string>>([]);
@@ -46,43 +100,45 @@ function Page() {
   const [viewEdit, setViewEdit] = useState(false);
   const [viewSuspend, setViewSuspend] = useState(false);
   const [viewDelete, setViewDelete] = useState(false);
+  const [openAddDipe, setOpenAddDipe] = useState(false);
 
-  function viewSelected (e:Employee):void{
+  function viewSelected(e: Employee): void {
     setSelected(e);
     setOpenProfile(true);
   }
-  function editSelected (e:Employee):void{
+  function editSelected(e: Employee): void {
     setSelected(e);
     setViewEdit(true);
   }
-  function suspendSelected (e:Employee):void{
+  function suspendSelected(e: Employee): void {
     setSelected(e);
     setViewSuspend(true);
   }
-  function deleteSelected (e:Employee):void{
+  function deleteSelected(e: Employee): void {
     setSelected(e);
     setViewDelete(true);
   }
 
-  useEffect(()=>{
+  function openDipe(e: Employee): void {
+    setSelected(e);
+    setOpenAddDipe(true);
+  }
+
+  useEffect(() => {
     if (isSuccess && data) {
       const uniqueDepartments = Array.from(
-        new Set(
-          data
-            .map((user) => user.department)
-            .filter(Boolean)
-        )
+        new Set(data.map((user) => user.department).filter(Boolean)),
       );
       setDepartments(uniqueDepartments);
     }
-  },[isSuccess, data]);
+  }, [isSuccess, data]);
 
   const [searchValue, setSearchValue] = useState<string>("");
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
   const [yearsFilter, setYearsFilter] = useState<LengthOfService>("over");
   const [years, setYears] = useState<number>(0);
 
-  function resetFilters(){
+  function resetFilters() {
     setSearchValue("");
     setDepartmentFilter("all");
     setYearsFilter("over");
@@ -95,7 +151,8 @@ function Page() {
     return data
       .filter((employee) => {
         // recherche sur nom + prénom
-        const fullName = `${employee.firstName} ${employee.lastName}`.toLowerCase();
+        const fullName =
+          `${employee.firstName} ${employee.lastName}`.toLowerCase();
         const query = searchValue.trim().toLowerCase();
         const matchSearch = query === "" || fullName.includes(query);
 
@@ -105,22 +162,29 @@ function Page() {
           employee.department === departmentFilter;
 
         // filtre ancienneté
-        const matchYears = matchYearsFilter(employee.startDate, yearsFilter, years);
+        const matchYears = matchYearsFilter(
+          employee.startDate,
+          yearsFilter,
+          years,
+        );
 
         return matchSearch && matchDepartment && matchYears;
       })
       .sort((a, b) =>
-        a.lastName.localeCompare(b.lastName, "fr", { sensitivity: "base" })
+        a.lastName.localeCompare(b.lastName, "fr", { sensitivity: "base" }),
       );
   }, [isSuccess, data, searchValue, departmentFilter, yearsFilter, years]);
 
-  if(isLoading){
-    return <LoadingComponent/>
+  if (isLoading || isLoadingSalarial) {
+    return <LoadingComponent />;
   }
-  if(isError){
-    return <ErrorComponent description={error.message}/>
+  if (isError) {
+    return <ErrorComponent description={error.message} />;
   }
-  if(!isSuccess){
+  if (isErrorSalarial) {
+    return <ErrorComponent description={errorSalarial.message} />;
+  }
+  if (!isSuccess || !isSuccessSalarial) {
     return null;
   }
   return (
@@ -177,8 +241,22 @@ function Page() {
                   <SelectItem value="equal">{"Egal à"}</SelectItem>
                 </SelectContent>
               </Select>
-              <Input type="number" value={years} onChange={(e)=>{setYears(Number(e.target.value))}} placeholder='ex 1' className="w-20" />
+              <Input
+                type="number"
+                value={years}
+                onChange={(e) => {
+                  setYears(Number(e.target.value));
+                }}
+                placeholder="ex 1"
+                className="w-20"
+              />
             </div>
+            <Link href={"/tableau-de-bord/employes/ajouter"}>
+              <Button variant={"accent"}>
+                {"Ajouter un employé"}
+                <HugeiconsIcon icon={PlusSignSquareIcon} strokeWidth={2} />
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -210,10 +288,11 @@ function Page() {
                       </EmptyDescription>
                     </EmptyHeader>
                     <EmptyContent>
-                      {
-                        data.length !== 0 &&
-                        <Button variant={"outline"} onClick={resetFilters}>{"Réinitialiser les filtres"}</Button>
-                      }
+                      {data.length !== 0 && (
+                        <Button variant={"outline"} onClick={resetFilters}>
+                          {"Réinitialiser les filtres"}
+                        </Button>
+                      )}
                     </EmptyContent>
                   </Empty>
                 </TableCell>
@@ -232,28 +311,41 @@ function Page() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button size={"icon"} variant={"ghost"}>
-                          <EllipsisIcon/>
+                          <EllipsisIcon />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem onClick={()=>viewSelected(employee)}>
-                          <HugeiconsIcon icon={UserAccountIcon} />{"Voir le profil"}
+                        <DropdownMenuItem
+                          onClick={() => viewSelected(employee)}
+                        >
+                          <HugeiconsIcon icon={UserAccountIcon} />
+                          {"Voir le profil"}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={()=>editSelected(employee)}>
-                          <HugeiconsIcon icon={UserEdit01Icon} />{"Modifier le profil"}
+                        <DropdownMenuItem
+                          onClick={() => editSelected(employee)}
+                        >
+                          <HugeiconsIcon icon={UserEdit01Icon} />
+                          {"Modifier le profil"}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={()=>{}}>
-                          <HugeiconsIcon icon={AddSquareIcon} />{"Ajouter le DIPE"}
+                        <DropdownMenuItem onClick={() => openDipe(employee)}>
+                          <HugeiconsIcon icon={AddSquareIcon} />
+                          {"Ajouter le DIPE"}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={()=>suspendSelected(employee)}>
-                          <HugeiconsIcon icon={UserBlock02Icon} />{"Suspendre"}
+                        <DropdownMenuItem
+                          onClick={() => suspendSelected(employee)}
+                        >
+                          <HugeiconsIcon icon={UserBlock02Icon} />
+                          {"Suspendre"}
                         </DropdownMenuItem>
-                        {
-                          user?.role === "MANAGER" &&
-                          <DropdownMenuItem variant="destructive" onClick={()=>deleteSelected(employee)}>
-                          <HugeiconsIcon icon={UserRemove01Icon} />{"Supprimer"}
-                        </DropdownMenuItem>
-                        }
+                        {user?.role === "MANAGER" && (
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() => deleteSelected(employee)}
+                          >
+                            <HugeiconsIcon icon={UserRemove01Icon} />
+                            {"Supprimer"}
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -263,15 +355,52 @@ function Page() {
           </TableBody>
         </Table>
       </div>
-      {
-        selected && 
+      {selected && (
         <>
-        <ViewProfile isOpen={openProfile} openChange={setOpenProfile} employee={selected} users={data}/>
-        <EditProfile isOpen={viewEdit} openChange={setViewEdit} employee={selected} users={data}/>
+          <ViewProfile
+            isOpen={openProfile}
+            openChange={setOpenProfile}
+            employee={selected}
+            users={data}
+          />
+          <EditProfile
+            isOpen={viewEdit}
+            openChange={setViewEdit}
+            employee={selected}
+            users={data}
+          />
+          <AddDipe
+            isOpen={openAddDipe}
+            openChange={setOpenAddDipe}
+            salarial={salarialData.items}
+            employee={selected}
+          />
         </>
-      }
+      )}
+      <WarningModal
+        open={viewSuspend}
+        onOpenChange={setViewSuspend}
+        title={"Etes-vous sur de vouloir suspendre cet employé?"}
+        action={() => {
+          toast.success("L'employé a bien été suspendu !");
+        }}
+        variant="warning"
+        actionLabel="Suspendre"
+        cancelLabel="Annuler"
+      />
+      <WarningModal
+        open={viewDelete}
+        onOpenChange={setViewDelete}
+        title={"Etes-vous sur de vouloir Supprimer cet employé?"}
+        action={() => {
+          toast.success("L'employé a bien été supprimé !");
+        }}
+        variant="error"
+        actionLabel="Supprimer"
+        cancelLabel="Annuler"
+      />
     </div>
-  )
+  );
 }
 
-export default Page
+export default Page;

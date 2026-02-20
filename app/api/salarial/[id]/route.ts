@@ -1,4 +1,5 @@
-import { demoUsers } from "@/data/temp";
+// app/api/salarial/[id]/route.ts
+import { salarialData } from "@/data/temp";
 import { NextRequest, NextResponse } from "next/server";
 
 type Params = {
@@ -14,24 +15,24 @@ export async function GET(
   const { id } = await params;
   const numericId = Number(id);
 
-  if (isNaN(numericId)) {
+  if (Number.isNaN(numericId)) {
     return NextResponse.json(
       { success: false, message: "ID invalide" },
       { status: 400 }
     );
   }
 
-  const employee = demoUsers.find((e) => e.id === numericId);
+  const item = salarialData.find((s) => s.id === numericId);
 
-  if (!employee) {
+  if (!item) {
     return NextResponse.json(
-      { success: false, message: "Employé introuvable" },
+      { success: false, message: "Fiche salariale introuvable" },
       { status: 404 }
     );
   }
 
   return NextResponse.json({
     success: true,
-    user: employee,
+    item,
   });
 }

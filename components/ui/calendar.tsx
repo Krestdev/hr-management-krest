@@ -209,7 +209,7 @@ function CalendarDayButton({
         className
       )}
       {...props}
-    />
+    >{props.children}</Button>
   )
 }
 

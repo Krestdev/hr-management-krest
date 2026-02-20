@@ -1,4 +1,5 @@
-import { demoUsers } from "@/data/temp";
+// app/api/leaves/[id]/route.ts
+import { leavesData } from "@/data/temp";
 import { NextRequest, NextResponse } from "next/server";
 
 type Params = {
@@ -14,24 +15,17 @@ export async function GET(
   const { id } = await params;
   const numericId = Number(id);
 
-  if (isNaN(numericId)) {
-    return NextResponse.json(
-      { success: false, message: "ID invalide" },
-      { status: 400 }
-    );
-  }
+  const leave = leavesData.find((l) => l.id === numericId);
 
-  const employee = demoUsers.find((e) => e.id === numericId);
-
-  if (!employee) {
+  if (!leave) {
     return NextResponse.json(
-      { success: false, message: "Employé introuvable" },
+      { success: false, message: "Leave not found" },
       { status: 404 }
     );
   }
 
   return NextResponse.json({
     success: true,
-    user: employee,
+    item: leave,
   });
 }
