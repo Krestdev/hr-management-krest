@@ -50,7 +50,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
       />
 
       {/* 🔹 Grid des fichiers filtrés */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6 gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6 gap-5">
         {filteredFiles.map((doc, index) => (
           <div key={index}>
             <Link

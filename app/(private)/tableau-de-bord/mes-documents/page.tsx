@@ -54,7 +54,7 @@ const Page = () => {
       />
 
       {/* 🔹 Grid des fichiers */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6 gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6 gap-5">
         {filteredFiles.map((doc) => (
           <div key={doc.id}>
             <Link

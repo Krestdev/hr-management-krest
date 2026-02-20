@@ -39,7 +39,7 @@ const Page = () => {
       <Header variant="primary" title="Employés" />
 
       {/* 🔹 Grid des utilisateurs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6 gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6 gap-5">
         {data.map((emp) => (
           <Link
             key={emp.id}
