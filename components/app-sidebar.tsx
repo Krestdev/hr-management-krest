@@ -71,7 +71,7 @@ export function AppSidebar() {
                   <Avatar>
                     <AvatarImage src={user.photo} />
                     <AvatarFallback>
-                      {getInitials(user.firstName.concat(" ", user.lastName))}
+                      {getInitials(user.firstName.concat(" ", user.lastName, " ", user.lastName))}
                     </AvatarFallback>
                   </Avatar>
                   <div className="group-data-[collapsible=icon]:hidden">
