@@ -1,5 +1,7 @@
 import api from "@/context/api";
 import { Leaves } from "@/types/types";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "./queryKeys";
 
 export default class LeavesQuery {
   route = "/leaves";
@@ -92,3 +94,39 @@ export default class LeavesQuery {
     }
   };
 }
+
+export function useLeavesQuery() {
+  const leavesQuery = new LeavesQuery();
+  return useQuery({
+    queryKey: queryKeys.leaves.all(),
+    queryFn: leavesQuery.getAll,
+  });
+}
+
+export function useMyLeavesQuery(userId: number, enabled: boolean = true) {
+  const leavesQuery = new LeavesQuery();
+  return useQuery({
+    queryKey: queryKeys.leaves.mine(userId),
+    queryFn: () => leavesQuery.getMine(userId),
+    enabled: enabled && !!userId,
+  });
+}
+
+export function useLeavesByUserIdQuery(userId: string, enabled: boolean = true) {
+  const leavesQuery = new LeavesQuery();
+  return useQuery({
+    queryKey: queryKeys.leaves.byUserId(userId),
+    queryFn: () => leavesQuery.getByUserId(userId),
+    enabled: enabled && !!userId,
+  });
+}
+
+export function useLeaveByIdQuery(id: number, enabled: boolean = true) {
+  const leavesQuery = new LeavesQuery();
+  return useQuery({
+    queryKey: queryKeys.leaves.detail(id),
+    queryFn: () => leavesQuery.getById(id),
+    enabled: enabled && !!id,
+  });
+}
+

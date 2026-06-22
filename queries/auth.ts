@@ -1,5 +1,6 @@
 import api from "@/context/api";
 import { Employee } from "@/types/types";
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
 export default class AuthQuery {
     route = "/auth";
@@ -22,3 +23,12 @@ export default class AuthQuery {
         }
     };
 }
+
+export function useLoginMutation(options?: UseMutationOptions<{ user: Employee; access_token: string }, Error, { email: string; password: string }>) {
+    const authQuery = new AuthQuery();
+    return useMutation({
+        mutationFn: authQuery.login,
+        ...options,
+    });
+}
+

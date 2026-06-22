@@ -16,18 +16,14 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Calendar02Icon,
 } from "@hugeicons/core-free-icons";
-import { demoPayslips } from "@/data/temp";
 import PaySlipCard from "@/components/pay-slip";
-import { useQuery } from "@tanstack/react-query";
+import { usePayslipsQuery } from "@/queries/payslips";
 import LoadingComponent from "@/components/loading-comp";
 import ErrorComponent from "@/components/error-comp";
 
 
 function Page() {
-  const {data, isLoading, isSuccess, isError} = useQuery({
-    queryKey: ["payslips"],
-    queryFn: async () =>demoPayslips
-  });
+  const {data, isLoading, isSuccess, isError} = usePayslipsQuery();
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: undefined,
     to: undefined,

@@ -1,5 +1,7 @@
 import api from "@/context/api";
 import { Files } from "@/types/types"; // adapte le chemin si besoin
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "./queryKeys";
 
 export default class DocumentQuery {
   route = "/documents";
@@ -55,3 +57,30 @@ export default class DocumentQuery {
     }
   };
 }
+
+export function useDocumentsQuery() {
+    const documentQuery = new DocumentQuery();
+    return useQuery({
+        queryKey: queryKeys.documents.all(),
+        queryFn: documentQuery.getAll,
+    });
+}
+
+export function useMyDocumentsQuery(userId: string, enabled: boolean = true) {
+    const documentQuery = new DocumentQuery();
+    return useQuery({
+        queryKey: queryKeys.documents.mine(userId),
+        queryFn: () => documentQuery.getMine(userId),
+        enabled: enabled && !!userId,
+    });
+}
+
+export function useDocumentByIdQuery(id: number, enabled: boolean = true) {
+    const documentQuery = new DocumentQuery();
+    return useQuery({
+        queryKey: queryKeys.documents.detail(id),
+        queryFn: () => documentQuery.getById(id),
+        enabled: enabled && !!id,
+    });
+}
+

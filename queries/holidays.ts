@@ -6,6 +6,8 @@ import {
   EmployeeLeaveBalance,
   HolidayType,
 } from "@/types/types";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "./queryKeys";
 
 export default class HolidaysQuery {
   route = "/holidays";
@@ -138,3 +140,85 @@ export default class HolidaysQuery {
     }
   };
 }
+
+export function useHolidaysRequestsQuery() {
+  const holidaysQuery = new HolidaysQuery();
+  return useQuery({
+    queryKey: queryKeys.holidays.all(),
+    queryFn: holidaysQuery.getAllRequests,
+  });
+}
+
+export function useHolidaysRequestsByUserQuery(userId: string, enabled: boolean = true) {
+  const holidaysQuery = new HolidaysQuery();
+  return useQuery({
+    queryKey: queryKeys.holidays.byUser(userId),
+    queryFn: () => holidaysQuery.getRequestsByUser(userId),
+    enabled: enabled && !!userId,
+  });
+}
+
+export function useHolidaysStatsQuery(enabled: boolean = true) {
+  const holidaysQuery = new HolidaysQuery();
+  return useQuery({
+    queryKey: queryKeys.holidays.stats(),
+    queryFn: holidaysQuery.getStats,
+    enabled,
+  });
+}
+
+export function useHolidaysBalanceQuery(userId: string, year?: number, enabled: boolean = true) {
+  const holidaysQuery = new HolidaysQuery();
+  return useQuery({
+    queryKey: queryKeys.holidays.balance(userId, year),
+    queryFn: () => holidaysQuery.getBalance(userId, year),
+    enabled: enabled && !!userId,
+  });
+}
+
+export function useSendHolidayRequestMutation() {
+  const holidaysQuery = new HolidaysQuery();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: holidaysQuery.sendRequest,
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.holidays.all() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.holidays.byUser(variables.userId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.holidays.stats() });
+    },
+  });
+}
+
+export function useEditHolidayRequestMutation() {
+  const holidaysQuery = new HolidaysQuery();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: holidaysQuery.editRequest,
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.holidays.all() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.holidays.byUser(variables.request.userId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.holidays.stats() });
+    },
+  });
+}
+
+export function useCancelHolidayRequestMutation() {
+  const holidaysQuery = new HolidaysQuery();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: holidaysQuery.cancelRequest,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.holidays.all() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.holidays.stats() });
+    },
+  });
+}
+
+export function useHolidayTypesQuery() {
+  const holidaysQuery = new HolidaysQuery();
+  return useQuery({
+    queryKey: queryKeys.holidays.types(),
+    queryFn: holidaysQuery.getTypes,
+  });
+}
+

@@ -26,9 +26,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import SalarialQuery from "@/queries/salarials";
-import UserQuery from "@/queries/employee";
-import { useQuery } from "@tanstack/react-query";
+import { useSalarialsQuery } from "@/queries/salarials";
+import { useEmployeesQuery } from "@/queries/employee";
 import { EllipsisIcon, HistoryIcon } from "lucide-react";
 import Link from "next/link";
 import React, { useMemo } from "react";
@@ -93,19 +92,13 @@ type SalarialWithUser = Salarial & {
 };
 
 function Page() {
-  const usersQuery = new UserQuery();
-  const salarialsQuery = new SalarialQuery();
-
   const {
     data: users,
     isSuccess: isUsersSuccess,
     isLoading: isUsersLoading,
     isError: isUsersError,
     error: usersError,
-  } = useQuery({
-    queryKey: ["users"],
-    queryFn: () => usersQuery.getAll(1, 20, "", undefined, undefined),
-  });
+  } = useEmployeesQuery(1, 20, "", undefined, undefined);
 
   const {
     data: salarials,
@@ -113,10 +106,7 @@ function Page() {
     isLoading: isSalarialsLoading,
     isError: isSalarialsError,
     error: salarialsError,
-  } = useQuery({
-    queryKey: ["salarials"],
-    queryFn: salarialsQuery.getAll,
-  });
+  } = useSalarialsQuery();
 
   const [search, setSearch] = React.useState("");
   const [filterType, setFilterType] = React.useState<string>("all");
@@ -137,11 +127,15 @@ function Page() {
         ...salarial,
         user: user
           ? {
-            ...user,
+            uuid: user.uuid,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            position: user.position?.[0] || "",
+            department: user.department?.[0] || "",
             startDate:
-              user.startDate instanceof Date
-                ? user.startDate.toISOString()
-                : user.startDate,
+              user.hireDate instanceof Date
+                ? user.hireDate.toISOString()
+                : String(user.hireDate),
           }
           : undefined,
       };

@@ -12,11 +12,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import LeavesTypeQuery from "@/queries/leaves-type";
-import UserQuery from "@/queries/employee";
-import LeavesQuery from "@/queries/leaves";
+import { useLeavesTypesQuery } from "@/queries/leaves-type";
+import { useEmployeesQuery } from "@/queries/employee";
+import { useLeavesByUserIdQuery } from "@/queries/leaves";
 import { Employee, LeavesType, Leaves } from "@/types/types";
-import { useQuery } from "@tanstack/react-query";
 import React, { useMemo, useState } from "react";
 
 type Props = {
@@ -38,27 +37,14 @@ type LeaveFormState = {
 };
 
 function ViewConge({ isOpen, openChange, employeeId }: Props) {
-  const usersQuery = new UserQuery();
-  const leavesTypeQuery = new LeavesTypeQuery();
-  const leavesQuery = new LeavesQuery();
-
   // USERS
-  const { data: usersData, isSuccess: isSuccessUsers } = useQuery({
-    queryKey: ["employees"],
-    queryFn: () => usersQuery.getAll(1, 20, "", undefined, undefined),
-  });
+  const { data: usersData, isSuccess: isSuccessUsers } = useEmployeesQuery(1, 20, "");
 
   // LEAVES TYPES
-  const { data: leavesTypeData, isSuccess: isLeavesTypeSuccess } = useQuery({
-    queryKey: ["leaves-types"],
-    queryFn: leavesTypeQuery.getAll,
-  });
+  const { data: leavesTypeData, isSuccess: isLeavesTypeSuccess } = useLeavesTypesQuery();
 
   // USER LEAVES
-  const { data: leavesData, isSuccess: isLeavesSuccess } = useQuery({
-    queryKey: ["leaves", employeeId],
-    queryFn: () => leavesQuery.getByUserId(employeeId),
-  });
+  const { data: leavesData, isSuccess: isLeavesSuccess } = useLeavesByUserIdQuery(employeeId);
 
   const employee: Employee | undefined = useMemo(() => {
     if (!isSuccessUsers) return undefined;

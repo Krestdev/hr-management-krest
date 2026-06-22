@@ -1,5 +1,7 @@
 import api from "@/context/api";
 import { Employee, Leaves } from "@/types/types";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "./queryKeys";
 
 export default class UserQuery {
   route = "/employees";
@@ -164,3 +166,141 @@ export default class UserQuery {
     }
   }
 }
+
+export function useEmployeesQuery(
+  page: number,
+  limit: number,
+  companyId: string,
+  departmentId?: string,
+  positionUuid?: string,
+  status: string = "ACTIVE",
+  search?: string,
+  includeInactive?: boolean,
+  includeSensitive: boolean = false,
+  enabled: boolean = true
+) {
+  const userQuery = new UserQuery();
+  return useQuery({
+    queryKey: queryKeys.employees.all({
+      page,
+      limit,
+      companyId,
+      departmentId,
+      positionUuid,
+      status,
+      search,
+      includeInactive,
+      includeSensitive,
+    }),
+    queryFn: () =>
+      userQuery.getAll(
+        page,
+        limit,
+        companyId,
+        departmentId,
+        positionUuid,
+        status,
+        search,
+        includeInactive,
+        includeSensitive
+      ),
+    enabled: enabled && companyId !== undefined,
+  });
+}
+
+export function useEmployeeQuery(id: string, enabled: boolean = true) {
+  const userQuery = new UserQuery();
+  return useQuery({
+    queryKey: queryKeys.employees.detail(id),
+    queryFn: () => userQuery.getById(id),
+    enabled: enabled && !!id,
+  });
+}
+
+export function useCreateEmployeeMutation() {
+  const userQuery = new UserQuery();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: userQuery.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+    },
+  });
+}
+
+export function useUpdateEmployeeMutation() {
+  const userQuery = new UserQuery();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Employee, "uuid" | "createdAt" | "updatedAt">> }) =>
+      userQuery.update(id, data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.employees.detail(data.data.uuid) });
+    },
+  });
+}
+
+export function useEmployeePersonalInfoQuery(id: string, enabled: boolean = true) {
+  const userQuery = new UserQuery();
+  return useQuery({
+    queryKey: queryKeys.employees.personal(id),
+    queryFn: () => userQuery.getPersonnalInformation(id),
+    enabled: enabled && !!id,
+  });
+}
+
+export function useDeleteEmployeeMutation() {
+  const userQuery = new UserQuery();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => userQuery.delete(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.employees.detail(data.data.uuid) });
+    },
+  });
+}
+
+export function useReactivateEmployeeMutation() {
+  const userQuery = new UserQuery();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => userQuery.reactivate(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.employees.detail(data.data.uuid) });
+    },
+  });
+}
+
+export function useEmployeeLeaveRequestsQuery(id: string, enabled: boolean = true) {
+  const userQuery = new UserQuery();
+  return useQuery({
+    queryKey: queryKeys.employees.leaves(id),
+    queryFn: () => userQuery.getLeaveRequests(id),
+    enabled: enabled && !!id,
+  });
+}
+
+export function useEmployeeLeaveBalanceQuery(id: string, enabled: boolean = true) {
+  const userQuery = new UserQuery();
+  return useQuery({
+    queryKey: queryKeys.employees.leaveBalance(id),
+    queryFn: () => userQuery.getLeaveBalance(id),
+    enabled: enabled && !!id,
+  });
+}
+
+export function useUpdateEmployeeLeaveQuotaMutation() {
+  const userQuery = new UserQuery();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, date }: { id: string; date: string }) =>
+      userQuery.updateLeaveBalanceQuota(id, date),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.employees.leaveBalance(variables.id) });
+    },
+  });
+}
+

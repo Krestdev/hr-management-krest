@@ -1,5 +1,7 @@
 import api from "@/context/api";
 import { Presence } from "@/types/types";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "./queryKeys";
 
 export default class PresenceQuery {
   route = "/presences";
@@ -65,3 +67,33 @@ export default class PresenceQuery {
     }
   };
 }
+
+export function usePresencesQuery() {
+  const presenceQuery = new PresenceQuery();
+  return useQuery({
+    queryKey: queryKeys.presences.all(),
+    queryFn: presenceQuery.getAll,
+  });
+}
+
+export function usePresencesByUserIdQuery(userId: string, enabled: boolean = true) {
+  const presenceQuery = new PresenceQuery();
+  return useQuery({
+    queryKey: queryKeys.presences.byUserId(userId),
+    queryFn: () => presenceQuery.getByUserId(userId),
+    enabled: enabled && !!userId,
+  });
+}
+
+export function useCreatePresenceMutation() {
+  const presenceQuery = new PresenceQuery();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: presenceQuery.post,
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.presences.all() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.presences.byUserId(variables.userId) });
+    },
+  });
+}
+

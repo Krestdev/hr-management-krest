@@ -12,7 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useQuery } from "@tanstack/react-query";
 import React, { useMemo, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -22,8 +21,8 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
-import LeavesQuery from "@/queries/leaves";
-import UserQuery from "@/queries/employee";
+import { useLeavesQuery } from "@/queries/leaves";
+import { useEmployeesQuery } from "@/queries/employee";
 import { Leaves, Employee } from "@/types/types";
 import WarningModal from "@/components/WarningModal";
 import { toast } from "sonner";
@@ -108,9 +107,6 @@ const statusOptions = [
 ];
 
 function Page() {
-  const leavesQuery = new LeavesQuery();
-  const usersQuery = new UserQuery();
-
   // État pour les filtres
   const [employeeFilter, setEmployeeFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
@@ -126,10 +122,7 @@ function Page() {
     isError: isErrorLeaves,
     error: errorLeaves,
     isSuccess: isSuccessLeaves,
-  } = useQuery({
-    queryKey: ["leaves-history"],
-    queryFn: leavesQuery.getAll,
-  });
+  } = useLeavesQuery();
 
   const {
     data: usersData,
@@ -137,10 +130,7 @@ function Page() {
     isError: isErrorUsers,
     error: errorUsers,
     isSuccess: isSuccessUsers,
-  } = useQuery({
-    queryKey: ["employees"],
-    queryFn: () => usersQuery.getAll(1, 20, "", undefined, undefined),
-  });
+  } = useEmployeesQuery(1, 20, "");
 
   const [selectedLeave, setSelectedLeave] = useState<Leaves | null>(null);
   const [viewApprove, setViewApprove] = useState(false);

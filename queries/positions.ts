@@ -1,5 +1,7 @@
 import api from "@/context/api";
 import { Position } from "@/types/types";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "./queryKeys";
 
 export default class PositionQuery {
     route = "/positions";
@@ -93,3 +95,56 @@ export default class PositionQuery {
         }
     };
 }
+
+export function usePositionsQuery() {
+  const positionQuery = new PositionQuery();
+  return useQuery({
+    queryKey: queryKeys.positions.all(),
+    queryFn: positionQuery.getAll,
+  });
+}
+
+export function usePositionQuery(id: string, enabled: boolean = true) {
+  const positionQuery = new PositionQuery();
+  return useQuery({
+    queryKey: queryKeys.positions.detail(id),
+    queryFn: () => positionQuery.getById(id),
+    enabled: enabled && !!id,
+  });
+}
+
+export function useCreatePositionMutation() {
+  const positionQuery = new PositionQuery();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: positionQuery.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.positions.all() });
+    },
+  });
+}
+
+export function useUpdatePositionMutation() {
+  const positionQuery = new PositionQuery();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Position, "uuid" | "createdAt" | "updatedAt">> }) =>
+      positionQuery.update(id, data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.positions.all() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.positions.detail(data.uuid) });
+    },
+  });
+}
+
+export function useDeletePositionMutation() {
+  const positionQuery = new PositionQuery();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: positionQuery.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.positions.all() });
+    },
+  });
+}
+

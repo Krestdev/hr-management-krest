@@ -4,22 +4,16 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import useKizunaStore from '@/context/store'
 import { formatSeniority, getInitials, getYearsOfService } from '@/lib/utils';
-import UserQuery from '@/queries/employee';
+import { useEmployeeQuery } from '@/queries/employee';
 import { Edit03Icon, FileAttachmentIcon, Profile02Icon, UserAccountIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import React, { useState } from 'react'
 import UpdatePhoto from './update-photo';
 
 function Page() {
   const { user } = useKizunaStore();
-  const usersQuery = new UserQuery();
-  const { data, isLoading, isSuccess } = useQuery({
-    queryKey: ["user", user?.supervisorId],
-    queryFn: async () => usersQuery.getById(user?.supervisorId ?? ""),
-    enabled: !!user
-  });
+  const { data, isLoading, isSuccess } = useEmployeeQuery(user?.supervisorId ?? "", !!user);
   const [openUpdate, setOpenUpdate] = useState<boolean>(false);
   return (
     <div className="grid gap-4 sm:gap-6">
@@ -55,7 +49,7 @@ function Page() {
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Date de naissance"}</span>
-            <span className="font-medium">{user && format(user.birthDate, "dd/MM/yyyy")}</span>
+            <span className="font-medium">{user && format(new Date(user.birthday), "dd/MM/yyyy")}</span>
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Nationalité"}</span>
@@ -63,7 +57,7 @@ function Page() {
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Pays de résidence"}</span>
-            <span className="font-medium">{user?.country}</span>
+            <span className="font-medium">{user?.countryOfResidence}</span>
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Adresse"}</span>
@@ -71,19 +65,19 @@ function Page() {
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Numero de téléphone"}</span>
-            <span className="font-medium">{user?.phone}</span>
+            <span className="font-medium">{user?.phoneNumber}</span>
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Situation matrimoniale"}</span>
-            <span className="font-medium">{user?.maritalStatus}</span>
+            <span className="font-medium">{user?.matrimonial_status === 1 ? "Marié(e)" : "Célibataire"}</span>
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Enfants"}</span>
-            <span className="font-medium">{user?.childrenCount === 0 ? "Aucun" : user?.childrenCount}</span>
+            <span className="font-medium">{user?.number_of_children === 0 ? "Aucun" : user?.number_of_children}</span>
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Contact d'urgence"}</span>
-            <span className="font-medium">{user?.emergencyContact}</span>
+            <span className="font-medium">{user?.EmergencyContactPhone}</span>
           </div>
         </div>
       </section>
@@ -96,14 +90,16 @@ function Page() {
         <div className="mt-5 grid grid-cols-1 gap-x-4 gap-y-6 @min-[460px]/main:grid-cols-2 @min-[760px]/main:grid-cols-3 @min-[1024px]/main:grid-cols-4 @min-[1280px]/main:grid-cols-5 @min-[1560px]/main:grid-cols-6">
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"CNPS"}</span>
-            <span className="font-medium">{user?.cnpsNumber ?? "Non défini"}</span>
+            <span className="font-medium">{user?.CNPSNumber ?? "Non défini"}</span>
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Pièce d'identité"}</span>
             <span className="font-medium">
-              {`${user?.idType} - ${user?.idNumber}`}
+              {`${user?.idDocumentType} - ${user?.idDocumentNumber}`}
               <br />
-              <span className="text-[12px] text-slate-600 font-normal">{`Délivrée le ${user?.idIssueDate && format(user.idIssueDate, "dd/MM/yyyy")} à ${user?.idIssuePlace}, expire le ${user?.idExpiryDate && format(user.idExpiryDate, "dd/MM/yyyy")}`}</span>
+              <span className="text-[12px] text-slate-600 font-normal">
+                {user?.idDocumentIssueDate && `Délivrée le ${format(new Date(user.idDocumentIssueDate), "dd/MM/yyyy")} à ${user?.idDocumentIssuePlace}, expire le ${user?.idDocumentExpiryDate && format(new Date(user.idDocumentExpiryDate), "dd/MM/yyyy")}`}
+              </span>
             </span>
           </div>
         </div>
@@ -117,19 +113,19 @@ function Page() {
         <div className="mt-5 grid grid-cols-1 gap-x-4 gap-y-6 @min-[460px]/main:grid-cols-2 @min-[760px]/main:grid-cols-3 @min-[1024px]/main:grid-cols-4 @min-[1280px]/main:grid-cols-5 @min-[1560px]/main:grid-cols-6">
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Poste"}</span>
-            <span className="font-medium">{user?.position}</span>
+            <span className="font-medium">{user?.position?.join(", ")}</span>
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Département"}</span>
             <span className="font-medium">
-              {user?.department}
+              {user?.department?.join(", ")}
             </span>
           </div>
           {
             isSuccess &&
             <div className="flex flex-col gap-0.5">
               <span className="text-slate-600">{"Supérieur hiérarchique"}</span>
-              <span className="font-medium">{!!data ? data.data.firstName.concat(" ", data.data.lastName) : "Aucun"}</span>
+              <span className="font-medium">{!!data ? data.firstName.concat(" ", data.lastName) : "Aucun"}</span>
             </div>
           }
           <div className="flex flex-col gap-0.5">
@@ -141,7 +137,7 @@ function Page() {
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Echelon"}</span>
             <span className="font-medium">
-              {user?.level}
+              {user?.grade}
             </span>
           </div>
           <div className="flex flex-col gap-0.5">
@@ -153,13 +149,13 @@ function Page() {
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Ancienneté"}</span>
             <span className="font-medium">
-              {user?.startDate && formatSeniority(user.startDate)}
+              {user?.hireDate && formatSeniority(user.hireDate)}
             </span>
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Date de début"}</span>
             <span className="font-medium">
-              {user?.startDate && format(user.startDate, "dd/MM/yyyy")}
+              {user?.hireDate && format(new Date(user.hireDate), "dd/MM/yyyy")}
             </span>
           </div>
           {
@@ -167,7 +163,7 @@ function Page() {
             <div className="flex flex-col gap-0.5">
               <span className="text-slate-600">{"Date de fin"}</span>
               <span className="font-medium">
-                {user.endDate && format(user.endDate, "dd/MM/yyyy")}
+                {user.endDate && format(new Date(user.endDate), "dd/MM/yyyy")}
               </span>
             </div>
           }

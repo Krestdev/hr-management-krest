@@ -4,10 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import useKizunaStore from '@/context/store';
-import AuthQuery from '@/queries/auth';
+import { useLoginMutation } from '@/queries/auth';
 import UserQuery from '@/queries/employee';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from '@tanstack/react-query';
 import { ArrowRight } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -20,7 +19,6 @@ const formSchema = z.object({
 
 function LoginForm() {
     const { setToken, setUser } = useKizunaStore(); // On utilise les fonctions séparées
-    const authQuery = new AuthQuery();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -30,10 +28,7 @@ function LoginForm() {
         }
     });
 
-    const signIn = useMutation({
-        mutationFn: (data: { email: string; password: string }) => {
-            return authQuery.login(data);
-        },
+    const signIn = useLoginMutation({
         onSuccess: async (data) => {
             try {
                 // ÉTAPE 1: Stocker le token immédiatement

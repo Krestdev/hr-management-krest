@@ -4,29 +4,23 @@ import EmployeeForm from "@/components/employee-form";
 import ErrorComponent from "@/components/error-comp";
 import LoadingComponent from "@/components/loading-comp";
 import useKizunaStore from "@/context/store";
-import UserQuery from "@/queries/employee";
-import { useQuery } from "@tanstack/react-query";
+import { useEmployeesQuery } from "@/queries/employee";
 import React from "react";
 
 const Page = () => {
   const { user } = useKizunaStore();
-  const usersQuery = new UserQuery();
-
-  const { data, isSuccess, isLoading, isError, error } = useQuery({
-    queryKey: ["employees", "add", user?.companyId],
-    queryFn: () => usersQuery.getAll(
-      1,
-      100,
-      user?.companyId || "",
-      "",
-      "",
-      "ACTIVE",
-      "",
-      true,
-      true
-    ),
-    enabled: !!user?.companyId,
-  });
+  const { data, isSuccess, isLoading, isError, error } = useEmployeesQuery(
+    1,
+    100,
+    user?.companyId!,
+    "",
+    "",
+    "ACTIVE",
+    "",
+    true,
+    true,
+    !!user?.companyId
+  );
 
   if (isLoading) {
     return <LoadingComponent />;

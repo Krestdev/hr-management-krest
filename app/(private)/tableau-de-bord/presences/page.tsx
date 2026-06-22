@@ -30,9 +30,8 @@ import {
 import { useMemo, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { UserGroupIcon } from "@hugeicons/core-free-icons";
-import { useQuery } from "@tanstack/react-query";
-import PresenceQuery from "@/queries/presences";
-import UserQuery from "@/queries/employee";
+import { usePresencesQuery } from "@/queries/presences";
+import { useEmployeesQuery } from "@/queries/employee";
 import { Employee } from "@/types/types";
 import { id } from "date-fns/locale";
 import PresenceComp from "./PresenceComp";
@@ -92,19 +91,13 @@ export default function Page() {
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
-  const presenceQuery = new PresenceQuery();
-  const usersQuery = new UserQuery();
-
   const {
     data: presenceRes,
     isLoading: isLoadingPresence,
     isError: isErrorPresence,
     error: errorPresence,
     isSuccess: isSuccessPresence,
-  } = useQuery({
-    queryKey: ["presences"],
-    queryFn: presenceQuery.getAll,
-  });
+  } = usePresencesQuery();
 
   const {
     data: usersRes,
@@ -112,10 +105,7 @@ export default function Page() {
     isError: isErrorUsers,
     error: errorUsers,
     isSuccess: isSuccessUsers,
-  } = useQuery({
-    queryKey: ["employees"],
-    queryFn: () => usersQuery.getAll(1, 20, "", undefined, undefined),
-  });
+  } = useEmployeesQuery(1, 20, "");
 
   /* ===== BUILD TABLE ===== */
   const presenceTable: PresenceSummary[] = useMemo(() => {

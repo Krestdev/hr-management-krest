@@ -18,7 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useQuery } from "@tanstack/react-query";
 import { EllipsisIcon, HistoryIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -28,8 +27,8 @@ import {
   EyeFreeIcons,
 } from "@hugeicons/core-free-icons";
 
-import LeavesQuery from "@/queries/leaves";
-import UserQuery from "@/queries/employee";
+import { useLeavesQuery } from "@/queries/leaves";
+import { useEmployeesQuery } from "@/queries/employee";
 import { Leaves, Employee } from "@/types/types";
 import WarningModal from "@/components/WarningModal";
 import { toast } from "sonner";
@@ -39,19 +38,13 @@ import ViewConge from "./ViewConge";
 const TOTAL_ANNUAL_DAYS = 30; // règle RH annuelle
 
 function Page() {
-  const leavesQuery = new LeavesQuery();
-  const usersQuery = new UserQuery();
-
   const {
     data: leavesData,
     isLoading: isLoadingLeaves,
     isError: isErrorLeaves,
     error: errorLeaves,
     isSuccess: isSuccessLeaves,
-  } = useQuery({
-    queryKey: ["leaves"],
-    queryFn: leavesQuery.getAll,
-  });
+  } = useLeavesQuery();
 
   const {
     data: usersData,
@@ -59,10 +52,7 @@ function Page() {
     isError: isErrorUsers,
     error: errorUsers,
     isSuccess: isSuccessUsers,
-  } = useQuery({
-    queryKey: ["employees"],
-    queryFn: () => usersQuery.getAll(1, 20, "", undefined, undefined),
-  });
+  } = useEmployeesQuery(1, 20, "");
 
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [viewProcess, setViewProcess] = useState(false);

@@ -5,19 +5,14 @@ import Header from "@/components/header";
 import LoadingComponent from "@/components/loading-comp";
 import { Input } from "@/components/ui/input";
 import { filesData } from "@/data/temp";
-import UserQuery from "@/queries/employee";
-import { useQuery } from "@tanstack/react-query";
+import { useEmployeesQuery } from "@/queries/employee";
 import Link from "next/link";
 import React, { useState } from "react";
 
 const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = React.use(params);
 
-  const usersQuery = new UserQuery();
-  const { data, isSuccess, isLoading, isError, error } = useQuery({
-    queryKey: ["employees"],
-    queryFn: () => usersQuery.getAll(1, 20, "", undefined, undefined),
-  });
+  const { data, isSuccess, isLoading, isError, error } = useEmployeesQuery(1, 20, "");
 
   // 🔹 État pour la recherche
   const [search, setSearch] = useState("");

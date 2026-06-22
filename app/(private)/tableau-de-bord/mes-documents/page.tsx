@@ -5,20 +5,17 @@ import Header from "@/components/header";
 import LoadingComponent from "@/components/loading-comp";
 import { Input } from "@/components/ui/input";
 import useKizunaStore from "@/context/store";
-import DocumentQuery from "@/queries/documents";
-import { useQuery } from "@tanstack/react-query";
+import { useMyDocumentsQuery } from "@/queries/documents";
 import Link from "next/link";
 import React, { useState } from "react";
 
 const Page = () => {
   const { user } = useKizunaStore();
-  const documentsQuery = new DocumentQuery();
 
-  const { data, isSuccess, isLoading, isError, error } = useQuery({
-    queryKey: ["documents", "mine", user?.uuid], // ✅ clé propre
-    queryFn: () => documentsQuery.getMine(user?.uuid ?? ""), // ✅ fonction
-    enabled: !!user?.uuid, // ✅ évite l’appel si user pas prêt
-  });
+  const { data, isSuccess, isLoading, isError, error } = useMyDocumentsQuery(
+    user?.uuid ?? "",
+    !!user?.uuid
+  );
 
   // 🔹 État pour la recherche
   const [search, setSearch] = useState("");

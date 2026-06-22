@@ -18,9 +18,8 @@ import countries from '@/data/countries'
 import departmentsSample from '@/data/departments'
 import { employeeCategories } from '@/data/categories'
 import TableUpload from './table-upload'
-import PositionQuery from '@/queries/positions'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import UserQuery from '@/queries/employee'
+import { usePositionsQuery } from '@/queries/positions'
+import { useCreateEmployeeMutation, useUpdateEmployeeMutation } from '@/queries/employee'
 import { toast } from 'sonner'
 
 interface Props {
@@ -100,43 +99,11 @@ function EmployeeForm({ employee, users }: Props) {
     const [hireData, setHireData] = useState(false);
     const [endDate, setEndDate] = useState(false);
 
-    const positionQuery = new PositionQuery()
-    const employeeQuery = new UserQuery()
+    const positionData = usePositionsQuery();
 
-    const positionData = useQuery({
-        queryKey: ["position"],
-        queryFn: () => positionQuery.getAll(),
-    });
+    const updateEmployee = useUpdateEmployeeMutation();
 
-    const updateEmployee = useMutation({
-        mutationKey: ["employee", employee?.uuid],
-        mutationFn: (data: Partial<Omit<Employee, "uuid" | "createdAt" | "updatedAt">>) => employeeQuery.update(employee?.uuid!, {
-            ...data
-        }),
-        onSuccess: () => {
-            form.reset();
-            setStep(1);
-            toast.success("Employe mis à jour avec succès")
-        },
-        onError: (error) => {
-            toast.error("Erreur lors de la mise à jour de l'employe" + error.message)
-        }
-    })
-
-    const createEmployee = useMutation({
-        mutationKey: ["employee"],
-        mutationFn: (data: Omit<Employee, "uuid" | "createdAt" | "updatedAt">) => employeeQuery.create({
-            ...data
-        }),
-        onSuccess: () => {
-            form.reset();
-            setStep(1);
-            toast.success("Employe créé avec succès")
-        },
-        onError: (error) => {
-            toast.error("Erreur lors de la création de l'employe" + error.message)
-        }
-    })
+    const createEmployee = useCreateEmployeeMutation();
 
     const steps = [
         {
@@ -200,9 +167,27 @@ function EmployeeForm({ employee, users }: Props) {
             hireData: new Date(values.hireData),
         }
         if (employee) {
-            updateEmployee.mutate(data as unknown as Partial<Omit<Employee, "uuid" | "createdAt" | "updatedAt">>);
+            updateEmployee.mutate({ id: employee.uuid, data: data as unknown as Partial<Omit<Employee, "uuid" | "createdAt" | "updatedAt">> }, {
+                onSuccess: () => {
+                    form.reset();
+                    setStep(1);
+                    toast.success("Employe mis à jour avec succès");
+                },
+                onError: (error) => {
+                    toast.error("Erreur lors de la mise à jour de l'employe: " + error.message);
+                }
+            });
         } else {
-            createEmployee.mutate(data as unknown as Omit<Employee, "uuid" | "createdAt" | "updatedAt">);
+            createEmployee.mutate(data as unknown as Omit<Employee, "uuid" | "createdAt" | "updatedAt">, {
+                onSuccess: () => {
+                    form.reset();
+                    setStep(1);
+                    toast.success("Employe créé avec succès");
+                },
+                onError: (error) => {
+                    toast.error("Erreur lors de la création de l'employe: " + error.message);
+                }
+            });
         }
     }
     return (

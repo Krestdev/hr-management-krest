@@ -25,8 +25,6 @@ import {
 import { MoreVerticalIcon } from "@hugeicons/core-free-icons";
 import useKizunaStore from "@/context/store";
 import { getInitials } from "@/lib/utils";
-import UserQuery from "@/queries/employee";
-import { useQuery } from "@tanstack/react-query";
 
 export function AppSidebar() {
   const path = usePathname();

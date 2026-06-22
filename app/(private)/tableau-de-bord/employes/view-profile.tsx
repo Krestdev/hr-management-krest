@@ -10,10 +10,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { formatSalary, formatSeniority, getInitials } from "@/lib/utils";
-import DepartmentQuery from "@/queries/department";
-import PositionQuery from "@/queries/positions";
+import { useDepartmentsQuery } from "@/queries/department";
+import { usePositionsQuery } from "@/queries/positions";
 import { Employee } from "@/types/types";
-import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import React from "react";
 
@@ -27,18 +26,8 @@ type Props = {
 function ViewProfile({ isOpen, openChange, employee, users }: Props) {
   const supervisor = users.find((x) => x.uuid === employee.supervisorId);
 
-  const positionQuery = new PositionQuery()
-  const departmentQuery = new DepartmentQuery()
-
-  const positionData = useQuery({
-    queryKey: ["position"],
-    queryFn: () => positionQuery.getAll(),
-  });
-
-  const departmentData = useQuery({
-    queryKey: ["department"],
-    queryFn: () => departmentQuery.getAll(),
-  });
+  const positionData = usePositionsQuery();
+  const departmentData = useDepartmentsQuery();
 
 
   return (

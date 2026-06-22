@@ -27,11 +27,10 @@ import {
 } from "@/components/ui/table";
 import useKizunaStore from "@/context/store";
 import { cn, PRESENCE_FLAGS } from "@/lib/utils";
-import PresenceQuery from "@/queries/presences";
-import { Presence, PresenceFlag, PresenceRecord } from "@/types/types";
+import { usePresencesByUserIdQuery } from "@/queries/presences";
+import { Presence, PresenceFlag } from "@/types/types";
 import { Calendar02Icon, SearchVisualIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import React, { useMemo, useState } from "react";
@@ -43,12 +42,10 @@ import ErrorComponent from "@/components/error-comp";
 
 function Page() {
   const { user } = useKizunaStore();
-  const presenceQuery = new PresenceQuery();
-  const { data, isLoading, isError, error, isSuccess } = useQuery({
-    queryKey: ["presences", user?.uuid],
-    queryFn: async () => presenceQuery.getByUserId(user?.uuid ?? ""),
-    enabled: !!user,
-  });
+  const { data, isLoading, isError, error, isSuccess } = usePresencesByUserIdQuery(
+    user?.uuid ?? "",
+    !!user
+  );
 
   const [away, setAway] = useState<boolean>(false);
   const [statusFilter, setStatusFilter] = useState<PresenceFlag | "all">("all");

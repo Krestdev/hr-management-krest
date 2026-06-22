@@ -2,8 +2,7 @@
 
 import Header from "@/components/header";
 import useKizunaStore from "@/context/store";
-import UserQuery from "@/queries/employee";
-import { useQuery } from "@tanstack/react-query";
+import { useEmployeesQuery } from "@/queries/employee";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
@@ -11,14 +10,10 @@ import LoadingComponent from "@/components/loading-comp";
 import ErrorComponent from "@/components/error-comp";
 
 const Page = () => {
-  const usersQuery = new UserQuery();
   const { user } = useKizunaStore();
   const router = useRouter();
 
-  const { data, isSuccess, isLoading, isError, error } = useQuery({
-    queryKey: ["employees"],
-    queryFn: () => usersQuery.getAll(1, 20, "", undefined, undefined),
-  });
+  const { data, isSuccess, isLoading, isError, error } = useEmployeesQuery(1, 20, "");
 
   // 🔁 Redirection auto si USER → ses documents directement
   useEffect(() => {

@@ -9,10 +9,9 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { demoNotifications } from "@/data/temp";
+import { useNotificationsQuery } from "@/queries/notifications";
 import { Notification02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
 import { Notification } from "@/types/types";
 import { AnimatePresence, motion } from "framer-motion";
@@ -25,10 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 
 function Page() {
-  const { data, isSuccess, isLoading, isError, error } = useQuery({
-    queryKey: ["notifications"],
-    queryFn: async (): Promise<Notification[]> => demoNotifications,
-  });
+  const { data, isSuccess, isLoading, isError, error } = useNotificationsQuery();
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
       from: undefined,

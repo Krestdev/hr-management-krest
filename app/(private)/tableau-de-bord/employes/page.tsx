@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/table";
 import useKizunaStore from "@/context/store";
 import { formatSalary, formatSeniority, getYearsOfService } from "@/lib/utils";
-import UserQuery from "@/queries/employee";
+import { useEmployeesQuery, useDeleteEmployeeMutation, useReactivateEmployeeMutation } from "@/queries/employee";
 import {
   AddSquareIcon,
   PlusSignSquareIcon,
@@ -48,7 +48,6 @@ import {
   UserUnlock01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { EllipsisIcon } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import ViewProfile from "./view-profile";
@@ -58,7 +57,7 @@ import Link from "next/link";
 import WarningModal from "@/components/WarningModal";
 import { toast } from "sonner";
 import AddDipe from "./add-dipe";
-import SalarialQuery from "@/queries/salarials";
+import { useSalarialsQuery } from "@/queries/salarials";
 import { useDebounce } from "@/hooks/useDebounce";
 
 type LengthOfService = "under" | "over" | "equal";
@@ -76,9 +75,6 @@ function matchYearsFilter(
 
 function Page() {
   const { user } = useKizunaStore();
-  const usersQuery = new UserQuery();
-  const dipeQuery = new SalarialQuery();
-
   // États pour les filtres backend
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
@@ -96,55 +92,22 @@ function Page() {
   const inclueSensitive = true
 
   // Récupérer les employés avec les filtres backend
-  const { data, isSuccess, isLoading, isError, error } = useQuery({
-    queryKey: [
-      "employees",
-      page,
-      limit,
-      user?.companyId,
-      departmentFilter,
-      statusFilter,
-      debouncedSearch,
-      includeInactive,
-    ],
-    queryFn: () => usersQuery.getAll(
-      page,
-      limit,
-      user?.companyId || "",
-      departmentFilter !== "all" ? departmentFilter : "",
-      "",
-      statusFilter,
-      debouncedSearch,
-      includeInactive,
-      inclueSensitive
-    ),
-    enabled: !!user?.companyId,
-  });
+  const { data, isSuccess, isLoading, isError, error } = useEmployeesQuery(
+    page,
+    limit,
+    user?.companyId || "",
+    departmentFilter !== "all" ? departmentFilter : "",
+    "",
+    statusFilter,
+    debouncedSearch,
+    includeInactive,
+    inclueSensitive,
+    !!user?.companyId
+  );
 
+  const diactivate = useDeleteEmployeeMutation();
 
-
-  const diactivate = useMutation({
-    mutationKey: ["diactivate-employee"],
-    mutationFn: (uuid: string) => usersQuery.delete(uuid),
-    onSuccess: () => {
-      toast.success("Employe désactivé avec succès")
-    },
-    onError: (error) => {
-      toast.error("Erreur lors de la désactivation de l'employe" + error.message)
-    }
-  })
-
-
-  const resume = useMutation({
-    mutationKey: ["resume-employee"],
-    mutationFn: (uuid: string) => usersQuery.reactivate(uuid),
-    onSuccess: () => {
-      toast.success("Employe activé avec succès")
-    },
-    onError: (error) => {
-      toast.error("Erreur lors de l'activation de l'employe" + error.message)
-    }
-  })
+  const resume = useReactivateEmployeeMutation();
 
   // const {
   //   data: salarialData,
@@ -537,7 +500,14 @@ function Page() {
         open={viewSuspend}
         onOpenChange={setViewSuspend}
         title={"Etes-vous sur de vouloir suspendre cet employé?"}
-        action={() => diactivate.mutate(selected!.uuid)}
+        action={() => diactivate.mutate(selected!.uuid, {
+          onSuccess: () => {
+            toast.success("Employe désactivé avec succès");
+          },
+          onError: (error) => {
+            toast.error("Erreur lors de la désactivation de l'employe: " + error.message);
+          }
+        })}
         variant="warning"
         actionLabel="Suspendre"
         cancelLabel="Annuler"
@@ -546,7 +516,14 @@ function Page() {
         open={viewResume}
         onOpenChange={setViewResume}
         title={"Etes-vous sur de vouloir activer cet employé?"}
-        action={() => resume.mutate(selected!.uuid)}
+        action={() => resume.mutate(selected!.uuid, {
+          onSuccess: () => {
+            toast.success("Employe activé avec succès");
+          },
+          onError: (error) => {
+            toast.error("Erreur lors de l'activation de l'employe: " + error.message);
+          }
+        })}
         variant="warning"
         actionLabel="Activer"
         cancelLabel="Annuler"

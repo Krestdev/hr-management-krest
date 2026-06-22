@@ -9,11 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import useKizunaStore from '@/context/store'
 import { formatDate } from '@/lib/utils'
-import HolidaysQuery from '@/queries/holidays'
+import { useHolidayTypesQuery, useHolidaysRequestsByUserQuery } from '@/queries/holidays'
 import { HolidayRequest, HolidayType } from '@/types/types'
 import { CancelSquareIcon, MoreHorizontalIcon, PencilEdit02Icon, PlusSignSquareIcon, SearchVisualIcon, ViewIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { useQuery } from '@tanstack/react-query'
 import { VariantProps } from 'class-variance-authority'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
@@ -59,16 +58,11 @@ export function badgeStatusVariant(status: HolidayRequest["status"]): VariantPro
 
 function Page() {
   const { user } = useKizunaStore();
-  const holidaysQuery = new HolidaysQuery();
-  const holidaysType = useQuery({
-    queryKey: ["leaveTypes"],
-    queryFn: holidaysQuery.getTypes,
-  });
-  const { data, isSuccess, isLoading, isError } = useQuery({
-    queryKey: ["leave-requests", user?.uuid],
-    queryFn: async () => holidaysQuery.getRequestsByUser(user!.uuid),
-    enabled: !!user,
-  });
+  const holidaysType = useHolidayTypesQuery();
+  const { data, isSuccess, isLoading, isError } = useHolidaysRequestsByUserQuery(
+    user?.uuid ?? "",
+    !!user
+  );
 
   const [view, setView] = useState<boolean>(false);
   const [edit, setEdit] = useState<boolean>(false);

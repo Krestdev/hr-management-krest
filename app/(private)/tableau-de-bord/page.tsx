@@ -9,8 +9,8 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import useKizunaStore from "@/context/store";
-import HolidaysQuery from "@/queries/holidays";
-import UserQuery from "@/queries/employee";
+import { useHolidaysStatsQuery, useHolidaysBalanceQuery } from "@/queries/holidays";
+import { useEmployeesQuery } from "@/queries/employee";
 import {
   AddSquareIcon,
   Calendar02Icon,
@@ -25,30 +25,15 @@ import {
   UserSquareIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 function Page() {
   const { user } = useKizunaStore();
   const router = useRouter();
-  const holidaysQuery = new HolidaysQuery();
-  const userQuery = new UserQuery();
-  const stats = useQuery({
-    queryKey: ["statistics"],
-    queryFn: holidaysQuery.getStats,
-    enabled: user?.role !== "USER",
-  });
-  const employees = useQuery({
-    queryKey: ["employees"],
-    queryFn: () => userQuery.getAll(1, 20, "", undefined, undefined),
-    enabled: user?.role !== "USER",
-  });
-  const userHolidays = useQuery({
-    queryKey: ["self-holidays", user?.uuid],
-    queryFn: () => holidaysQuery.getBalance(user?.uuid ?? ""),
-    enabled: !!user?.uuid,
-  });
+  const stats = useHolidaysStatsQuery(user?.role !== "USER");
+  const employees = useEmployeesQuery(1, 20, user?.companyId || "", undefined, undefined, "ACTIVE", undefined, false, false, user?.role !== "USER");
+  const userHolidays = useHolidaysBalanceQuery(user?.uuid ?? "", undefined, !!user?.uuid);
   return (
     <div className="flex flex-col gap-4 sm:gap-6">
       <header className="flex flex-col">
