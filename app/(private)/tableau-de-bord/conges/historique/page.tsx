@@ -139,7 +139,7 @@ function Page() {
   const tableData = useMemo(() => {
     if (!isSuccessLeaves || !isSuccessUsers) return [];
 
-    return leavesData.items.map((leave: Leaves) => {
+    return leavesData.map((leave: Leaves) => {
       const user = usersData.data.find((u: Employee) => u.uuid === leave.userId);
 
       return {
