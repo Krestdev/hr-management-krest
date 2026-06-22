@@ -15,19 +15,19 @@ import {
 // --- Base d'utilisateurs fictifs ---
 export const demoUsers: Array<Employee> = [
   {
-    id: 1,
+    uuid: "1",
     firstName: "Jean",
     lastName: "Dupont",
     email: "admin@example.com",
-    password: "admin123", // 👈 mot de passe démo
-    role: "MANAGER",
-    gender: "Homme",
-    birthDate: new Date("1990-05-12"),
+    password: "admin123",
+    role: "SUPER_ADMIN",
+    gender: "MALE",
+    birthDate: new Date("1990-05-12").toISOString().split("T")[0],
     nationality: "Cameroun",
     country: "Cameroun",
     address: "Douala - Akwa",
     phone: "+237650000000",
-    maritalStatus: "Célibataire",
+    maritalStatus: 0,
     childrenCount: 0,
     emergencyContact: "+237699999999",
     cnpsNumber: "CNPS123456",
@@ -48,24 +48,25 @@ export const demoUsers: Array<Employee> = [
     workLocation: "headquarters",
     leaveDays: 24,
     attachments: [],
-    createdAt: new Date(),
+    createdAt: new Date().toISOString().split("T")[0],
     photo: "/samples/admin.png",
     autorizedLeaves: [1, 2, 3],
+    endDate: new Date("2025-03-01"),
   },
   {
-    id: 2,
+    uuid: "2",
     firstName: "Marie",
     lastName: "Nkem",
     email: "employee@example.com",
     password: "employee123",
     role: "USER",
-    gender: "Femme",
-    birthDate: new Date("1995-10-25"),
+    gender: "FEMALE",
+    birthDate: new Date("1995-10-25").toISOString().split("T")[0],
     nationality: "Cameroun",
     country: "Cameroun",
     address: "Yaoundé - Bastos",
     phone: "+237690111222",
-    maritalStatus: "Marié",
+    maritalStatus: 1,
     childrenCount: 2,
     emergencyContact: "+237699888777",
     idType: "CNI",
@@ -75,7 +76,7 @@ export const demoUsers: Array<Employee> = [
     idIssuePlace: "Yaoundé",
     position: "Comptable",
     department: "Finance",
-    supervisorId: 2,
+    supervisorId: "2",
     category: "VIII",
     level: "C",
     contractType: "CDD",
@@ -86,24 +87,24 @@ export const demoUsers: Array<Employee> = [
     workLocation: "agency",
     leaveDays: 22,
     attachments: [],
-    createdAt: new Date(),
+    createdAt: new Date().toISOString().split("T")[0],
     photo: "/samples/user.png",
     autorizedLeaves: [1, 4, 5],
   },
   {
-    id: 3,
+    uuid: "3",
     firstName: "Vanessa",
     lastName: "Ngando",
     email: "vanessangando@krest.com",
     password: "password",
-    role: "HR",
-    gender: "Femme",
-    birthDate: new Date("1992-04-21"),
+    role: "ADMIN",
+    gender: "FEMALE",
+    birthDate: new Date("1992-04-21").toISOString().split("T")[0],
     nationality: "Cameroun",
     country: "Cameroun",
     address: "Douala - Bonamoussadi",
     phone: "+237694604886",
-    maritalStatus: "Marié",
+    maritalStatus: 1,
     childrenCount: 3,
     emergencyContact: "+237699888777",
     idType: "CNI",
@@ -113,7 +114,7 @@ export const demoUsers: Array<Employee> = [
     idIssuePlace: "Douala",
     position: "Ressources humaines",
     department: "Ressources humaines",
-    supervisorId: 1,
+    supervisorId: "1",
     category: "X",
     level: "B",
     contractType: "CDD",
@@ -124,7 +125,7 @@ export const demoUsers: Array<Employee> = [
     workLocation: "agency",
     leaveDays: 22,
     attachments: [],
-    createdAt: new Date(),
+    createdAt: new Date().toISOString().split("T")[0],
     photo: "/samples/rh.png",
     autorizedLeaves: [1, 2, 3, 4, 5],
   },
@@ -174,21 +175,21 @@ export const demoHolidayTypes: HolidayType[] = [
 // quelques soldes exemple (pour tes cartes : Total, Consommés, Solde)
 export const demoLeaveBalances: EmployeeLeaveBalance[] = [
   {
-    userId: 1,
+    userId: "1",
     year: 2025,
     earnedDays: 21,
     usedDays: 15,
     remainingDays: 6,
   },
   {
-    userId: 2,
+    userId: "2",
     year: 2025,
     earnedDays: 21,
     usedDays: 8,
     remainingDays: 13,
   },
   {
-    userId: 3,
+    userId: "3",
     year: 2025,
     earnedDays: 21,
     usedDays: 4,
@@ -199,7 +200,7 @@ export const demoLeaveBalances: EmployeeLeaveBalance[] = [
 export const demoHolidayRequests: HolidayRequest[] = [
   {
     id: 1,
-    userId: 1,
+    userId: "1",
     typeId: 1,
     startDate: new Date("2025-06-10"),
     endDate: new Date("2025-06-15"),
@@ -211,7 +212,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 2,
-    userId: 1,
+    userId: "1",
     typeId: 5,
     startDate: new Date("2025-11-10"),
     endDate: new Date("2025-11-20"),
@@ -224,7 +225,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 3,
-    userId: 2,
+    userId: "2",
     typeId: 4,
     startDate: new Date("2025-03-01"),
     endDate: new Date("2025-03-03"),
@@ -236,7 +237,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 4,
-    userId: 2,
+    userId: "2",
     typeId: 7,
     startDate: new Date("2025-07-15"),
     endDate: new Date("2025-07-20"),
@@ -248,7 +249,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 5,
-    userId: 3,
+    userId: "3",
     typeId: 6,
     startDate: new Date("2025-04-10"),
     endDate: new Date("2025-04-12"),
@@ -262,7 +263,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   // 🔥 Ajouts (20 nouveaux)
   {
     id: 6,
-    userId: 1,
+    userId: "1",
     typeId: 1,
     startDate: new Date("2025-02-05"),
     endDate: new Date("2025-02-08"),
@@ -273,7 +274,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 7,
-    userId: 1,
+    userId: "1",
     typeId: 7,
     startDate: new Date("2025-09-01"),
     endDate: new Date("2025-09-05"),
@@ -284,7 +285,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 8,
-    userId: 1,
+    userId: "1",
     typeId: 4,
     startDate: new Date("2025-05-03"),
     endDate: new Date("2025-05-05"),
@@ -296,7 +297,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
 
   {
     id: 9,
-    userId: 2,
+    userId: "2",
     typeId: 1,
     startDate: new Date("2025-04-02"),
     endDate: new Date("2025-04-10"),
@@ -306,7 +307,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 10,
-    userId: 2,
+    userId: "2",
     typeId: 5,
     startDate: new Date("2025-10-20"),
     endDate: new Date("2025-10-25"),
@@ -317,7 +318,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 11,
-    userId: 2,
+    userId: "2",
     typeId: 6,
     startDate: new Date("2025-01-15"),
     endDate: new Date("2025-01-17"),
@@ -328,7 +329,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 12,
-    userId: 2,
+    userId: "2",
     typeId: 7,
     startDate: new Date("2025-12-05"),
     endDate: new Date("2025-12-20"),
@@ -339,7 +340,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 13,
-    userId: 2,
+    userId: "2",
     typeId: 4,
     startDate: new Date("2025-02-10"),
     endDate: new Date("2025-02-12"),
@@ -350,7 +351,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 14,
-    userId: 2,
+    userId: "2",
     typeId: 1,
     startDate: new Date("2025-06-20"),
     endDate: new Date("2025-06-25"),
@@ -362,7 +363,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
 
   {
     id: 15,
-    userId: 3,
+    userId: "3",
     typeId: 6,
     startDate: new Date("2025-08-01"),
     endDate: new Date("2025-08-03"),
@@ -373,7 +374,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 16,
-    userId: 3,
+    userId: "3",
     typeId: 1,
     startDate: new Date("2025-11-15"),
     endDate: new Date("2025-11-18"),
@@ -383,7 +384,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 17,
-    userId: 3,
+    userId: "3",
     typeId: 5,
     startDate: new Date("2025-03-02"),
     endDate: new Date("2025-03-06"),
@@ -394,7 +395,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 18,
-    userId: 3,
+    userId: "3",
     typeId: 7,
     startDate: new Date("2025-07-07"),
     endDate: new Date("2025-07-10"),
@@ -406,7 +407,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   // Ajout de variations sur plusieurs mois
   {
     id: 19,
-    userId: 1,
+    userId: "1",
     typeId: 5,
     startDate: new Date("2025-01-10"),
     endDate: new Date("2025-01-12"),
@@ -416,7 +417,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 20,
-    userId: 1,
+    userId: "1",
     typeId: 4,
     startDate: new Date("2025-03-15"),
     endDate: new Date("2025-03-17"),
@@ -426,7 +427,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 21,
-    userId: 1,
+    userId: "1",
     typeId: 1,
     startDate: new Date("2025-12-01"),
     endDate: new Date("2025-12-05"),
@@ -437,7 +438,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
 
   {
     id: 22,
-    userId: 2,
+    userId: "2",
     typeId: 4,
     startDate: new Date("2025-05-20"),
     endDate: new Date("2025-05-22"),
@@ -447,7 +448,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 23,
-    userId: 2,
+    userId: "2",
     typeId: 1,
     startDate: new Date("2025-09-10"),
     endDate: new Date("2025-09-15"),
@@ -457,7 +458,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 24,
-    userId: 2,
+    userId: "2",
     typeId: 7,
     startDate: new Date("2025-08-15"),
     endDate: new Date("2025-08-18"),
@@ -467,7 +468,7 @@ export const demoHolidayRequests: HolidayRequest[] = [
   },
   {
     id: 25,
-    userId: 2,
+    userId: "2",
     typeId: 5,
     startDate: new Date("2025-10-01"),
     endDate: new Date("2025-10-03"),
@@ -692,7 +693,7 @@ export const filesData: Files[] = [
     id: 1,
     title: "Contrat de travail",
     url: "/files/contrat-travail.pdf",
-    userId: 1,
+    userId: "1",
     createdAt: "2025-02-10T09:30:00Z",
     updatedAt: "2025-02-12T14:20:00Z",
   },
@@ -700,21 +701,21 @@ export const filesData: Files[] = [
     id: 2,
     title: "Rapport mensuel",
     url: "/files/rapport-mensuel.pdf",
-    userId: 1,
+    userId: "1",
     createdAt: "2025-01-28T16:45:00Z",
   },
   {
     id: 3,
     title: "Facture fournisseur",
     url: "/files/facture-fournisseur.pdf",
-    userId: 2,
+    userId: "2",
     createdAt: "2025-02-01T11:10:00Z",
   },
   {
     id: 4,
     title: "Planning RH",
     url: "/files/planning-rh.xlsx",
-    userId: 3,
+    userId: "3",
     createdAt: "2025-02-05T08:00:00Z",
     updatedAt: "2025-02-06T10:15:00Z",
   },
@@ -722,7 +723,7 @@ export const filesData: Files[] = [
     id: 5,
     title: "Ndongo Blaise",
     url: "/files/ndongo-blaise-cv.pdf",
-    userId: 3,
+    userId: "3",
     createdAt: "2025-02-14T13:00:00Z",
   },
 ];
@@ -742,7 +743,7 @@ const m = (
 export const salarialData: Salarial[] = [
   {
     id: 1,
-    userId: 1,
+    userId: "1",
     salaire_base: m(250000, "PRIME", true, true),
     indem_transport: m(20000, "INDEMNITE", false, false),
     indem_representation: m(15000, "INDEMNITE", false, false),
@@ -762,7 +763,7 @@ export const salarialData: Salarial[] = [
   },
   {
     id: 2,
-    userId: 2,
+    userId: "2",
     salaire_base: m(180000, "PRIME", true, true),
     indem_transport: m(15000, "INDEMNITE", false, false),
     indem_representation: m(10000, "INDEMNITE", false, false),
@@ -785,7 +786,7 @@ export const salarialData: Salarial[] = [
 export const leavesData: Leaves[] = [
   {
     id: 1,
-    userId: 1,
+    userId: "1",
     days: 5,
     status: "COMPLETED",
     startDate: new Date("2025-01-01"),
@@ -796,7 +797,7 @@ export const leavesData: Leaves[] = [
   },
   {
     id: 2,
-    userId: 1,
+    userId: "1",
     days: 3,
     status: "REJECTED",
     startDate: new Date("2025-02-01"),
@@ -807,7 +808,7 @@ export const leavesData: Leaves[] = [
   },
   {
     id: 3,
-    userId: 2,
+    userId: "2",
     days: 2,
     status: "APPROVED",
     startDate: new Date("2025-03-01"),
@@ -818,7 +819,7 @@ export const leavesData: Leaves[] = [
   },
   {
     id: 5,
-    userId: 2,
+    userId: "2",
     days: 2,
     status: "IN PROGRESS",
     startDate: new Date("2026-02-16"),
@@ -829,7 +830,7 @@ export const leavesData: Leaves[] = [
   },
   {
     id: 4,
-    userId: 3,
+    userId: "3",
     days: 1,
     status: "PENDING",
     startDate: new Date("2026-04-01"),
@@ -910,35 +911,35 @@ export const leavesTypeData: LeavesType[] = [
 export const presencesData: Presence[] = [
   {
     id: 1,
-    userId: 1,
+    userId: "1",
     date: "2026-02-15T00:00:00.000Z",
     statut: ["PRESENT", "VALID"],
     createdAt: "2026-02-15T08:00:00.000Z",
   },
   {
     id: 2,
-    userId: 1,
+    userId: "1",
     date: "2026-02-16T00:00:00.000Z",
     statut: ["LATE"],
     createdAt: "2026-02-16T08:00:00.000Z",
   },
   {
     id: 3,
-    userId: 2,
+    userId: "2",
     date: "2026-02-16T00:00:00.000Z",
     statut: ["ON_LEAVE"],
     createdAt: "2026-02-16T08:00:00.000Z",
   },
   {
     id: 4,
-    userId: 3,
+    userId: "3",
     date: "2026-02-16T00:00:00.000Z",
     statut: ["ABSENT", "EXCUSED"],
     createdAt: "2026-02-16T08:00:00.000Z",
   },
   {
     id: 5,
-    userId: 2,
+    userId: "2",
     date: "2026-02-17T00:00:00.000Z",
     statut: ["FIELD"],
     createdAt: "2026-02-17T08:00:00.000Z",

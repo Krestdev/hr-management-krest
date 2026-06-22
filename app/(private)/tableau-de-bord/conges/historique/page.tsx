@@ -23,7 +23,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
 import LeavesQuery from "@/queries/leaves";
-import UserQuery from "@/queries/users";
+import UserQuery from "@/queries/employee";
 import { Leaves, Employee } from "@/types/types";
 import WarningModal from "@/components/WarningModal";
 import { toast } from "sonner";
@@ -139,7 +139,7 @@ function Page() {
     isSuccess: isSuccessUsers,
   } = useQuery({
     queryKey: ["employees"],
-    queryFn: usersQuery.getAll,
+    queryFn: () => usersQuery.getAll(1, 20, "", undefined, undefined),
   });
 
   const [selectedLeave, setSelectedLeave] = useState<Leaves | null>(null);
@@ -150,7 +150,7 @@ function Page() {
     if (!isSuccessLeaves || !isSuccessUsers) return [];
 
     return leavesData.items.map((leave: Leaves) => {
-      const user = usersData.find((u: Employee) => u.id === leave.userId);
+      const user = usersData.data.find((u: Employee) => u.uuid === leave.userId);
 
       return {
         ...leave,
@@ -269,8 +269,8 @@ function Page() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tous les employés</SelectItem>
-              {usersData?.map((user: Employee) => (
-                <SelectItem key={user.id} value={user.id.toString()}>
+              {usersData?.data.map((user: Employee) => (
+                <SelectItem key={user.uuid} value={user.uuid.toString()}>
                   {user.firstName} {user.lastName}
                 </SelectItem>
               ))}
@@ -374,16 +374,16 @@ function Page() {
           typeFilter ||
           startPeriod ||
           endPeriod) && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={resetFilters}
-            className="ml-auto"
-            title="Réinitialiser les filtres"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={resetFilters}
+              className="ml-auto"
+              title="Réinitialiser les filtres"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
       </div>
 
       <div className="card-1">

@@ -9,8 +9,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { formatSeniority, getInitials } from "@/lib/utils";
+import { formatSalary, formatSeniority, getInitials } from "@/lib/utils";
+import DepartmentQuery from "@/queries/department";
+import PositionQuery from "@/queries/positions";
 import { Employee } from "@/types/types";
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import React from "react";
 
@@ -22,7 +25,22 @@ type Props = {
 };
 
 function ViewProfile({ isOpen, openChange, employee, users }: Props) {
-  const supervisor = users.find((x) => x.id === employee.supervisorId);
+  const supervisor = users.find((x) => x.uuid === employee.supervisorId);
+
+  const positionQuery = new PositionQuery()
+  const departmentQuery = new DepartmentQuery()
+
+  const positionData = useQuery({
+    queryKey: ["position"],
+    queryFn: () => positionQuery.getAll(),
+  });
+
+  const departmentData = useQuery({
+    queryKey: ["department"],
+    queryFn: () => departmentQuery.getAll(),
+  });
+
+
   return (
     <Dialog open={isOpen} onOpenChange={openChange}>
       <DialogContent className="sm:max-w-5xl">
@@ -46,7 +64,7 @@ function ViewProfile({ isOpen, openChange, employee, users }: Props) {
               </span>
               <p className="text-slate-800">
                 <span className="text-slate-600 font-light">{"Poste: "}</span>
-                {employee.position}
+                {employee.position ? positionData.data?.find((x) => x.uuid === employee.position[0])?.title : "--"}
               </p>
             </div>
           </div>
@@ -56,7 +74,7 @@ function ViewProfile({ isOpen, openChange, employee, users }: Props) {
             <div className="mt-5 grid grid-cols-1 gap-x-4 gap-y-6 @min-[460px]:grid-cols-2 @min-[760px]:grid-cols-3 @min-[1024px]:grid-cols-4 @min-[1280px]:grid-cols-5 @min-[1560px]:grid-cols-6">
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Adresse mail"}</span>
-                <span className="font-medium">{employee.email}</span>
+                <span className="font-medium">{employee.user.email}</span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Sexe"}</span>
@@ -65,7 +83,7 @@ function ViewProfile({ isOpen, openChange, employee, users }: Props) {
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Date de naissance"}</span>
                 <span className="font-medium">
-                  {format(employee.birthDate, "dd/MM/yyyy")}
+                  {format(employee.birthday, "dd/MM/yyyy")}
                 </span>
               </div>
               <div className="flex flex-col gap-0.5">
@@ -74,7 +92,7 @@ function ViewProfile({ isOpen, openChange, employee, users }: Props) {
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Pays de résidence"}</span>
-                <span className="font-medium">{employee.country}</span>
+                <span className="font-medium">{employee.countryOfResidence}</span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Adresse"}</span>
@@ -82,23 +100,23 @@ function ViewProfile({ isOpen, openChange, employee, users }: Props) {
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Numero de téléphone"}</span>
-                <span className="font-medium">{employee.phone}</span>
+                <span className="font-medium">{employee.phoneNumber}</span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Situation matrimoniale"}</span>
-                <span className="font-medium">{employee.maritalStatus}</span>
+                <span className="font-medium">{employee.matrimonial_status === 0 ? "Célibataire" : "Marié(e)"}</span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Enfants"}</span>
                 <span className="font-medium">
-                  {employee.childrenCount === 0
+                  {employee.number_of_children === 0
                     ? "Aucun"
-                    : employee.childrenCount}
+                    : employee.number_of_children}
                 </span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Contact d'urgence"}</span>
-                <span className="font-medium">{employee.emergencyContact}</span>
+                <span className="font-medium">{employee.EmergencyContactPhone}</span>
               </div>
             </div>
           </div>
@@ -109,36 +127,34 @@ function ViewProfile({ isOpen, openChange, employee, users }: Props) {
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"CNPS"}</span>
                 <span className="font-medium">
-                  {employee.cnpsNumber ?? "Non défini"}
+                  {employee.CNPSNumber ?? "Non défini"}
                 </span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Pièce d'identité"}</span>
                 <span className="font-medium">
-                  {`${employee.idType} - ${employee.idNumber}`}
+                  {`${employee.idDocumentType} - ${employee.idDocumentNumber}`}
                   <br />
-                  <span className="text-[12px] text-slate-600 font-normal">{`Délivrée le ${
-                    employee.idIssueDate &&
-                    format(employee.idIssueDate, "dd/MM/yyyy")
-                  } à ${employee.idIssuePlace}, expire le ${
-                    employee.idExpiryDate &&
-                    format(employee.idExpiryDate, "dd/MM/yyyy")
-                  }`}</span>
+                  <span className="text-[12px] text-slate-600 font-normal">{`Délivrée le ${employee.idDocumentIssueDate &&
+                    format(employee.idDocumentIssueDate, "dd/MM/yyyy")
+                    } à ${employee.idDocumentIssuePlace}, expire le ${employee.idDocumentExpiryDate &&
+                    format(employee.idDocumentExpiryDate, "dd/MM/yyyy")
+                    }`}</span>
                 </span>
               </div>
             </div>
           </div>
-          {/**Informations personnelles */}
+          {/**Informations profession */}
           <div className="space-y-2 py-4">
-            <h3 className="bg-slate-50 px-3 py-1.5">{"Informations personnelles"}</h3>
+            <h3 className="bg-slate-50 px-3 py-1.5">{"Informations professionnelles"}</h3>
             <div className="mt-5 grid grid-cols-1 gap-x-4 gap-y-6 @min-[460px]:grid-cols-2 @min-[760px]:grid-cols-3 @min-[1024px]:grid-cols-4 @min-[1280px]:grid-cols-5 @min-[1560px]:grid-cols-6">
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Poste"}</span>
-                <span className="font-medium">{employee.position}</span>
+                <span className="font-medium">{employee.position ?? "--"}</span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Département"}</span>
-                <span className="font-medium">{employee.department}</span>
+                <span className="font-medium">{employee.department ?? "--"}</span>
               </div>
               {!!supervisor && (
                 <div className="flex flex-col gap-0.5">
@@ -156,20 +172,24 @@ function ViewProfile({ isOpen, openChange, employee, users }: Props) {
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Grade"}</span>
-                <span className="font-medium">{employee.level}</span>
+                <span className="font-medium">{employee.grade}</span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Contrat"}</span>
-                <span className="font-medium">{employee.contractType}</span>
+                <span className="font-medium">{employee?.contracts![0].contract_type}</span>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-slate-600">{"Salaire de base"}</span>
+                <span className="font-medium">{formatSalary(employee?.contracts![0].baseSalary!)}</span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Ancienneté"}</span>
-                <span className="font-medium">{formatSeniority(employee.startDate)}</span>
+                <span className="font-medium">{formatSeniority(employee.hireDate)}</span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Date de début"}</span>
                 <span className="font-medium">
-                  {employee.startDate && format(employee.startDate, "dd/MM/yyyy")}
+                  {employee.hireDate && format(employee.hireDate, "dd/MM/yyyy")}
                 </span>
               </div>
               {employee.endDate && (
@@ -186,11 +206,11 @@ function ViewProfile({ isOpen, openChange, employee, users }: Props) {
               </div>
             </div>
           </div>
-          </div>
+        </div>
         <DialogFooter>
-            <DialogClose asChild>
-                <Button variant={"outline"}>{"Fermer"}</Button>
-            </DialogClose>
+          <DialogClose asChild>
+            <Button variant={"outline"}>{"Fermer"}</Button>
+          </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>

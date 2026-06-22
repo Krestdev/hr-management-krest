@@ -21,7 +21,7 @@ export async function GET(
     );
   }
 
-  const employee = demoUsers.find((e) => e.id === numericId);
+  const employee = demoUsers.find((e) => e.uuid === id);
 
   if (!employee) {
     return NextResponse.json(

@@ -48,7 +48,7 @@ export default class LeavesQuery {
 
   // ✅ GET BY USERID
   getByUserId = async (
-    userId: number,
+    userId: string,
   ): Promise<{
     success: boolean;
     items: Leaves[];

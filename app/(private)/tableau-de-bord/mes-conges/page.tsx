@@ -41,265 +41,265 @@ export function formatStatusLabel(status: HolidayRequest["status"]) {
   }
 }
 
-export function badgeStatusVariant(status: HolidayRequest["status"]): VariantProps<typeof badgeVariants>["variant"]{
-    switch (status) {
-        case "ACCEPTED":
-            return "success";
-        case "REJECTED" :
-            return "destructive";
-        case 'PENDING_MANAGER':
-            return "orange";
-        case 'PENDING_HR':
-            return "orange";
-        default:
-            return "default";
-    }
+export function badgeStatusVariant(status: HolidayRequest["status"]): VariantProps<typeof badgeVariants>["variant"] {
+  switch (status) {
+    case "ACCEPTED":
+      return "success";
+    case "REJECTED":
+      return "destructive";
+    case 'PENDING_MANAGER':
+      return "orange";
+    case 'PENDING_HR':
+      return "orange";
+    default:
+      return "default";
+  }
 }
 
 
 function Page() {
-    const { user } = useKizunaStore();
-    const holidaysQuery = new HolidaysQuery();
-    const holidaysType = useQuery({
-      queryKey: ["leaveTypes"],
-      queryFn: holidaysQuery.getTypes,
-    });
-    const { data, isSuccess, isLoading, isError } = useQuery({
-        queryKey: ["leave-requests", user?.id],
-        queryFn: async()=>holidaysQuery.getRequestsByUser(user?.id ?? 0),
-        enabled: !!user,
-    });
+  const { user } = useKizunaStore();
+  const holidaysQuery = new HolidaysQuery();
+  const holidaysType = useQuery({
+    queryKey: ["leaveTypes"],
+    queryFn: holidaysQuery.getTypes,
+  });
+  const { data, isSuccess, isLoading, isError } = useQuery({
+    queryKey: ["leave-requests", user?.uuid],
+    queryFn: async () => holidaysQuery.getRequestsByUser(user!.uuid),
+    enabled: !!user,
+  });
 
-    const [view, setView] = useState<boolean>(false);
-    const [edit, setEdit] = useState<boolean>(false);
-    const [cancel, setCancel] = useState<boolean>(false);
-    const [activeReq, setActiveReq] = useState<HolidayRequest>();
-    const [statusFilter, setStatusFilter] = useState<string>("all");
-    const [typeFilter, setTypeFilter] = useState<string>("all");
-    const [dateRange, setDateRange] = useState<DateRange | undefined>({
+  const [view, setView] = useState<boolean>(false);
+  const [edit, setEdit] = useState<boolean>(false);
+  const [cancel, setCancel] = useState<boolean>(false);
+  const [activeReq, setActiveReq] = useState<HolidayRequest>();
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: undefined,
     to: undefined,
   });
-    const [types, setTypes] = useState<Array<HolidayType>>([]);
+  const [types, setTypes] = useState<Array<HolidayType>>([]);
 
-    useEffect(()=>{
-      if(holidaysType.isSuccess){
-        setTypes(holidaysType.data);
-      }
-    },[holidaysType.isSuccess, holidaysType.data, setTypes]);
+  useEffect(() => {
+    if (holidaysType.isSuccess) {
+      setTypes(holidaysType.data);
+    }
+  }, [holidaysType.isSuccess, holidaysType.data, setTypes]);
 
-  function resetFilters(){
+  function resetFilters() {
     setStatusFilter("all");
     setDateRange(undefined);
     setTypeFilter("all");
   }
 
-  function handleView(req: HolidayRequest){
+  function handleView(req: HolidayRequest) {
     setActiveReq(req);
     setView(true);
   }
-  function handleEdit(req: HolidayRequest){
+  function handleEdit(req: HolidayRequest) {
     setActiveReq(req);
     setEdit(true);
   }
-  function handleCancel(req: HolidayRequest){
+  function handleCancel(req: HolidayRequest) {
     setActiveReq(req);
     setCancel(true);
   }
 
-    const filteredRequests = useMemo(() => {
-  if (!isSuccess || !data) return [];
+  const filteredRequests = useMemo(() => {
+    if (!isSuccess || !data) return [];
 
-  return data
-    .filter((request) => {
-      // ----- filtre statut -----
-      const matchStatus =
-        statusFilter === "all" ? true : request.status.startsWith(statusFilter);
+    return data
+      .filter((request) => {
+        // ----- filtre statut -----
+        const matchStatus =
+          statusFilter === "all" ? true : request.status.startsWith(statusFilter);
 
-      // ----- filtre dates -----
-      const from = dateRange?.from;
-      const to = dateRange?.to;
+        // ----- filtre dates -----
+        const from = dateRange?.from;
+        const to = dateRange?.to;
 
-      // attention si ton API renvoie des string, pense à caster :
-      const start = new Date(request.createdAt);
+        // attention si ton API renvoie des string, pense à caster :
+        const start = new Date(request.createdAt);
 
-      let matchDate = true;
+        let matchDate = true;
 
-      if (from && !to) {
-        matchDate = start >= from;
-      } else if (!from && to) {
-        matchDate = start <= to;
-      } else if (from && to) {
-        matchDate = start >= from && start <= to;
-      }
+        if (from && !to) {
+          matchDate = start >= from;
+        } else if (!from && to) {
+          matchDate = start <= to;
+        } else if (from && to) {
+          matchDate = start >= from && start <= to;
+        }
 
-      const matchType = 
-        typeFilter === "all" ? true : String(request.typeId) === typeFilter
+        const matchType =
+          typeFilter === "all" ? true : String(request.typeId) === typeFilter
 
-      return matchStatus && matchDate && matchType;
-    })
-    // optionnel : tri par date de début décroissante
-    .sort(
-      (a, b) =>
-        new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
-    );
-}, [isSuccess, data, statusFilter, dateRange, typeFilter]);
+        return matchStatus && matchDate && matchType;
+      })
+      // optionnel : tri par date de début décroissante
+      .sort(
+        (a, b) =>
+          new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+      );
+  }, [isSuccess, data, statusFilter, dateRange, typeFilter]);
 
-    if(isLoading){
-      return <LoadingComponent/>
-    }
-    if(isError){
-      return <ErrorComponent/>
-    }
+  if (isLoading) {
+    return <LoadingComponent />
+  }
+  if (isError) {
+    return <ErrorComponent />
+  }
 
-    if(isSuccess)
-  return (
-    <div className="grid gap-4 sm:gap-6">
-      <Header variant={"grey"} title="Mes Congés" />
+  if (isSuccess)
+    return (
+      <div className="grid gap-4 sm:gap-6">
+        <Header variant={"grey"} title="Mes Congés" />
         <div className="card-1 w-full overflow-x-auto">
-            <div className="card-1-header2">
-                <h3>{"Historique des congés"}</h3>
-                {/**Filtres */}
-                <div className="filters">
-                    <div className="filter-group">
-                        <Label htmlFor='type'>{"Type"}</Label>
-                        <Select name="type" value={typeFilter} onValueChange={(value)=>setTypeFilter(value)} >
-                            <SelectTrigger className="min-w-32">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">{"Tous"}</SelectItem>
-                                {
-                                  types.map((type)=>(
-                                    <SelectItem key={type.id} value={String(type.id)}>{type.label}</SelectItem>
-                                  ))
-                                }
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="filter-group">
-                        <Label htmlFor='status'>{"Statut"}</Label>
-                        <Select name="status" value={statusFilter} onValueChange={(value)=>setStatusFilter(value)} >
-                            <SelectTrigger className="min-w-32">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">{"Tous"}</SelectItem>
-                                <SelectItem value="ACCEPTED">{"Accepté"}</SelectItem>
-                                <SelectItem value="PENDING">{"En attente"}</SelectItem>
-                                <SelectItem value="REJECTED">{"Rejeté"}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="filter-group">
-                        <Label htmlFor="date">{"Période"}</Label>
-                        <DateRangePicker
-                        date={dateRange}
-                        onChange={setDateRange}
-                        className="min-w-40"/>
-                    </div>
-                    <Link href={"/tableau-de-bord/mes-conges/creer"}>
-                        <Button variant={"accent"}>{"Demande d'absence"}<HugeiconsIcon icon={PlusSignSquareIcon} strokeWidth={2} /></Button>
-                    </Link>
-                </div>
+          <div className="card-1-header2">
+            <h3>{"Historique des congés"}</h3>
+            {/**Filtres */}
+            <div className="filters">
+              <div className="filter-group">
+                <Label htmlFor='type'>{"Type"}</Label>
+                <Select name="type" value={typeFilter} onValueChange={(value) => setTypeFilter(value)} >
+                  <SelectTrigger className="min-w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{"Tous"}</SelectItem>
+                    {
+                      types.map((type) => (
+                        <SelectItem key={type.id} value={String(type.id)}>{type.label}</SelectItem>
+                      ))
+                    }
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="filter-group">
+                <Label htmlFor='status'>{"Statut"}</Label>
+                <Select name="status" value={statusFilter} onValueChange={(value) => setStatusFilter(value)} >
+                  <SelectTrigger className="min-w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{"Tous"}</SelectItem>
+                    <SelectItem value="ACCEPTED">{"Accepté"}</SelectItem>
+                    <SelectItem value="PENDING">{"En attente"}</SelectItem>
+                    <SelectItem value="REJECTED">{"Rejeté"}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="filter-group">
+                <Label htmlFor="date">{"Période"}</Label>
+                <DateRangePicker
+                  date={dateRange}
+                  onChange={setDateRange}
+                  className="min-w-40" />
+              </div>
+              <Link href={"/tableau-de-bord/mes-conges/creer"}>
+                <Button variant={"accent"}>{"Demande d'absence"}<HugeiconsIcon icon={PlusSignSquareIcon} strokeWidth={2} /></Button>
+              </Link>
             </div>
-            {/**Header END */}
-            <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{"Type"}</TableHead>
-              <TableHead>{"Période"}</TableHead>
-              <TableHead>{"Émis le"}</TableHead>
-              <TableHead>{"Statut"}</TableHead>
-              <TableHead>{"Justificatif"}</TableHead>
-              <TableHead>{"Observation"}</TableHead>
-              <TableHead>{"Actions"}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredRequests.length === 0 && (
+          </div>
+          {/**Header END */}
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={7}>
-                  <Empty>
-                    <EmptyHeader>
+                <TableHead>{"Type"}</TableHead>
+                <TableHead>{"Période"}</TableHead>
+                <TableHead>{"Émis le"}</TableHead>
+                <TableHead>{"Statut"}</TableHead>
+                <TableHead>{"Justificatif"}</TableHead>
+                <TableHead>{"Observation"}</TableHead>
+                <TableHead>{"Actions"}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredRequests.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <Empty>
+                      <EmptyHeader>
                         <EmptyMedia variant={"icon"}>
-                            <HugeiconsIcon icon={SearchVisualIcon} />
+                          <HugeiconsIcon icon={SearchVisualIcon} />
                         </EmptyMedia>
                         <EmptyTitle>{"Aucun résultat correspondant"}</EmptyTitle>
                         <EmptyDescription>{"Nous ne trouvons pas d'élement correspondant à ces critères"}</EmptyDescription>
-                    </EmptyHeader>
-                    <EmptyContent>
+                      </EmptyHeader>
+                      <EmptyContent>
                         <Button variant={"outline"} onClick={resetFilters}>{"Réinitialiser les filtres"}</Button>
-                    </EmptyContent>
-                  </Empty>
-                </TableCell>
-              </TableRow>
-            )}
+                      </EmptyContent>
+                    </Empty>
+                  </TableCell>
+                </TableRow>
+              )}
 
-            {filteredRequests.map((request) => (
-              <TableRow className="h-13" key={request.id}>
-                <TableCell>
-                  {/* typeLabel vient de l'API si tu l'as ajouté, sinon adapte */}
-                  {"typeLabel" in request
-                    ? (request as any).typeLabel
-                    : "Congé"}
-                </TableCell>
-                <TableCell>
-                  {format(request.startDate, "eee d LLL y", {locale: fr})}{" "}
-                  {" - "}
-                  {format(request.endDate, "d LLL y", {locale: fr})}
-                </TableCell>
-                <TableCell>
-                  {formatDate(request.createdAt)}
-                </TableCell>
-                <TableCell>
-                  <Badge variant={badgeStatusVariant(request.status)}>
-                    {formatStatusLabel(request.status)}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  {request.justificationFile ? (
-                    <a
-                      href={request.justificationFile}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary underline text-sm"
-                    >
-                      {"Voir le fichier"}
-                    </a>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">
-                      {"Aucun"}
+              {filteredRequests.map((request) => (
+                <TableRow className="h-13" key={request.id}>
+                  <TableCell>
+                    {/* typeLabel vient de l'API si tu l'as ajouté, sinon adapte */}
+                    {"typeLabel" in request
+                      ? (request as any).typeLabel
+                      : "Congé"}
+                  </TableCell>
+                  <TableCell>
+                    {format(request.startDate, "eee d LLL y", { locale: fr })}{" "}
+                    {" - "}
+                    {format(request.endDate, "d LLL y", { locale: fr })}
+                  </TableCell>
+                  <TableCell>
+                    {formatDate(request.createdAt)}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={badgeStatusVariant(request.status)}>
+                      {formatStatusLabel(request.status)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {request.justificationFile ? (
+                      <a
+                        href={request.justificationFile}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary underline text-sm"
+                      >
+                        {"Voir le fichier"}
+                      </a>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">
+                        {"Aucun"}
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell className="max-w-xs">
+                    <span className="block truncate text-sm text-muted-foreground">
+                      {request.reason || "—"}
                     </span>
-                  )}
-                </TableCell>
-                <TableCell className="max-w-xs">
-                  <span className="block truncate text-sm text-muted-foreground">
-                    {request.reason || "—"}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
                         <HugeiconsIcon icon={MoreHorizontalIcon} />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuItem onClick={()=>handleView(request)}><HugeiconsIcon icon={ViewIcon}/>{"Voir"}</DropdownMenuItem>
-                        <DropdownMenuItem onClick={()=>handleEdit(request)} disabled={request.status !== "PENDING_HR"}><HugeiconsIcon icon={PencilEdit02Icon} />{"Modifier"}</DropdownMenuItem>
-                        <DropdownMenuItem variant="destructive" onClick={()=>handleCancel(request)} disabled={request.status === "REJECTED" || request.status === "PENDING_MANAGER"}><HugeiconsIcon icon={CancelSquareIcon} />{"Annuler"}</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => handleView(request)}><HugeiconsIcon icon={ViewIcon} />{"Voir"}</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleEdit(request)} disabled={request.status !== "PENDING_HR"}><HugeiconsIcon icon={PencilEdit02Icon} />{"Modifier"}</DropdownMenuItem>
+                        <DropdownMenuItem variant="destructive" onClick={() => handleCancel(request)} disabled={request.status === "REJECTED" || request.status === "PENDING_MANAGER"}><HugeiconsIcon icon={CancelSquareIcon} />{"Annuler"}</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
-        { activeReq && <ViewLeaveRequest isOpen={view} openChange={setView} request={activeReq}/>}
-        { activeReq && <EditLeaveRequest isOpen={edit} openChange={setEdit} request={activeReq}/>}
-        { activeReq && <CancelLeaveRequest isOpen={cancel} openChange={setCancel} request={activeReq}/>}
-    </div>
-  )
+        {activeReq && <ViewLeaveRequest isOpen={view} openChange={setView} request={activeReq} />}
+        {activeReq && <EditLeaveRequest isOpen={edit} openChange={setEdit} request={activeReq} />}
+        {activeReq && <CancelLeaveRequest isOpen={cancel} openChange={setCancel} request={activeReq} />}
+      </div>
+    )
 }
 
 export default Page

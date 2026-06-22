@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import useKizunaStore from '@/context/store'
 import { formatSeniority, getInitials, getYearsOfService } from '@/lib/utils';
-import UserQuery from '@/queries/users';
+import UserQuery from '@/queries/employee';
 import { Edit03Icon, FileAttachmentIcon, Profile02Icon, UserAccountIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useQuery } from '@tanstack/react-query';
@@ -17,7 +17,7 @@ function Page() {
   const usersQuery = new UserQuery();
   const { data, isLoading, isSuccess } = useQuery({
     queryKey: ["user", user?.supervisorId],
-    queryFn: async()=>usersQuery.getUser(user?.supervisorId ?? 0),
+    queryFn: async () => usersQuery.getById(user?.supervisorId ?? ""),
     enabled: !!user
   });
   const [openUpdate, setOpenUpdate] = useState<boolean>(false);
@@ -36,10 +36,10 @@ function Page() {
               <AvatarImage src={user?.photo} />
               <AvatarFallback>{getInitials(user?.firstName.concat(" ", user.lastName))}</AvatarFallback>
             </Avatar>
-            <Button size={"icon-sm"} variant={"outline"} className="absolute bottom-2 right-2" onClick={()=>setOpenUpdate(true)}><HugeiconsIcon icon={Edit03Icon} /></Button>
+            <Button size={"icon-sm"} variant={"outline"} className="absolute bottom-2 right-2" onClick={() => setOpenUpdate(true)}><HugeiconsIcon icon={Edit03Icon} /></Button>
           </div>
           <div className="w-full flex flex-col gap-0.5 text-center sm:text-left">
-            <span className="text-[clamp(18px,2vw,24px)] font-semibold">{user?.firstName.concat(" ",user.lastName)}</span>
+            <span className="text-[clamp(18px,2vw,24px)] font-semibold">{user?.firstName.concat(" ", user.lastName)}</span>
             <p className="text-slate-800"><span className="text-slate-600 font-light">{"Poste: "}</span>{user?.position}</p>
           </div>
         </div>
@@ -102,7 +102,7 @@ function Page() {
             <span className="text-slate-600">{"Pièce d'identité"}</span>
             <span className="font-medium">
               {`${user?.idType} - ${user?.idNumber}`}
-              <br/>
+              <br />
               <span className="text-[12px] text-slate-600 font-normal">{`Délivrée le ${user?.idIssueDate && format(user.idIssueDate, "dd/MM/yyyy")} à ${user?.idIssuePlace}, expire le ${user?.idExpiryDate && format(user.idExpiryDate, "dd/MM/yyyy")}`}</span>
             </span>
           </div>
@@ -128,9 +128,9 @@ function Page() {
           {
             isSuccess &&
             <div className="flex flex-col gap-0.5">
-            <span className="text-slate-600">{"Supérieur hiérarchique"}</span>
-            <span className="font-medium">{ !!data ? data.user.firstName.concat(" ", data.user.lastName) : "Aucun"}</span>
-          </div>
+              <span className="text-slate-600">{"Supérieur hiérarchique"}</span>
+              <span className="font-medium">{!!data ? data.data.firstName.concat(" ", data.data.lastName) : "Aucun"}</span>
+            </div>
           }
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Catégorie"}</span>
@@ -153,7 +153,7 @@ function Page() {
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Ancienneté"}</span>
             <span className="font-medium">
-              { user?.startDate && formatSeniority(user.startDate)}
+              {user?.startDate && formatSeniority(user.startDate)}
             </span>
           </div>
           <div className="flex flex-col gap-0.5">
@@ -165,11 +165,11 @@ function Page() {
           {
             user?.endDate &&
             <div className="flex flex-col gap-0.5">
-            <span className="text-slate-600">{"Date de fin"}</span>
-            <span className="font-medium">
-              {user.endDate && format(user.endDate, "dd/MM/yyyy")}
-            </span>
-          </div>
+              <span className="text-slate-600">{"Date de fin"}</span>
+              <span className="font-medium">
+                {user.endDate && format(user.endDate, "dd/MM/yyyy")}
+              </span>
+            </div>
           }
           <div className="flex flex-col gap-0.5">
             <span className="text-slate-600">{"Lieu de travail"}</span>

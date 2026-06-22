@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import LeavesTypeQuery from "@/queries/leaves-type";
-import UserQuery from "@/queries/users";
+import UserQuery from "@/queries/employee";
 import LeavesQuery from "@/queries/leaves";
 import { Employee, LeavesType, Leaves } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
@@ -22,7 +22,7 @@ import React, { useMemo, useState } from "react";
 type Props = {
   isOpen: boolean;
   openChange: React.Dispatch<React.SetStateAction<boolean>>;
-  employeeId: number;
+  employeeId: string;
 };
 
 type LeaveFormState = {
@@ -45,7 +45,7 @@ function ViewConge({ isOpen, openChange, employeeId }: Props) {
   // USERS
   const { data: usersData, isSuccess: isSuccessUsers } = useQuery({
     queryKey: ["employees"],
-    queryFn: usersQuery.getAll,
+    queryFn: () => usersQuery.getAll(1, 20, "", undefined, undefined),
   });
 
   // LEAVES TYPES
@@ -62,7 +62,7 @@ function ViewConge({ isOpen, openChange, employeeId }: Props) {
 
   const employee: Employee | undefined = useMemo(() => {
     if (!isSuccessUsers) return undefined;
-    return usersData.find((u: Employee) => u.id === employeeId);
+    return usersData?.data.find((u: Employee) => u.uuid === employeeId);
   }, [isSuccessUsers, usersData, employeeId]);
 
   // FORM STATE
@@ -156,7 +156,7 @@ function ViewConge({ isOpen, openChange, employeeId }: Props) {
 
               // Déterminer si la checkbox doit être désactivée
               const isCheckboxDisabled = state.isAnnualLeave;
-              
+
               // Déterminer si l'input doit être désactivé
               const isInputDisabled = state.isAnnualLeave;
 
@@ -202,9 +202,8 @@ function ViewConge({ isOpen, openChange, employeeId }: Props) {
                           },
                         }));
                       }}
-                      className={`w-20 text-center ${
-                        state.isAnnualLeave ? "bg-gray-100 cursor-not-allowed" : ""
-                      }`}
+                      className={`w-20 text-center ${state.isAnnualLeave ? "bg-gray-100 cursor-not-allowed" : ""
+                        }`}
                     />
                     <span className="text-sm">Jours</span>
                   </div>
@@ -249,7 +248,7 @@ function ViewConge({ isOpen, openChange, employeeId }: Props) {
                 };
 
                 console.log("PAYLOAD COMPLET:", JSON.stringify(payload, null, 2));
-                
+
                 // Alternative: Format plus simple si vous préférez
                 const simplePayload = {
                   userId: employeeId,
@@ -263,7 +262,7 @@ function ViewConge({ isOpen, openChange, employeeId }: Props) {
                 };
 
                 console.log("PAYLOAD SIMPLE:", JSON.stringify(simplePayload, null, 2));
-                
+
                 openChange(false);
               }}
             >

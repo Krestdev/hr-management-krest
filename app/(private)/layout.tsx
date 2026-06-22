@@ -8,7 +8,7 @@ export default function PrivateLayout({ children }: { children: ReactNode }) {
   const { isReady, isAuthenticated } = useAuthGuard();
 
   if (!isReady) {
-    return <PageLoader/>
+    return <PageLoader />
   }
 
   if (!isAuthenticated) {

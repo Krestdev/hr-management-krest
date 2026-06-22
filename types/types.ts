@@ -1,70 +1,78 @@
-import { string } from "zod";
+import { string, uuid } from "zod";
 
 export type Employee = {
-  id: number;
-  updatedAt?: Date;
-  createdAt: Date;
+  uuid: string;
+  employeeId?: string;
+  updatedAt?: string;
+  createdAt?: string;
   photo?: string;
   password?: string;
-  role: "MANAGER" | "HR" | "USER";
+  role: "SUPER_ADMIN" | "ADMIN" | "USER";
+  status: string;
+  isActive: boolean;
   //Form
   firstName: string;
   lastName: string;
   email: string;
-  birthDate: Date;
-  gender: "Homme" | "Femme";
+  birthday: string;
+  gender: "MALE" | "FEMALE";
   nationality: string;
-  country: string;
+  countryOfResidence: string;
   address: string;
-  phone: string;
-  maritalStatus: "Célibataire" | "Marié"; // | "Divorcé" | "Veuf"
-  childrenCount: number;
-  emergencyContact?: string;
+  phoneNumber: string;
+  matrimonial_status: number; // 0 = célibataire, 1 = marié(e)
+  number_of_children: number;
+  EmergencyContactPhone?: string;
   // -----------------------------
   // 2️⃣ Informations administratives
   // -----------------------------
-  cnpsNumber?: string;
-  idType: string; // CNI, Passeport, Permis...
-  idNumber: string;
-  idIssueDate: Date;
-  idExpiryDate: Date;
-  idIssuePlace: string;
-  idDocumentFile?: File | string; // fichier uploadé ou URL (si déjà stocké
+  CNPSNumber?: string;
+  idDocumentType: string; // CNI, Passeport, Permis...
+  idDocumentNumber: string;
+  idDocumentIssueDate: Date;
+  idDocumentExpiryDate: Date;
+  idDocumentIssuePlace: string;
+  idDocumentFileUrl?: File | string;
+  contracts?: {
+    baseSalary: number;
+    contract_type: string
+  }[];
+  user: {
+    uuid: string
+    email: string
+  };
   // -----------------------------
   // 3️⃣ Informations professionnelles
   // -----------------------------
-  position: string; // poste occupé
-  department: string; // département / service
-  supervisorId?: number | null; // employé supérieur hiérarchique
+  companyId: string;
+  position: string[]; // poste occupé
+  department: string[]; // département / service
+  supervisorId?: string | null; // employé supérieur hiérarchique
   category: string; // catégorie professionnelle
-  level: string; // Échelon
-  startDate: Date; // date d'entrée
-  endDate?: Date; // date de fin (si CDD)
+  grade: string; // Échelon
+  hireDate: Date; // date d'entrée
+  endDate: Date; // date de fin (si CDD)
   contractType: "CDI" | "CDD" | "Stage" | "Prestation" | "Essai";
   baseSalary: number;
   paymentMode:
-    | "Virement bancaire"
-    | "Espèces"
-    | "Mobile Money"
-    | "Chèque"
-    | string;
+  | "Virement bancaire"
+  | "Espèces"
+  | "Mobile Money"
+  | "Chèque"
+  | string;
   workLocation:
-    | "Siège"
-    | "Agence"
-    | "Chantier"
-    | "Télétravail"
-    | "Autre"
-    | string;
+  | "Siège"
+  | "Agence"
+  | "Chantier"
+  | "Télétravail"
+  | "Autre"
+  | string;
   workLocationName?: string; // si lieu = "Autre"
   leaveDays: number; // droit de congé annuel
   autorizedLeaves: number[]; // type de congés autorisés
   attachments?: File[] | string[]; // fichiers joints (contrat, etc.)
 };
-export type HolidayRequestStatus =
-  | "PENDING_MANAGER" // en attente du supérieur
-  | "PENDING_HR" // validé sup, en attente RH
-  | "ACCEPTED"
-  | "REJECTED";
+export type HolidayRequestStatus = "PENDING_MANAGER" | "PENDING_HR" | "ACCEPTED" | "REJECTED" | "CANCELLED";
 
 export interface HolidayType {
   id: number;
@@ -77,7 +85,7 @@ export interface HolidayType {
 
 export interface HolidayRequest {
   id: number;
-  userId: number;
+  userId: string;
   typeId: number;
   typeLabel?: string;
   startDate: Date;
@@ -91,7 +99,7 @@ export interface HolidayRequest {
 }
 
 export interface EmployeeLeaveBalance {
-  userId: number;
+  userId: string;
   year: number;
   earnedDays: number; // acquis
   usedDays: number; // consommés
@@ -100,17 +108,17 @@ export interface EmployeeLeaveBalance {
 
 export type PresenceFlag =
   | "PRESENT"
-  | "EXCEPTIONAL"
-  | "VALID"
   | "ABSENT"
   | "LATE"
+  | "ON_LEAVE"
   | "FIELD"
-  | "EXCUSED"
-  | "ON_LEAVE";
+  | "EXCEPTIONAL"
+  | "VALID"
+  | "EXCUSED";
 
 export interface PresenceRecord {
   id: number;
-  userId: number;
+  userId: string;
 
   date: Date;
 
@@ -150,7 +158,7 @@ export type Files = {
   id: number;
   title: string;
   url: string;
-  userId: number;
+  userId: string;
   createdAt: string;
   updatedAt?: string;
 };
@@ -164,7 +172,7 @@ type Montant = {
 
 export type Salarial = {
   id: number;
-  userId: number;
+  userId: string;
   salaire_base: Montant;
   indem_transport: Montant;
   indem_representation: Montant;
@@ -188,21 +196,21 @@ export type LeavesType = {
   label: string;
   value: number;
   code:
-    | "ANNUAL"
-    | "SICK"
-    | "ERRAND"
-    | "MATERNITY"
-    | "PATERNITY"
-    | "MARRIAGE"
-    | "BREAST-FEEDING"
-    | "BEREAVEMENT";
+  | "ANNUAL"
+  | "SICK"
+  | "ERRAND"
+  | "MATERNITY"
+  | "PATERNITY"
+  | "MARRIAGE"
+  | "BREAST-FEEDING"
+  | "BEREAVEMENT";
   createdAt: Date;
   updatedAt?: Date;
 };
 
 export type Leaves = {
   id: number;
-  userId: number;
+  userId: string;
   status: "PENDING" | "APPROVED" | "REJECTED" | "COMPLETED" | "IN PROGRESS";
   type: LeavesType["code"];
   days: number;
@@ -215,9 +223,32 @@ export type Leaves = {
 
 export type Presence = {
   id: number;
-  userId: number;
+  userId: string;
   date: string;
   statut: PresenceFlag[];
   createdAt: string;
   updatedAt?: string;
 };
+
+export type Department = {
+  uuid: string;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  companyId: string;
+  employees?: Employee;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export type Position = {
+  uuid: string;
+  title: string;
+  description?: string;
+  level: number;
+  departmentUuid: string;
+  employeeUuid?: Employee;
+  permissionUuids?: string[];
+  createdAt?: Date;
+  updatedAt?: Date;
+}

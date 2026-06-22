@@ -32,7 +32,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { UserGroupIcon } from "@hugeicons/core-free-icons";
 import { useQuery } from "@tanstack/react-query";
 import PresenceQuery from "@/queries/presences";
-import UserQuery from "@/queries/users";
+import UserQuery from "@/queries/employee";
 import { Employee } from "@/types/types";
 import { id } from "date-fns/locale";
 import PresenceComp from "./PresenceComp";
@@ -51,7 +51,7 @@ type PresenceFlag =
 
 type Presence = {
   id: number;
-  userId: number;
+  userId: string;
   date: string;
   statut: PresenceFlag[];
   createdAt: string;
@@ -60,7 +60,7 @@ type Presence = {
 
 type PresenceSummary = {
   id: number;
-  userId: number;
+  userId: string;
   name: string;
   PRESENT: number;
   EXCEPTIONAL: number;
@@ -90,7 +90,7 @@ export default function Page() {
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
   const [openDetail, setOpenDetail] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const presenceQuery = new PresenceQuery();
   const usersQuery = new UserQuery();
@@ -114,16 +114,16 @@ export default function Page() {
     isSuccess: isSuccessUsers,
   } = useQuery({
     queryKey: ["employees"],
-    queryFn: usersQuery.getAll,
+    queryFn: () => usersQuery.getAll(1, 20, "", undefined, undefined),
   });
 
   /* ===== BUILD TABLE ===== */
   const presenceTable: PresenceSummary[] = useMemo(() => {
     if (!isSuccessPresence || !isSuccessUsers) return [];
 
-    const table = presenceRes.items.reduce<Record<number, PresenceSummary>>(
+    const table = presenceRes.items.reduce<Record<string, PresenceSummary>>(
       (acc, curr: Presence) => {
-        const user = usersRes.find((u: Employee) => u.id === curr.userId);
+        const user = usersRes.data.find((u: Employee) => u.uuid === curr.userId);
 
         if (!acc[curr.userId]) {
           acc[curr.userId] = {
@@ -178,7 +178,7 @@ export default function Page() {
     });
   }, [presenceTable, search, filterType]);
 
-  const onSelectPresence = (userId: number) => {
+  const onSelectPresence = (userId: string) => {
     setSelectedUserId(userId);
     setOpenDetail(true);
   };
@@ -192,7 +192,7 @@ export default function Page() {
 
   const selectedUserName = useMemo(() => {
     if (!selectedUserId || !isSuccessUsers) return "";
-    const u = usersRes.find((u: Employee) => u.id === selectedUserId);
+    const u = usersRes.data.find((u: Employee) => u.uuid === selectedUserId);
     return u ? `${u.firstName} ${u.lastName}` : "Employé";
   }, [selectedUserId, isSuccessUsers, usersRes]);
 

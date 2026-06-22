@@ -25,11 +25,14 @@ import {
 import { MoreVerticalIcon } from "@hugeicons/core-free-icons";
 import useKizunaStore from "@/context/store";
 import { getInitials } from "@/lib/utils";
+import UserQuery from "@/queries/employee";
+import { useQuery } from "@tanstack/react-query";
 
 export function AppSidebar() {
   const path = usePathname();
   const router = useRouter();
   const { user, logout } = useKizunaStore();
+
   const navigation =
     user?.role === "USER"
       ? BASE_ROUTES.filter((r) => r.isAdmin !== true)
@@ -71,7 +74,10 @@ export function AppSidebar() {
                   <Avatar>
                     <AvatarImage src={user.photo} />
                     <AvatarFallback>
-                      {getInitials(user.firstName.concat(" ", user.lastName, " ", user.lastName))}
+                      {user.firstName && user.lastName ?
+                        getInitials(user.firstName.concat(" ", user.lastName, " ", user.lastName))
+                        :
+                        getInitials("Krest Dev")}
                     </AvatarFallback>
                   </Avatar>
                   <div className="group-data-[collapsible=icon]:hidden">

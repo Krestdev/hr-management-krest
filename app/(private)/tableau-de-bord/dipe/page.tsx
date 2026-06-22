@@ -27,7 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import SalarialQuery from "@/queries/salarials";
-import UserQuery from "@/queries/users";
+import UserQuery from "@/queries/employee";
 import { useQuery } from "@tanstack/react-query";
 import { EllipsisIcon, HistoryIcon } from "lucide-react";
 import Link from "next/link";
@@ -60,7 +60,7 @@ type Montant = {
 
 type Salarial = {
   id: number;
-  userId: number;
+  userId: string;
   salaire_base: Montant;
   indem_transport: Montant;
   indem_representation: Montant;
@@ -80,7 +80,7 @@ type Salarial = {
 };
 
 type User = {
-  id: number;
+  uuid: string;
   firstName: string;
   lastName: string;
   position?: string;
@@ -104,7 +104,7 @@ function Page() {
     error: usersError,
   } = useQuery({
     queryKey: ["users"],
-    queryFn: usersQuery.getAll,
+    queryFn: () => usersQuery.getAll(1, 20, "", undefined, undefined),
   });
 
   const {
@@ -132,17 +132,17 @@ function Page() {
       return [];
 
     return salarials.items.map((salarial: Salarial) => {
-      const user = users.find((u) => u.id === salarial.userId);
+      const user = users.data.find((u) => u.uuid === salarial.userId);
       return {
         ...salarial,
         user: user
           ? {
-              ...user,
-              startDate:
-                user.startDate instanceof Date
-                  ? user.startDate.toISOString()
-                  : user.startDate,
-            }
+            ...user,
+            startDate:
+              user.startDate instanceof Date
+                ? user.startDate.toISOString()
+                : user.startDate,
+          }
           : undefined,
       };
     });
@@ -183,7 +183,7 @@ function Page() {
 
   const viewSelected = (salarial: SalarialWithUser) => {
     setSelectedSalarial(salarial);
-    setSelected(users?.find((u) => u.id === salarial.userId) || null);
+    setSelected(users?.data.find((u) => u.uuid === salarial.userId) || null);
     setOpenShowDipe(true);
   };
 
@@ -194,7 +194,7 @@ function Page() {
 
   const openDipe = (salarial: SalarialWithUser) => {
     // Implement DIPE logic
-    setSelected(users?.find((u) => u.id === salarial.userId) || null);
+    setSelected(users?.data.find((u) => u.uuid === salarial.userId) || null);
     setOpenAddDipe(true);
   };
 

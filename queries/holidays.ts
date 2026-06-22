@@ -30,12 +30,10 @@ export default class HolidaysQuery {
    * Récupération des demandes d'un employé (self-service)
    */
   getRequestsByUser = async (
-    userId: number
+    userId: string,
   ): Promise<Array<HolidayRequest>> => {
     try {
-      const response = await api.get(
-        `${this.route}/requests?userId=${userId}`
-      );
+      const response = await api.get(`${this.route}/requests?userId=${userId}`);
       return response.data.items;
     } catch (error: any) {
       const message =
@@ -49,7 +47,12 @@ export default class HolidaysQuery {
   /**
    * Récupération des statistiques RH
    */
-  getStats = async ():Promise<{totalRequests:number;pendingRequests:number;acceptedRequests:number;rejectedRequests:number}> => {
+  getStats = async (): Promise<{
+    totalRequests: number;
+    pendingRequests: number;
+    acceptedRequests: number;
+    rejectedRequests: number;
+  }> => {
     try {
       const response = await api.get(`${this.route}/stats`);
       return response.data; // { total, pending, accepted, rejected, byType: [...] }
@@ -66,12 +69,12 @@ export default class HolidaysQuery {
    * Récupération du solde de congés d’un employé
    */
   getBalance = async (
-    userId: number,
-    year?: number
+    userId: string,
+    year?: number,
   ): Promise<EmployeeLeaveBalance> => {
     try {
       const response = await api.get(
-        `${this.route}/balance?userId=${userId}${!!year ? `&year=${year}` : ""}`
+        `${this.route}/balance?userId=${userId}${!!year ? `&year=${year}` : ""}`,
       );
       return response.data.balance;
     } catch (error: any) {
@@ -83,12 +86,10 @@ export default class HolidaysQuery {
     }
   };
   sendRequest = async (
-    data: Omit<HolidayRequest, "id" | "requestedDays" | "status">
-  ):Promise<HolidayRequest> => {
+    data: Omit<HolidayRequest, "id" | "requestedDays" | "status">,
+  ): Promise<HolidayRequest> => {
     try {
-      const response = await api.post(
-        `${this.route}/requests`, data
-      );
+      const response = await api.post(`${this.route}/requests`, data);
       return response.data;
     } catch (error: any) {
       const message =
@@ -98,16 +99,12 @@ export default class HolidaysQuery {
       throw new Error(message);
     }
   };
-  editRequest = async (
-    data: {
-      request:Omit<HolidayRequest, "id" | "status" | "requestedDays">,
-      id: number
-    }
-  ):Promise<HolidayRequest> => {
+  editRequest = async (data: {
+    request: Omit<HolidayRequest, "id" | "status" | "requestedDays">;
+    id: number;
+  }): Promise<HolidayRequest> => {
     try {
-      const response = await api.put(
-        `${this.route}/requests`, data
-      );
+      const response = await api.put(`${this.route}/requests`, data);
       return response.data;
     } catch (error: any) {
       const message =
@@ -117,13 +114,9 @@ export default class HolidaysQuery {
       throw new Error(message);
     }
   };
-  cancelRequest = async (
-    id: number
-  ):Promise<{success: boolean}> => {
+  cancelRequest = async (id: number): Promise<{ success: boolean }> => {
     try {
-      const response = await api.post(
-        `${this.route}/requests/cancel`, id
-      );
+      const response = await api.post(`${this.route}/requests/cancel`, id);
       return response.data;
     } catch (error: any) {
       const message =
@@ -133,7 +126,7 @@ export default class HolidaysQuery {
       throw new Error(message);
     }
   };
-  getTypes = async():Promise<Array<HolidayType>>=>{
+  getTypes = async (): Promise<Array<HolidayType>> => {
     try {
       return demoHolidayTypes;
     } catch (error: any) {
@@ -143,5 +136,5 @@ export default class HolidaysQuery {
         "Une erreur est survenue pendant l'enregistrement de votre requête";
       throw new Error(message);
     }
-  }
+  };
 }

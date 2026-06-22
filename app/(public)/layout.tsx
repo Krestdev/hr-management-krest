@@ -10,7 +10,7 @@ export default function PrivateLayout({ children }: { children: ReactNode }) {
   // 1. Tant que Zustand n'est pas hydraté OU qu'on est en train de rediriger,
   //    on évite de flasher le contenu
   if (!isReady) {
-    return <PageLoader/>
+    return <PageLoader />
   }
 
   // 2. S'il n'est pas authentifié, le hook a déjà fait router.replace("/login")

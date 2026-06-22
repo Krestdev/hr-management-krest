@@ -10,7 +10,7 @@ const MOCK_USER_ID = 1;
 
 export async function GET() {
   const myLeaves = leavesData.filter(
-    (l) => l.userId === MOCK_USER_ID
+    (l) => String(l.userId) === String(MOCK_USER_ID)
   );
 
   return NextResponse.json({

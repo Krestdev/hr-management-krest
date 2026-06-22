@@ -27,7 +27,7 @@ type WarningModalProps = {
 
 const variantStyles: Record<Variant, {
   icon: string;
-  buttonVariant: "default" | "destructive" | "link" | "primary" | "outline" | "secondary" |"ghost" | "accent" | "delete" | null | undefined;
+  buttonVariant: "default" | "destructive" | "link" | "primary" | "outline" | "secondary" | "ghost" | "accent" | "delete" | null | undefined;
 
   iconColor: string;
 }> = {
@@ -83,7 +83,7 @@ const WarningModal: React.FC<WarningModalProps> = ({
             )}
           </div>
         </DialogHeader>
-        
+
         <DialogFooter className="flex flex-row justify-center gap-2 sm:justify-center">
           <Button
             type="button"
@@ -92,7 +92,7 @@ const WarningModal: React.FC<WarningModalProps> = ({
           >
             {cancelLabel}
           </Button>
-          
+
           <Button
             type="button"
             variant={styles.buttonVariant}

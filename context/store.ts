@@ -5,16 +5,18 @@ import { createJSONStorage, persist } from "zustand/middleware";
 interface store {
     user?: Employee;
     token?: string;
-    isHydrated:boolean;
+    isHydrated: boolean;
 }
 
 interface actions {
-    logout: ()=>void;
-    login: (user:Employee, token:string)=>void;
-    setIsHydrated:(v:boolean)=>void;
+    logout: () => void;
+    setUser: (user: Employee) => void;  // Nouvelle fonction pour setter l'utilisateur
+    setToken: (token: string) => void;  // Nouvelle fonction pour setter le token
+    login: (user: Employee, token: string) => void; // Gardé pour compatibilité
+    setIsHydrated: (v: boolean) => void;
 }
 
-const initialValue:store = {
+const initialValue: store = {
     user: undefined,
     token: undefined,
     isHydrated: false
@@ -22,17 +24,19 @@ const initialValue:store = {
 
 const useKizunaStore = create<store & actions>()(
     persist(
-        (set, get)=>({
+        (set, get) => ({
             ...initialValue,
-            logout: ()=>{set({user:undefined, token:undefined})},
-            login: (user, token)=>{set({user:user, token:token})},
-            setIsHydrated: (v)=>{set({isHydrated:v})}
+            logout: () => { set({ user: undefined, token: undefined }) },
+            setUser: (user) => { set({ user: user }) },
+            setToken: (token) => { set({ token: token }) },
+            login: (user, token) => { set({ user: user, token: token }) },
+            setIsHydrated: (v) => { set({ isHydrated: v }) }
         }),
         {
             name: "kizuna-store",
-            storage: createJSONStorage(()=>sessionStorage),
-            onRehydrateStorage: ()=>(state)=> {
-                state?.setIsHydrated(true);//
+            storage: createJSONStorage(() => sessionStorage),
+            onRehydrateStorage: () => (state) => {
+                state?.setIsHydrated(true);
             }
         }
     )

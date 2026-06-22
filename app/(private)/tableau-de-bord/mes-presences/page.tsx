@@ -45,8 +45,8 @@ function Page() {
   const { user } = useKizunaStore();
   const presenceQuery = new PresenceQuery();
   const { data, isLoading, isError, error, isSuccess } = useQuery({
-    queryKey: ["presences", user?.id],
-    queryFn: async () => presenceQuery.getByUserId(user?.id ?? 0),
+    queryKey: ["presences", user?.uuid],
+    queryFn: async () => presenceQuery.getByUserId(user?.uuid ?? ""),
     enabled: !!user,
   });
 
@@ -110,14 +110,14 @@ function Page() {
     return format(date, "HH:mm", { locale: fr });
   };
 
-   if(isLoading){
-      return <LoadingComponent />
-    }
-    if(isError){
-      return <ErrorComponent />
-    }
+  if (isLoading) {
+    return <LoadingComponent />
+  }
+  if (isError) {
+    return <ErrorComponent />
+  }
 
-console.log(data, data?.items.length)
+  console.log(data, data?.items.length)
 
   if (isSuccess)
     return (

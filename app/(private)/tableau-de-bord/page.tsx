@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/empty";
 import useKizunaStore from "@/context/store";
 import HolidaysQuery from "@/queries/holidays";
-import UserQuery from "@/queries/users";
+import UserQuery from "@/queries/employee";
 import {
   AddSquareIcon,
   Calendar02Icon,
@@ -41,13 +41,13 @@ function Page() {
   });
   const employees = useQuery({
     queryKey: ["employees"],
-    queryFn: userQuery.getAll,
+    queryFn: () => userQuery.getAll(1, 20, "", undefined, undefined),
     enabled: user?.role !== "USER",
   });
   const userHolidays = useQuery({
-    queryKey: ["self-holidays", user?.id],
-    queryFn: () => holidaysQuery.getBalance(user?.id ?? 0),
-    enabled: !!user,
+    queryKey: ["self-holidays", user?.uuid],
+    queryFn: () => holidaysQuery.getBalance(user?.uuid ?? ""),
+    enabled: !!user?.uuid,
   });
   return (
     <div className="flex flex-col gap-4 sm:gap-6">
@@ -78,7 +78,7 @@ function Page() {
         {employees.isSuccess && (
           <StatisticCard
             title="Total Employés"
-            value={employees.data.length}
+            value={employees.data.data.length}
             variant={"dark"}
           >
             <DropdownMenuItem>

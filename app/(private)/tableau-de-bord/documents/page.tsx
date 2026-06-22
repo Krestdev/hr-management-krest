@@ -2,7 +2,7 @@
 
 import Header from "@/components/header";
 import useKizunaStore from "@/context/store";
-import UserQuery from "@/queries/users";
+import UserQuery from "@/queries/employee";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,13 +17,13 @@ const Page = () => {
 
   const { data, isSuccess, isLoading, isError, error } = useQuery({
     queryKey: ["employees"],
-    queryFn: usersQuery.getAll,
+    queryFn: () => usersQuery.getAll(1, 20, "", undefined, undefined),
   });
 
   // 🔁 Redirection auto si USER → ses documents directement
   useEffect(() => {
     if (user?.role === "USER") {
-      router.replace(`/tableau-de-bord/documents/${user.id}`);
+      router.replace(`/tableau-de-bord/documents/${user.uuid}`);
     }
   }, [user, router]);
 
@@ -40,10 +40,10 @@ const Page = () => {
 
       {/* 🔹 Grid des utilisateurs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6 gap-5">
-        {data.map((emp) => (
+        {data.data.map((emp) => (
           <Link
-            key={emp.id}
-            href={`/tableau-de-bord/documents/${emp.id}`}
+            key={emp.uuid}
+            href={`/tableau-de-bord/documents/${emp.uuid}`}
             className="flex flex-col items-center gap-2 cursor-pointer w-full hover:bg-gray-200 p-3 rounded-[14px]"
           >
             <img

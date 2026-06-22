@@ -25,7 +25,7 @@ export default class PresenceQuery {
 
   // ✅ GET PRESENCES BY USER ID
   getByUserId = async (
-    userId: number
+    userId: string
   ): Promise<{
     success: boolean;
     items: Presence[];

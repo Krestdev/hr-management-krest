@@ -21,7 +21,7 @@ export async function GET(request: Request) {
   const year = yearParam ? Number(yearParam) : undefined;
 
   // Filtrer les soldes de l'utilisateur
-  const balances = demoLeaveBalances.filter((b) => b.userId === userId);
+  const balances = demoLeaveBalances.filter((b) => String(b.userId) === userIdParam);
 
   if (balances.length === 0) {
     return NextResponse.json(

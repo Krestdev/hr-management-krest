@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       user: userWithoutPassword,
-      token: "fake-jwt-token-" + user.id, // 👉 tu pourras remplacer par un vrai token plus tard
+      token: "fake-jwt-token-" + user.uuid, // 👉 tu pourras remplacer par un vrai token plus tard
     });
   } catch (error: any) {
     return NextResponse.json(

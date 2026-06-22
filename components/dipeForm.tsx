@@ -89,15 +89,15 @@ const DipeForm = ({ salarial, employee, onSuccess }: Props) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<SalarialForm>(() => {
     // Rechercher le salarial de l'employé
-    const employeeSalarial = salarial?.find(x => x.userId === employee.id);
-    
+    const employeeSalarial = salarial?.find(x => x.userId === employee.uuid);
+
     if (employeeSalarial) {
       return mapSalarialToForm(employeeSalarial);
     }
     return createEmptySalarial();
   });
 
-  const isEditMode = salarial?.some(x => x.userId === employee.id) || false;
+  const isEditMode = salarial?.some(x => x.userId === employee.uuid) || false;
 
   const updateMontant = (
     field: keyof SalarialForm,

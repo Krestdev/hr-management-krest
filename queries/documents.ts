@@ -21,7 +21,7 @@ export default class DocumentQuery {
 
   // ✅ GET MY DOCUMENTS
   getMine = async (
-    userId: number
+    userId: string
   ): Promise<{ success: boolean; items: Files[]; count: number }> => {
     try {
       const response = await api.get(`${this.route}/mine`, {

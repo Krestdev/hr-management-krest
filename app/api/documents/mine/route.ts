@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     );
   }
 
-  const myDocs = filesData.filter((f) => f.userId === userId);
+  const myDocs = filesData.filter((f) => String(f.userId) === userIdParam);
 
   return NextResponse.json({
     success: true,

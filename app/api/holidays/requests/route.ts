@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   if (userIdParam) {
     const userId = Number(userIdParam);
     if (!isNaN(userId)) {
-      filtered = filtered.filter((r) => r.userId === userId);
+      filtered = filtered.filter((r) => String(r.userId) === userIdParam);
     }
   }
 

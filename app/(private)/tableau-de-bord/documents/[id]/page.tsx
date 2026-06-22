@@ -5,7 +5,7 @@ import Header from "@/components/header";
 import LoadingComponent from "@/components/loading-comp";
 import { Input } from "@/components/ui/input";
 import { filesData } from "@/data/temp";
-import UserQuery from "@/queries/users";
+import UserQuery from "@/queries/employee";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import React, { useState } from "react";
@@ -16,14 +16,14 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   const usersQuery = new UserQuery();
   const { data, isSuccess, isLoading, isError, error } = useQuery({
     queryKey: ["employees"],
-    queryFn: usersQuery.getAll,
+    queryFn: () => usersQuery.getAll(1, 20, "", undefined, undefined),
   });
 
- // 🔹 État pour la recherche
+  // 🔹 État pour la recherche
   const [search, setSearch] = useState("");
 
   // 🔹 Fichiers de cet employé uniquement
-  const userFiles = filesData.filter((doc) => doc.userId === Number(id));
+  const userFiles = filesData.filter((doc) => doc.userId === id);
 
   // 🔹 Filtrage par nom
   const filteredFiles = userFiles.filter((doc) =>
@@ -34,7 +34,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   if (isError) return <ErrorComponent description={(error as Error).message} />;
   if (!isSuccess || !data) return null;
 
-  const user = data.find((user) => user.id === Number(id));
+  const user = data.data.find((user) => user.uuid === id);
 
   return (
     <div className="grid gap-4 sm:gap-6">

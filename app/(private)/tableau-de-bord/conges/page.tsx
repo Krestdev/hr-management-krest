@@ -29,7 +29,7 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import LeavesQuery from "@/queries/leaves";
-import UserQuery from "@/queries/users";
+import UserQuery from "@/queries/employee";
 import { Leaves, Employee } from "@/types/types";
 import WarningModal from "@/components/WarningModal";
 import { toast } from "sonner";
@@ -61,10 +61,10 @@ function Page() {
     isSuccess: isSuccessUsers,
   } = useQuery({
     queryKey: ["employees"],
-    queryFn: usersQuery.getAll,
+    queryFn: () => usersQuery.getAll(1, 20, "", undefined, undefined),
   });
 
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [viewProcess, setViewProcess] = useState(false);
   const [viewReject, setViewReject] = useState(false);
   const [openView, setOpenView] = useState(false);
@@ -76,9 +76,9 @@ function Page() {
     if (!isSuccessLeaves || !isSuccessUsers) return [];
 
     const grouped: Record<
-      number,
+      string,
       {
-        userId: number;
+        userId: string;
         consumed: number;
         hasPending: boolean;
       }
@@ -107,7 +107,7 @@ function Page() {
 
     // mapping final
     return Object.values(grouped).map((item) => {
-      const user = usersData.find((u: Employee) => u.id === item.userId);
+      const user = usersData?.data.find((u: Employee) => u.uuid === item.userId);
 
       const total = TOTAL_ANNUAL_DAYS;
       const consumed = item.consumed;

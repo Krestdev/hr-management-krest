@@ -18,7 +18,7 @@ export async function GET(
   console.log("Utilisateur", numericUserId);
 
   // Filtrer par userId
-  const presences = presencesData.filter((p) => p.userId === numericUserId);
+  const presences = presencesData.filter((p) => String(p.userId) === userId);
 
   if (!presences.length) {
     return NextResponse.json(

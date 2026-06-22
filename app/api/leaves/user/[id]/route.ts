@@ -18,7 +18,7 @@ export async function GET(
   console.log("Utilisateur", userId);
 
   // ✅ filtrer par userId
-  const leaves = leavesData.filter((l) => l.userId === userId);
+  const leaves = leavesData.filter((l) => String(l.userId) === id);
 
   if (!leaves.length) {
     return NextResponse.json(

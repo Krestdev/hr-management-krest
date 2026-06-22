@@ -15,9 +15,9 @@ const Page = () => {
   const documentsQuery = new DocumentQuery();
 
   const { data, isSuccess, isLoading, isError, error } = useQuery({
-    queryKey: ["documents", "mine", user?.id], // ✅ clé propre
-    queryFn: () => documentsQuery.getMine(user?.id ?? 0), // ✅ fonction
-    enabled: !!user?.id, // ✅ évite l’appel si user pas prêt
+    queryKey: ["documents", "mine", user?.uuid], // ✅ clé propre
+    queryFn: () => documentsQuery.getMine(user?.uuid ?? ""), // ✅ fonction
+    enabled: !!user?.uuid, // ✅ évite l’appel si user pas prêt
   });
 
   // 🔹 État pour la recherche
