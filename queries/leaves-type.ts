@@ -60,6 +60,7 @@ export default class LeavesTypeQuery {
   };
 }
 
+// Hook pour récupérer tous les types de congés
 export function useLeavesTypesQuery() {
   const leavesTypeQuery = new LeavesTypeQuery();
   return useQuery({
@@ -68,6 +69,7 @@ export function useLeavesTypesQuery() {
   });
 }
 
+// Hook pour récupérer un type de congé par son id
 export function useLeavesTypeQuery(id: number, enabled: boolean = true) {
   const leavesTypeQuery = new LeavesTypeQuery();
   return useQuery({
@@ -77,6 +79,7 @@ export function useLeavesTypeQuery(id: number, enabled: boolean = true) {
   });
 }
 
+// Hook pour récupérer un type de congé par son code
 export function useLeavesTypeByCodeQuery(code: LeavesType["code"], enabled: boolean = true) {
   const leavesTypeQuery = new LeavesTypeQuery();
   return useQuery({

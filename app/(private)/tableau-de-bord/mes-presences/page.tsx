@@ -58,7 +58,7 @@ function Page() {
     if (!isSuccess || !data) return [];
 
     return (
-      data.items
+      data
         .filter((presence) => {
           // ----- filtre statut -----
           const matchStatus =
@@ -114,7 +114,7 @@ function Page() {
     return <ErrorComponent />
   }
 
-  console.log(data, data?.items.length)
+  console.log(data, data?.length)
 
   if (isSuccess)
     return (
@@ -165,7 +165,7 @@ function Page() {
             </div>
           </div>
           {/**Content */}
-          {data.items.length === 0 ? (
+          {data.length === 0 ? (
             <Empty>
               <EmptyHeader>
                 <EmptyMedia variant={"icon"}>

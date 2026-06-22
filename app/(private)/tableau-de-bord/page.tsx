@@ -32,8 +32,10 @@ function Page() {
   const { user } = useKizunaStore();
   const router = useRouter();
   const stats = useHolidaysStatsQuery(user?.role !== "USER");
-  const employees = useEmployeesQuery(1, 20, user?.companyId || "", undefined, undefined, "ACTIVE", undefined, false, false, user?.role !== "USER");
+  const employees = useEmployeesQuery(1, 20, user?.companyId || "", "", "", "ACTIVE", "", false, false, user?.role !== "USER");
   const userHolidays = useHolidaysBalanceQuery(user?.uuid ?? "", undefined, !!user?.uuid);
+
+
   return (
     <div className="flex flex-col gap-4 sm:gap-6">
       <header className="flex flex-col">

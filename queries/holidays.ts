@@ -141,6 +141,7 @@ export default class HolidaysQuery {
   };
 }
 
+// Hook pour récupérer toutes les demandes de congés
 export function useHolidaysRequestsQuery() {
   const holidaysQuery = new HolidaysQuery();
   return useQuery({
@@ -149,6 +150,7 @@ export function useHolidaysRequestsQuery() {
   });
 }
 
+// Hook pour récupérer les demandes de congés d'un utilisateur
 export function useHolidaysRequestsByUserQuery(userId: string, enabled: boolean = true) {
   const holidaysQuery = new HolidaysQuery();
   return useQuery({
@@ -158,6 +160,7 @@ export function useHolidaysRequestsByUserQuery(userId: string, enabled: boolean 
   });
 }
 
+// Hook pour récupérer les statistiques des demandes de congés
 export function useHolidaysStatsQuery(enabled: boolean = true) {
   const holidaysQuery = new HolidaysQuery();
   return useQuery({
@@ -167,6 +170,7 @@ export function useHolidaysStatsQuery(enabled: boolean = true) {
   });
 }
 
+// Hook pour récupérer le solde de congés d'un utilisateur
 export function useHolidaysBalanceQuery(userId: string, year?: number, enabled: boolean = true) {
   const holidaysQuery = new HolidaysQuery();
   return useQuery({
@@ -176,6 +180,7 @@ export function useHolidaysBalanceQuery(userId: string, year?: number, enabled: 
   });
 }
 
+// Hook pour envoyer une demande de congés
 export function useSendHolidayRequestMutation() {
   const holidaysQuery = new HolidaysQuery();
   const queryClient = useQueryClient();
@@ -189,6 +194,7 @@ export function useSendHolidayRequestMutation() {
   });
 }
 
+// Hook pour modifier une demande de congés
 export function useEditHolidayRequestMutation() {
   const holidaysQuery = new HolidaysQuery();
   const queryClient = useQueryClient();
@@ -202,6 +208,7 @@ export function useEditHolidayRequestMutation() {
   });
 }
 
+// Hook pour annuler une demande de congés
 export function useCancelHolidayRequestMutation() {
   const holidaysQuery = new HolidaysQuery();
   const queryClient = useQueryClient();
@@ -214,6 +221,7 @@ export function useCancelHolidayRequestMutation() {
   });
 }
 
+// Hook pour récupérer les types de congés
 export function useHolidayTypesQuery() {
   const holidaysQuery = new HolidaysQuery();
   return useQuery({

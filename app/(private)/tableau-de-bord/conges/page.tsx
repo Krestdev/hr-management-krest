@@ -25,6 +25,7 @@ import {
   CheckmarkSquare02Icon,
   CancelSquareIcon,
   EyeFreeIcons,
+  UserGroupIcon,
 } from "@hugeicons/core-free-icons";
 
 import { useLeavesQuery } from "@/queries/leaves";
@@ -34,6 +35,7 @@ import WarningModal from "@/components/WarningModal";
 import { toast } from "sonner";
 import Link from "next/link";
 import ViewConge from "./ViewConge";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 
 const TOTAL_ANNUAL_DAYS = 30; // règle RH annuelle
 
@@ -75,7 +77,7 @@ function Page() {
     > = {};
 
     // groupement des congés
-    leavesData.items.forEach((leave: Leaves) => {
+    leavesData.forEach((leave: Leaves) => {
       if (!grouped[leave.userId]) {
         grouped[leave.userId] = {
           userId: leave.userId,
@@ -152,6 +154,34 @@ function Page() {
             </TableHeader>
 
             <TableBody>
+              {
+                tableData.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={10} className="p-6">
+                      <Empty>
+                        <EmptyHeader>
+                          <EmptyMedia variant={"icon"}>
+                            <HugeiconsIcon icon={UserGroupIcon} />
+                          </EmptyMedia>
+                          <EmptyTitle>Aucune donnée de présence</EmptyTitle>
+                          <EmptyDescription>
+                            {tableData.length === 0
+                              ? "Aucune présence enregistrée."
+                              : "Aucune donnée correspondant à votre recherche."}
+                          </EmptyDescription>
+                        </EmptyHeader>
+                        <EmptyContent>
+                          {tableData.length !== 0 && (
+                            <Button variant={"outline"}>
+                              Réinitialiser les filtres
+                            </Button>
+                          )}
+                        </EmptyContent>
+                      </Empty>
+                    </TableCell>
+                  </TableRow>
+                )
+              }
               {tableData.map((row) => (
                 <TableRow key={row.userId}>
                   <TableCell>{row.employeeName}</TableCell>

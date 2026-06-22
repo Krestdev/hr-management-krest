@@ -2,11 +2,10 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import HolidaysQuery from '@/queries/holidays';
+import { useCancelHolidayRequestMutation } from '@/queries/holidays';
 import { HolidayRequest } from '@/types/types';
 import { Calendar01Icon, DateTimeIcon, InformationCircleIcon, Message01Icon, OfficeChairIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { useMutation } from '@tanstack/react-query';
 import React from 'react'
 import { toast } from 'sonner';
 import { badgeStatusVariant, formatStatusLabel } from './page';
@@ -21,17 +20,19 @@ type Props = {
 };
 
 function CancelLeaveRequest({isOpen,openChange, request}:Props) {
-    const holidaysQuery = new HolidaysQuery();
-    const { mutate, isPending } = useMutation({
-        mutationFn: (id:number)=>holidaysQuery.cancelRequest(id),
-        onSuccess: ()=>{
-            toast.success("Votre demande a été annulée !");
-            openChange(false);
-        },
-        onError: (error)=>{
-            toast.error(error.message);
-        }
-    })
+    const { mutate, isPending } = useCancelHolidayRequestMutation();
+    
+    const handleCancel = () => {
+        mutate(request.id, {
+            onSuccess: () => {
+                toast.success("Votre demande a été annulée !");
+                openChange(false);
+            },
+            onError: (error: any) => {
+                toast.error(error.message);
+            }
+        });
+    };
   return (
     <Dialog open={isOpen} onOpenChange={openChange}>
         <DialogContent>
@@ -99,7 +100,7 @@ function CancelLeaveRequest({isOpen,openChange, request}:Props) {
           )}
         </div>
             <DialogFooter>
-                <Button variant={"destructive"} onClick={()=>mutate(request.id)} isLoading={isPending} disabled={isPending}>{"Oui"}</Button>
+                <Button variant={"destructive"} onClick={handleCancel} isLoading={isPending} disabled={isPending}>{"Oui"}</Button>
                 <Button variant={"outline"} onClick={()=>openChange(prev=>!prev)} disabled={isPending}>{"Non"}</Button>
             </DialogFooter>
         </DialogContent>

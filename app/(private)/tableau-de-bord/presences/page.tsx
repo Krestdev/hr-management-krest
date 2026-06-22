@@ -111,7 +111,7 @@ export default function Page() {
   const presenceTable: PresenceSummary[] = useMemo(() => {
     if (!isSuccessPresence || !isSuccessUsers) return [];
 
-    const table = presenceRes.items.reduce<Record<string, PresenceSummary>>(
+    const table = presenceRes.reduce<Record<string, PresenceSummary>>(
       (acc, curr: Presence) => {
         const user = usersRes.data.find((u: Employee) => u.uuid === curr.userId);
 
@@ -175,7 +175,7 @@ export default function Page() {
 
   const selectedPresences = useMemo(() => {
     if (!selectedUserId || !isSuccessPresence) return [];
-    return presenceRes.items.filter(
+    return presenceRes.filter(
       (p: Presence) => p.userId === selectedUserId,
     );
   }, [selectedUserId, isSuccessPresence, presenceRes]);

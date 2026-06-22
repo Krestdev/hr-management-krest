@@ -37,6 +37,7 @@ export default class SalarialQuery {
   };
 }
 
+// Hook pour récupérer tous les salaires
 export function useSalarialsQuery() {
   const salarialQuery = new SalarialQuery();
   return useQuery({
@@ -45,6 +46,7 @@ export function useSalarialsQuery() {
   });
 }
 
+// Hook pour récupérer un salaire par son id
 export function useSalarialQuery(id: number, enabled: boolean = true) {
   const salarialQuery = new SalarialQuery();
   return useQuery({

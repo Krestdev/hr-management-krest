@@ -4,14 +4,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "./queryKeys";
 
 export default class PresenceQuery {
-  route = "/presences";
+  route = "/attendance";
 
   // ✅ GET ALL PRESENCES
-  getAll = async (): Promise<{
-    success: boolean;
-    items: Presence[];
-    count: number;
-  }> => {
+  getAll = async (): Promise<Presence[]> => {
     try {
       const response = await api.get(this.route);
       return response.data;
@@ -28,14 +24,10 @@ export default class PresenceQuery {
   // ✅ GET PRESENCES BY USER ID
   getByUserId = async (
     userId: string
-  ): Promise<{
-    success: boolean;
-    items: Presence[];
-    count: number;
-  }> => {
+  ): Promise<Presence[]> => {
     try {
       console.log(userId);
-      const response = await api.get(`${this.route}/user/${userId}`);
+      const response = await api.get(`${this.route}/employee/${userId}`);
       return response.data;
     } catch (error: any) {
       const message =
@@ -68,6 +60,7 @@ export default class PresenceQuery {
   };
 }
 
+// Hook pour récupérer toutes les présences
 export function usePresencesQuery() {
   const presenceQuery = new PresenceQuery();
   return useQuery({
@@ -76,6 +69,7 @@ export function usePresencesQuery() {
   });
 }
 
+// Hook pour récupérer les présences par id utilisateur
 export function usePresencesByUserIdQuery(userId: string, enabled: boolean = true) {
   const presenceQuery = new PresenceQuery();
   return useQuery({
@@ -85,6 +79,7 @@ export function usePresencesByUserIdQuery(userId: string, enabled: boolean = tru
   });
 }
 
+// Hook pour créer une présence
 export function useCreatePresenceMutation() {
   const presenceQuery = new PresenceQuery();
   const queryClient = useQueryClient();

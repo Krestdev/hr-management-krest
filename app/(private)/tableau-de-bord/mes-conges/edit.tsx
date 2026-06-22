@@ -17,10 +17,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import useKizunaStore from "@/context/store";
 import { demoHolidayTypes } from "@/data/temp";
-import HolidaysQuery from "@/queries/holidays";
+import { useEditHolidayRequestMutation } from "@/queries/holidays";
 import { HolidayRequest } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
 import { CalendarIcon } from "lucide-react";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -60,7 +59,6 @@ function EditLeaveRequest({ isOpen, openChange, request }: Props) {
     const { user } = useKizunaStore();
     const [startView, setStartView] = React.useState<boolean>(false);
     const [endView, setEndView] = React.useState<boolean>(false);
-    const holidayQuery = new HolidaysQuery();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -72,23 +70,23 @@ function EditLeaveRequest({ isOpen, openChange, request }: Props) {
             isAnnual: true
         }
     });
-    const editRequest = useMutation({
-        mutationFn: (data: { request: Omit<HolidayRequest, "id" | "requestedDays" | "status">, id: number }) => holidayQuery.editRequest(data),
-        onSuccess: () => {
-            toast.success("Votre requête a été mise à jour avec succès !");
-            openChange(false);
-        },
-        onError: (error) => {
-            toast.error(error.message);
-        }
-    })
+    const editRequest = useEditHolidayRequestMutation();
     function onSubmit(values: z.infer<typeof formSchema>) {
         editRequest.mutate(
             {
                 request: { typeId: Number(values.typeId), startDate: new Date(values.startDate), endDate: new Date(values.endDate), justificationFile: values.justificationFile, reason: values.reason, createdAt: new Date(), userId: user?.uuid ?? "0" },
                 id: request.id
-            })
-        //console.log(values);
+            },
+            {
+                onSuccess: () => {
+                    toast.success("Votre requête a été mise à jour avec succès !");
+                    openChange(false);
+                },
+                onError: (error: any) => {
+                    toast.error(error.message);
+                }
+            }
+        )
     }
     return (
         <Dialog open={isOpen} onOpenChange={openChange}>

@@ -7,11 +7,7 @@ export default class LeavesQuery {
   route = "/leaves";
 
   // ✅ GET ALL LEAVES
-  getAll = async (): Promise<{
-    success: boolean;
-    items: Leaves[];
-    count: number;
-  }> => {
+  getAll = async (): Promise<Leaves[]> => {
     try {
       const response = await api.get(this.route);
       return response.data;
@@ -95,6 +91,7 @@ export default class LeavesQuery {
   };
 }
 
+// Hook pour récupérer toutes les demandes de congés
 export function useLeavesQuery() {
   const leavesQuery = new LeavesQuery();
   return useQuery({
@@ -103,6 +100,7 @@ export function useLeavesQuery() {
   });
 }
 
+// Hook pour récupérer toutes les demandes de congés d'un utilisateur
 export function useMyLeavesQuery(userId: number, enabled: boolean = true) {
   const leavesQuery = new LeavesQuery();
   return useQuery({
@@ -112,6 +110,7 @@ export function useMyLeavesQuery(userId: number, enabled: boolean = true) {
   });
 }
 
+// Hook pour récupérer toutes les demandes de congés d'un utilisateur par son id
 export function useLeavesByUserIdQuery(userId: string, enabled: boolean = true) {
   const leavesQuery = new LeavesQuery();
   return useQuery({
@@ -121,6 +120,7 @@ export function useLeavesByUserIdQuery(userId: string, enabled: boolean = true) 
   });
 }
 
+// Hook pour récupérer une demande de congé par son id
 export function useLeaveByIdQuery(id: number, enabled: boolean = true) {
   const leavesQuery = new LeavesQuery();
   return useQuery({

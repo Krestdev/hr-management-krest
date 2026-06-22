@@ -39,9 +39,11 @@ export default class UserQuery {
   }
 
   // get employee by id
-  getById = async (id: string): Promise<Employee> => {
+  getById = async (id: string, companyId?: string): Promise<Employee> => {
     try {
-      const response = await api.get(`${this.route}/${id}`);
+      const response = await api.get(`${this.route}/${id}`, {
+        params: { companyId }
+      });
       return response.data;
     } catch (error: any) {
       const message =
@@ -71,9 +73,11 @@ export default class UserQuery {
   }
 
   // get employee personnal information (sensitive data)
-  getPersonnalInformation = async (id: string): Promise<{ data: Employee; token: string }> => {
+  getPersonnalInformation = async (id: string, companyId?: string): Promise<{ data: Employee; token: string }> => {
     try {
-      const response = await api.get(`${this.route}/${id}/personnal`);
+      const response = await api.get(`${this.route}/${id}/personnal`, {
+        params: { companyId }
+      });
       return response.data;
     } catch (error: any) {
       const message =
@@ -119,9 +123,11 @@ export default class UserQuery {
   }
 
   // get all leave requests for an employee
-  getLeaveRequests = async (id: string): Promise<{ data: Leaves[]; token: string }> => {
+  getLeaveRequests = async (id: string, companyId?: string): Promise<{ data: Leaves[]; token: string }> => {
     try {
-      const response = await api.get(`${this.route}/${id}/leave-requests`);
+      const response = await api.get(`${this.route}/${id}/leave-requests`, {
+        params: { companyId }
+      });
       return response.data;
     } catch (error: any) {
       const message =
@@ -135,9 +141,11 @@ export default class UserQuery {
   }
 
   // get leave balance for an employee
-  getLeaveBalance = async (id: string): Promise<{ data: Leaves[]; token: string }> => {
+  getLeaveBalance = async (id: string, companyId?: string): Promise<{ data: Leaves[]; token: string }> => {
     try {
-      const response = await api.get(`${this.route}/${id}/leave-balance`);
+      const response = await api.get(`${this.route}/${id}/leave-balance`, {
+        params: { companyId }
+      });
       return response.data;
     } catch (error: any) {
       const message =
@@ -167,6 +175,7 @@ export default class UserQuery {
   }
 }
 
+// Hook pour récupérer tous les employés
 export function useEmployeesQuery(
   page: number,
   limit: number,
@@ -208,6 +217,7 @@ export function useEmployeesQuery(
   });
 }
 
+// Hook pour récupérer un employé par son id
 export function useEmployeeQuery(id: string, enabled: boolean = true) {
   const userQuery = new UserQuery();
   return useQuery({
@@ -217,6 +227,7 @@ export function useEmployeeQuery(id: string, enabled: boolean = true) {
   });
 }
 
+// Hook pour créer un employé
 export function useCreateEmployeeMutation() {
   const userQuery = new UserQuery();
   const queryClient = useQueryClient();
@@ -228,6 +239,7 @@ export function useCreateEmployeeMutation() {
   });
 }
 
+// Hook pour mettre à jour un employé
 export function useUpdateEmployeeMutation() {
   const userQuery = new UserQuery();
   const queryClient = useQueryClient();
@@ -241,6 +253,7 @@ export function useUpdateEmployeeMutation() {
   });
 }
 
+// Hook pour récupérer les informations personnelles d'un employé
 export function useEmployeePersonalInfoQuery(id: string, enabled: boolean = true) {
   const userQuery = new UserQuery();
   return useQuery({
@@ -250,6 +263,7 @@ export function useEmployeePersonalInfoQuery(id: string, enabled: boolean = true
   });
 }
 
+// Hook pour supprimer un employé
 export function useDeleteEmployeeMutation() {
   const userQuery = new UserQuery();
   const queryClient = useQueryClient();
@@ -262,6 +276,7 @@ export function useDeleteEmployeeMutation() {
   });
 }
 
+// Hook pour réactiver un employé
 export function useReactivateEmployeeMutation() {
   const userQuery = new UserQuery();
   const queryClient = useQueryClient();
@@ -274,6 +289,7 @@ export function useReactivateEmployeeMutation() {
   });
 }
 
+// Hook pour récupérer les demandes de congés d'un employé
 export function useEmployeeLeaveRequestsQuery(id: string, enabled: boolean = true) {
   const userQuery = new UserQuery();
   return useQuery({
@@ -283,6 +299,7 @@ export function useEmployeeLeaveRequestsQuery(id: string, enabled: boolean = tru
   });
 }
 
+// Hook pour récupérer le solde de congés d'un employé
 export function useEmployeeLeaveBalanceQuery(id: string, enabled: boolean = true) {
   const userQuery = new UserQuery();
   return useQuery({
@@ -292,6 +309,7 @@ export function useEmployeeLeaveBalanceQuery(id: string, enabled: boolean = true
   });
 }
 
+// Hook pour mettre à jour le solde de congés d'un employé
 export function useUpdateEmployeeLeaveQuotaMutation() {
   const userQuery = new UserQuery();
   const queryClient = useQueryClient();

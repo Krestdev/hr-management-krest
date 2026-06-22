@@ -24,6 +24,8 @@ export default class AuthQuery {
     };
 }
 
+
+// Hook de connection
 export function useLoginMutation(options?: UseMutationOptions<{ user: Employee; access_token: string }, Error, { email: string; password: string }>) {
     const authQuery = new AuthQuery();
     return useMutation({

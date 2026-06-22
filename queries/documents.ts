@@ -7,9 +7,11 @@ export default class DocumentQuery {
   route = "/documents";
 
   // ✅ GET ALL DOCUMENTS
-  getAll = async (): Promise<{ success: boolean; items: Files[]; count: number }> => {
+  getAll = async (companyId?: string): Promise<{ success: boolean; items: Files[]; count: number }> => {
     try {
-      const response = await api.get(this.route);
+      const response = await api.get(this.route, {
+        params: { companyId }
+      });
       return response.data;
     } catch (error: any) {
       const message =
@@ -23,11 +25,12 @@ export default class DocumentQuery {
 
   // ✅ GET MY DOCUMENTS
   getMine = async (
-    userId: string
+    userId: string,
+    companyId?: string
   ): Promise<{ success: boolean; items: Files[]; count: number }> => {
     try {
       const response = await api.get(`${this.route}/mine`, {
-        params: { userId },
+        params: { userId, companyId },
       });
       return response.data;
     } catch (error: any) {
@@ -42,10 +45,13 @@ export default class DocumentQuery {
 
   // ✅ GET DOCUMENT BY ID
   getById = async (
-    id: number
+    id: number,
+    companyId?: string
   ): Promise<{ success: boolean; item: Files }> => {
     try {
-      const response = await api.get(`${this.route}/${id}`);
+      const response = await api.get(`${this.route}/${id}`, {
+        params: { companyId }
+      });
       return response.data;
     } catch (error: any) {
       const message =
@@ -58,29 +64,33 @@ export default class DocumentQuery {
   };
 }
 
-export function useDocumentsQuery() {
-    const documentQuery = new DocumentQuery();
-    return useQuery({
-        queryKey: queryKeys.documents.all(),
-        queryFn: documentQuery.getAll,
-    });
+// Hook pour récupérer tous les documents
+export function useDocumentsQuery(companyId?: string, enabled: boolean = true) {
+  const documentQuery = new DocumentQuery();
+  return useQuery({
+    queryKey: queryKeys.documents.all(companyId),
+    queryFn: () => documentQuery.getAll(companyId),
+    enabled: enabled && companyId !== undefined,
+  });
 }
 
-export function useMyDocumentsQuery(userId: string, enabled: boolean = true) {
-    const documentQuery = new DocumentQuery();
-    return useQuery({
-        queryKey: queryKeys.documents.mine(userId),
-        queryFn: () => documentQuery.getMine(userId),
-        enabled: enabled && !!userId,
-    });
+// Hook pour récupérer les documents d'un utilisateur
+export function useMyDocumentsQuery(userId: string, companyId?: string, enabled: boolean = true) {
+  const documentQuery = new DocumentQuery();
+  return useQuery({
+    queryKey: queryKeys.documents.mine(userId, companyId),
+    queryFn: () => documentQuery.getMine(userId, companyId),
+    enabled: enabled && !!userId && companyId !== undefined,
+  });
 }
 
-export function useDocumentByIdQuery(id: number, enabled: boolean = true) {
-    const documentQuery = new DocumentQuery();
-    return useQuery({
-        queryKey: queryKeys.documents.detail(id),
-        queryFn: () => documentQuery.getById(id),
-        enabled: enabled && !!id,
-    });
+// Hook pour récupérer un document par son id
+export function useDocumentByIdQuery(id: number, companyId?: string, enabled: boolean = true) {
+  const documentQuery = new DocumentQuery();
+  return useQuery({
+    queryKey: queryKeys.documents.detail(id, companyId),
+    queryFn: () => documentQuery.getById(id, companyId),
+    enabled: enabled && !!id && companyId !== undefined,
+  });
 }
 

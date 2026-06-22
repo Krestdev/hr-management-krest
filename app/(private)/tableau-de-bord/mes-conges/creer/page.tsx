@@ -10,10 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import useKizunaStore from '@/context/store'
 import { demoHolidayTypes } from '@/data/temp'
-import HolidaysQuery from '@/queries/holidays'
+import { useSendHolidayRequestMutation } from '@/queries/holidays'
 import { HolidayRequest } from '@/types/types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import React from 'react'
@@ -44,18 +43,7 @@ function Page() {
     const { user } = useKizunaStore();
     const [startView, setStartView] = React.useState<boolean>(false);
     const [endView, setEndView] = React.useState<boolean>(false);
-    const holidayRequest = new HolidaysQuery();
-    const sendLeaveRequest = useMutation({
-        mutationKey: ["leave-requests"],
-        mutationFn: async (data: Omit<HolidayRequest, "id" | "status" | "requestedDays">) => holidayRequest.sendRequest(data),
-        onSuccess: () => {
-            toast.success("Votre demande d'absence a été soumise avec succès !");
-            form.reset();
-        },
-        onError: (error) => {
-            toast.error(error.message);
-        }
-    });
+    const sendLeaveRequest = useSendHolidayRequestMutation();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -68,8 +56,18 @@ function Page() {
         }
     });
     function onSubmit(values: z.infer<typeof formSchema>) {
-        sendLeaveRequest.mutate({ typeId: Number(values.typeId), startDate: new Date(values.startDate), endDate: new Date(values.endDate), justificationFile: values.justificationFile, reason: values.reason, createdAt: new Date(), userId: user?.uuid ?? "0" })
-        //console.log(values);
+        sendLeaveRequest.mutate(
+            { typeId: Number(values.typeId), startDate: new Date(values.startDate), endDate: new Date(values.endDate), justificationFile: values.justificationFile, reason: values.reason, createdAt: new Date(), userId: user?.uuid ?? "0" },
+            {
+                onSuccess: () => {
+                    toast.success("Votre demande d'absence a été soumise avec succès !");
+                    form.reset();
+                },
+                onError: (error: any) => {
+                    toast.error(error.message);
+                }
+            }
+        )
     }
     return (
         <div className="flex flex-col gap-4 sm:gap-6">

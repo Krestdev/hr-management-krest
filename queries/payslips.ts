@@ -9,7 +9,7 @@ export class PayslipQuery {
     return demoPayslips;
   };
 }
-
+// Hook pour récupérer tous les bulletins de paie
 export function usePayslipsQuery() {
   const payslipQuery = new PayslipQuery();
   return useQuery({

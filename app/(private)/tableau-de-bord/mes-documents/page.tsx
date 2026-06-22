@@ -14,6 +14,7 @@ const Page = () => {
 
   const { data, isSuccess, isLoading, isError, error } = useMyDocumentsQuery(
     user?.uuid ?? "",
+    user?.companyId,
     !!user?.uuid
   );
 

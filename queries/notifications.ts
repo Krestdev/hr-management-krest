@@ -10,6 +10,7 @@ export class NotificationQuery {
   };
 }
 
+// Hook pour récupérer toutes les notifications
 export function useNotificationsQuery() {
   const notificationQuery = new NotificationQuery();
   return useQuery({

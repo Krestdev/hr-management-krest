@@ -21,9 +21,11 @@ export default class DepartmentQuery {
         }
     };
 
-    getAll = async (): Promise<{ departments: Department[] }> => {
+    getAll = async (companyId?: string): Promise<{ departments: Department[] }> => {
         try {
-            const response = await api.get(`${this.route}`);
+            const response = await api.get(`${this.route}`, {
+                params: { companyId }
+            });
             return response.data;
         } catch (error: any) {
             const message =
@@ -36,9 +38,11 @@ export default class DepartmentQuery {
         }
     };
 
-    getById = async (id: string): Promise<Department> => {
+    getById = async (id: string, companyId?: string): Promise<Department> => {
         try {
-            const response = await api.get(`${this.route}/${id}`);
+            const response = await api.get(`${this.route}/${id}`, {
+                params: { companyId }
+            });
             return response.data;
         } catch (error: any) {
             const message =
@@ -96,23 +100,27 @@ export default class DepartmentQuery {
     };
 }
 
-export function useDepartmentsQuery() {
+// Hook pour récupérer tous les départements
+export function useDepartmentsQuery(companyId?: string, enabled: boolean = true) {
     const departmentQuery = new DepartmentQuery();
     return useQuery({
-        queryKey: queryKeys.departments.all(),
-        queryFn: departmentQuery.getAll,
+        queryKey: queryKeys.departments.all(companyId),
+        queryFn: () => departmentQuery.getAll(companyId),
+        enabled: enabled && companyId !== undefined,
     });
 }
 
-export function useDepartmentQuery(id: string, enabled: boolean = true) {
+// Hook pour récupérer un département par son id
+export function useDepartmentQuery(id: string, companyId?: string, enabled: boolean = true) {
     const departmentQuery = new DepartmentQuery();
     return useQuery({
-        queryKey: queryKeys.departments.detail(id),
-        queryFn: () => departmentQuery.getById(id),
-        enabled: enabled && !!id,
+        queryKey: queryKeys.departments.detail(id, companyId),
+        queryFn: () => departmentQuery.getById(id, companyId),
+        enabled: enabled && !!id && companyId !== undefined,
     });
 }
 
+// Hook pour créer un département
 export function useCreateDepartmentMutation() {
     const departmentQuery = new DepartmentQuery();
     const queryClient = useQueryClient();
@@ -124,6 +132,7 @@ export function useCreateDepartmentMutation() {
     });
 }
 
+// Hook pour mettre à jour un département
 export function useUpdateDepartmentMutation() {
     const departmentQuery = new DepartmentQuery();
     const queryClient = useQueryClient();
@@ -137,6 +146,7 @@ export function useUpdateDepartmentMutation() {
     });
 }
 
+// Hook pour supprimer un département
 export function useDeleteDepartmentMutation() {
     const departmentQuery = new DepartmentQuery();
     const queryClient = useQueryClient();
@@ -148,6 +158,7 @@ export function useDeleteDepartmentMutation() {
     });
 }
 
+// Hook pour assigner un manager à un département
 export function useAssignDepartmentManagerMutation() {
     const departmentQuery = new DepartmentQuery();
     const queryClient = useQueryClient();
