@@ -21,7 +21,7 @@ export default class DepartmentQuery {
         }
     };
 
-    getAll = async (companyId?: string): Promise<{ departments: Department[] }> => {
+    getAll = async (companyId?: string): Promise<Department[]> => {
         try {
             const response = await api.get(`${this.route}`, {
                 params: { companyId }

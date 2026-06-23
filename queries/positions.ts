@@ -106,7 +106,7 @@ export function usePositionsQuery(companyId?: string, enabled: boolean = true) {
   return useQuery({
     queryKey: queryKeys.positions.all(companyId),
     queryFn: () => positionQuery.getAll(companyId),
-    enabled: enabled && companyId !== undefined,
+    enabled: enabled,
   });
 }
 

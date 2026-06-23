@@ -7,9 +7,13 @@ export default class UserQuery {
   route = "/employees";
 
   // create employee
-  create = async (data: Omit<Employee, "uuid" | "createdAt" | "updatedAt">): Promise<{ user: Employee; token: string }> => {
+  create = async (data: FormData): Promise<{ user: Employee; token: string }> => {
     try {
-      const response = await api.post(`${this.route}`, data);
+      const response = await api.post(`${this.route}`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       return response.data;
     } catch (error: any) {
       const message =
@@ -57,9 +61,13 @@ export default class UserQuery {
   }
 
   // update imployee informations
-  update = async (id: string, data: Partial<Omit<Employee, "uuid" | "createdAt" | "updatedAt">>): Promise<{ data: Employee; token: string }> => {
+  update = async (id: string, data: FormData): Promise<{ data: Employee; token: string }> => {
     try {
-      const response = await api.patch(`${this.route}/${id}`, data);
+      const response = await api.patch(`${this.route}/${id}`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       return response.data;
     } catch (error: any) {
       const message =
@@ -244,7 +252,7 @@ export function useUpdateEmployeeMutation() {
   const userQuery = new UserQuery();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Employee, "uuid" | "createdAt" | "updatedAt">> }) =>
+    mutationFn: ({ id, data }: { id: string; data: FormData }) =>
       userQuery.update(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["employees"] });

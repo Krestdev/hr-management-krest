@@ -51,7 +51,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { EllipsisIcon } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import ViewProfile from "./view-profile";
-import { Employee } from "@/types/types";
+import { Department, Employee } from "@/types/types";
 import EditProfile from "./edit-profile";
 import Link from "next/link";
 import WarningModal from "@/components/WarningModal";
@@ -59,14 +59,16 @@ import { toast } from "sonner";
 import AddDipe from "./add-dipe";
 import { useSalarialsQuery } from "@/queries/salarials";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useDepartmentsQuery } from "@/queries/department";
 
-type LengthOfService = "under" | "over" | "equal";
+type LengthOfService = "under" | "over" | "equal" | "none";
 
 function matchYearsFilter(
   startDate: Date | string,
   filterType: LengthOfService,
   filter: number,
 ): boolean {
+  if (filterType === "none") return true;
   const years = Math.floor(getYearsOfService(startDate));
   if (filterType === "equal") return years === filter;
   if (filterType === "over") return years > filter;
@@ -77,17 +79,15 @@ function Page() {
   const { user } = useKizunaStore();
   // États pour les filtres backend
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [querySearchTerm, setQuerySearchTerm] = useState<string>("");
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("ACTIVE");
   const [includeInactive, setIncludeInactive] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(20);
 
-  // Debounce pour la recherche (évite trop de requêtes)
-  const debouncedSearch = useDebounce(searchTerm, 500);
-
   // États pour les filtres locaux (ancienneté)
-  const [yearsFilter, setYearsFilter] = useState<LengthOfService>("over");
+  const [yearsFilter, setYearsFilter] = useState<LengthOfService>("none");
   const [years, setYears] = useState<number>(0);
   const inclueSensitive = true
 
@@ -99,15 +99,15 @@ function Page() {
     departmentFilter !== "all" ? departmentFilter : "",
     "",
     statusFilter,
-    debouncedSearch,
+    querySearchTerm,
     includeInactive,
     inclueSensitive,
     !!user?.companyId
   );
 
   const diactivate = useDeleteEmployeeMutation();
-
   const resume = useReactivateEmployeeMutation();
+  const departmentData = useDepartmentsQuery(user?.companyId!, true);
 
   // const {
   //   data: salarialData,
@@ -120,7 +120,7 @@ function Page() {
   //   queryFn: dipeQuery.getAll,
   // });
 
-  const [departments, setDepartments] = useState<Array<string>>([]);
+  const [departments, setDepartments] = useState<Array<Department>>([]);
   const [selected, setSelected] = useState<Employee>();
   const [openProfile, setOpenProfile] = useState(false);
   const [viewEdit, setViewEdit] = useState(false);
@@ -156,18 +156,11 @@ function Page() {
   }
 
   useEffect(() => {
-    if (isSuccess && data) {
-      // Extraire le premier département de chaque tableau
-      const uniqueDepartments = Array.from(
-        new Set(
-          data.data
-            .map((user) => user.department?.[0]) // Prendre le premier élément du tableau
-            .filter(Boolean)
-        )
-      );
-      setDepartments(uniqueDepartments as string[]);
+    if (departmentData.isSuccess && departmentData.data) {
+      setDepartments(departmentData.data);
     }
-  }, [isSuccess, data]);
+  }, [departmentData.isSuccess, departmentData.data]);
+
 
   // Filtrage local pour l'ancienneté
   const filteredData = useMemo(() => {
@@ -180,6 +173,7 @@ function Page() {
           yearsFilter,
           years,
         );
+
         return matchYears;
       })
       .sort((a, b) =>
@@ -190,10 +184,11 @@ function Page() {
   // Réinitialiser tous les filtres
   function resetFilters() {
     setSearchTerm("");
+    setQuerySearchTerm("");
     setDepartmentFilter("all");
     setStatusFilter("ACTIVE");
     setIncludeInactive(false);
-    setYearsFilter("over");
+    setYearsFilter("none");
     setYears(0);
     setPage(1);
   }
@@ -219,14 +214,22 @@ function Page() {
           <h3>{"Liste des employés"}</h3>
           <div className="filters">
             {/* Recherche par nom - Backend */}
-            <div className="filter-group">
+            <div className="filter-group flex gap-2">
               <Input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    setQuerySearchTerm(searchTerm);
+                  }
+                }}
                 type="search"
                 placeholder="Rechercher par nom"
                 className="min-w-60"
               />
+              <Button variant="secondary" onClick={() => setQuerySearchTerm(searchTerm)}>
+                Rechercher
+              </Button>
             </div>
 
             {/* Filtre département - Backend */}
@@ -243,8 +246,8 @@ function Page() {
                 <SelectContent>
                   <SelectItem value="all">{"Tous"}</SelectItem>
                   {departments.map((item, id) => (
-                    <SelectItem key={id} value={item}>
-                      {item}
+                    <SelectItem key={id} value={item.uuid}>
+                      {item.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -283,18 +286,21 @@ function Page() {
                   <SelectValue placeholder="Sélectionner" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="none">{"Aucun filtre"}</SelectItem>
                   <SelectItem value="over">{"Plus de"}</SelectItem>
                   <SelectItem value="under">{"Moins de"}</SelectItem>
                   <SelectItem value="equal">{"Egal à"}</SelectItem>
                 </SelectContent>
               </Select>
-              <Input
-                type="number"
-                value={years}
-                onChange={(e) => setYears(Number(e.target.value))}
-                placeholder="ex 1"
-                className="w-20"
-              />
+              {yearsFilter !== "none" && (
+                <Input
+                  type="number"
+                  value={years}
+                  onChange={(e) => setYears(Number(e.target.value))}
+                  placeholder="ex 1"
+                  className="w-20"
+                />
+              )}
             </div>
 
             {/* Bouton Ajouter */}
@@ -319,7 +325,7 @@ function Page() {
                 onChange={(e) => setIncludeInactive(e.target.checked)}
               />
               <Label htmlFor="includeInactive" className="text-sm">
-                {`Inclure les inactifs (${data.data.filter((emp) => emp.isActive === false).length})`}
+                {`Inclure les inactifs`}
               </Label>
             </div>
           </div>

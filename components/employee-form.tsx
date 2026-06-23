@@ -21,6 +21,8 @@ import TableUpload from './table-upload'
 import { usePositionsQuery } from '@/queries/positions'
 import { useCreateEmployeeMutation, useUpdateEmployeeMutation } from '@/queries/employee'
 import { toast } from 'sonner'
+import useKizunaStore from '@/context/store'
+import { useDepartmentQuery, useDepartmentsQuery } from '@/queries/department'
 
 interface Props {
     employee?: Employee;
@@ -69,7 +71,7 @@ const formSchema = z.object({
     supervisorId: z.string().optional(),
     category: z.string(),
     grade: z.string(),
-    hireData: z
+    hireDate: z
         .string({ message: "Veuillez définir une date" })
         .refine((val) => {
             const d = new Date(val);
@@ -92,14 +94,17 @@ const formSchema = z.object({
 });
 
 function EmployeeForm({ employee, users }: Props) {
+
+    const { user } = useKizunaStore()
     const [step, setStep] = useState(1);
     const [popBD, setPopBD] = useState(false);
     const [issueDate, setIssueDate] = useState(false);
     const [expiryDate, setExpiryDate] = useState(false);
-    const [hireData, setHireData] = useState(false);
+    const [hireDate, sethireDate] = useState(false);
     const [endDate, setEndDate] = useState(false);
 
     const positionData = usePositionsQuery();
+    const departmentData = useDepartmentsQuery(user?.companyId!, true);
 
     const updateEmployee = useUpdateEmployeeMutation();
 
@@ -145,7 +150,7 @@ function EmployeeForm({ employee, users }: Props) {
             supervisorId: employee?.supervisorId ?? undefined,
             category: employee?.category ?? "",
             grade: employee?.grade ?? "",
-            hireData: employee?.hireDate ? new Date(employee.hireDate).toISOString().slice(0, 10) : "",
+            hireDate: employee?.hireDate ? new Date(employee.hireDate).toISOString().slice(0, 10) : "",
             endDate: employee?.endDate ? new Date(employee.endDate).toISOString().slice(0, 10) : undefined,
             contract_type: employee?.contracts?.[0].contract_type ?? "",
             baseSalary: employee?.contracts![0].baseSalary ?? 100000,
@@ -160,32 +165,77 @@ function EmployeeForm({ employee, users }: Props) {
 
     });
     function onSubmit(values: z.infer<typeof formSchema>) {
-        const data = {
-            ...values,
-            idDocumentIssueDate: new Date(values.idDocumentIssueDate),
-            idDocumentExpiryDate: new Date(values.idDocumentExpiryDate),
-            hireData: new Date(values.hireData),
+        const formData = new FormData();
+
+        formData.append("firstName", values.firstName);
+        formData.append("lastName", values.lastName);
+        formData.append("birthday", values.birthday);
+        formData.append("email", values.email);
+        formData.append("gender", values.gender);
+        formData.append("nationality", values.nationality);
+        formData.append("countryOfResidence", values.countryOfResidence);
+        formData.append("address", values.address);
+        formData.append("phoneNumber", values.phoneNumber);
+        formData.append("matrimonial_status", String(values.matrimonial_status));
+        formData.append("number_of_children", String(values.number_of_children));
+        if (values.EmergencyContactPhone) formData.append("EmergencyContactPhone", values.EmergencyContactPhone);
+        if (values.CNPSNumber) formData.append("CNPSNumber", values.CNPSNumber);
+        formData.append("idDocumentType", values.idDocumentType);
+        formData.append("idDocumentNumber", values.idDocumentNumber);
+        formData.append("idDocumentIssueDate", new Date(values.idDocumentIssueDate).toISOString());
+        formData.append("idDocumentExpiryDate", new Date(values.idDocumentExpiryDate).toISOString());
+        formData.append("idDocumentIssuePlace", values.idDocumentIssuePlace);
+
+        if (values.idDocumentFileUrl) {
+            if (values.idDocumentFileUrl instanceof FileList && values.idDocumentFileUrl.length > 0) {
+                formData.append("idDocumentFileUrl", values.idDocumentFileUrl[0]);
+            } else {
+                formData.append("idDocumentFileUrl", values.idDocumentFileUrl);
+            }
         }
+
+        formData.append("positionId", values.position);
+        formData.append("departmentId", values.department);
+        if (values.supervisorId) formData.append("supervisorId", values.supervisorId);
+        formData.append("category", values.category);
+        formData.append("grade", values.grade);
+        formData.append("paymentMode", values.paymentMode);
+        formData.append("workLocation", values.workLocation);
+        formData.append("leaveDays", String(values.leaveDays));
+
+        if (values.attachments) {
+            formData.append("attachments", JSON.stringify(values.attachments));
+        }
+
+        formData.append("contract", JSON.stringify([
+            {
+                baseSalary: values.baseSalary,
+                contract_type: values.contract_type,
+                endDate: values.endDate,
+                startDate: values.hireDate
+            }
+        ]));
+
         if (employee) {
-            updateEmployee.mutate({ id: employee.uuid, data: data as unknown as Partial<Omit<Employee, "uuid" | "createdAt" | "updatedAt">> }, {
+            updateEmployee.mutate({ id: employee.uuid, data: formData }, {
                 onSuccess: () => {
                     form.reset();
                     setStep(1);
-                    toast.success("Employe mis à jour avec succès");
+                    toast.success("Employé mis à jour avec succès");
                 },
                 onError: (error) => {
-                    toast.error("Erreur lors de la mise à jour de l'employe: " + error.message);
+                    toast.error("Erreur lors de la mise à jour de l'employé: " + error.message);
                 }
             });
         } else {
-            createEmployee.mutate(data as unknown as Omit<Employee, "uuid" | "createdAt" | "updatedAt">, {
+            createEmployee.mutate(formData as any, {
                 onSuccess: () => {
                     form.reset();
                     setStep(1);
-                    toast.success("Employe créé avec succès");
+                    toast.success("Employé créé avec succès");
                 },
                 onError: (error) => {
-                    toast.error("Erreur lors de la création de l'employe: " + error.message);
+                    toast.error("Erreur lors de la création de l'employé: " + error.message);
                 }
             });
         }
@@ -389,7 +439,7 @@ function EmployeeForm({ employee, users }: Props) {
                                 <FormItem>
                                     <FormLabel isRequired>{"Situation Matrimoniale"}</FormLabel>
                                     <FormControl>
-                                        <Select value={String(field.value)} onValueChange={field.onChange}>
+                                        <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
                                             <SelectTrigger className="w-full">
                                                 <SelectValue placeholder="Sélectionner" />
                                             </SelectTrigger>
@@ -576,11 +626,11 @@ function EmployeeForm({ employee, users }: Props) {
                                     <FormMessage />
                                 </FormItem>
                             } />
-                            <FormField control={form.control} name="idDocumentFileUrl" render={({ field }) =>
+                            <FormField control={form.control} name="idDocumentFileUrl" render={({ field: { value, onChange, ...fieldProps } }) =>
                                 <FormItem>
                                     <FormLabel isRequired>{"Importer la pièce d'identité"}</FormLabel>
                                     <FormControl>
-                                        <Input type="file" {...field} />
+                                        <Input type="file" {...fieldProps} onChange={(event) => onChange(event.target.files)} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -598,7 +648,7 @@ function EmployeeForm({ employee, users }: Props) {
                                             <SelectContent>
                                                 {
                                                     positionData.data?.map((pos, id) =>
-                                                        <SelectItem key={id} value={pos.uuid}>{pos.title}</SelectItem>)
+                                                        <SelectItem key={id} value={pos.uuid ? String(pos.uuid) : `pos-${id}`}>{pos.title}</SelectItem>)
                                                 }
                                             </SelectContent>
                                         </Select>
@@ -616,8 +666,8 @@ function EmployeeForm({ employee, users }: Props) {
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {
-                                                    departmentsSample.map((dep, id) =>
-                                                        <SelectItem key={id} value={dep}>{dep}</SelectItem>)
+                                                    departmentData.data?.map((dep, id) =>
+                                                        <SelectItem key={id} value={dep.uuid ? dep.uuid : `dep-${id}`}>{dep.name}</SelectItem>)
                                                 }
                                             </SelectContent>
                                         </Select>
@@ -690,9 +740,9 @@ function EmployeeForm({ employee, users }: Props) {
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {
-                                                    users.map((user) =>
-                                                        <SelectItem key={user.uuid}
-                                                            value={user.uuid}>
+                                                    users.map((user, id) =>
+                                                        <SelectItem key={user.uuid ?? id}
+                                                            value={user.uuid ? String(user.uuid) : `user-${id}`}>
                                                             {user.firstName.concat(" ", user.lastName)}
                                                         </SelectItem>)
                                                 }
@@ -786,7 +836,7 @@ function EmployeeForm({ employee, users }: Props) {
                                     <FormMessage />
                                 </FormItem>
                             } />
-                            <FormField control={form.control} name="hireData" render={({ field }) =>
+                            <FormField control={form.control} name="hireDate" render={({ field }) =>
                                 <FormItem>
                                     <FormLabel isRequired>{"Date d'entrée"}</FormLabel>
                                     <FormControl>
@@ -802,11 +852,11 @@ function EmployeeForm({ employee, users }: Props) {
                                                 onKeyDown={(e) => {
                                                     if (e.key === "ArrowDown") {
                                                         e.preventDefault()
-                                                        setHireData(true)
+                                                        sethireDate(true)
                                                     }
                                                 }}
                                             />
-                                            <Popover open={hireData} onOpenChange={setHireData}>
+                                            <Popover open={hireDate} onOpenChange={sethireDate}>
                                                 <PopoverTrigger asChild>
                                                     <Button
                                                         id="date-picker"
@@ -831,7 +881,7 @@ function EmployeeForm({ employee, users }: Props) {
                                                             if (!date) return;
                                                             const value = date.toISOString().slice(0, 10); // "YYYY-MM-DD"
                                                             field.onChange(value);
-                                                            setHireData(false);
+                                                            sethireDate(false);
                                                         }}
                                                     />
                                                 </PopoverContent>
