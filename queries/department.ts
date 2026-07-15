@@ -100,13 +100,18 @@ export default class DepartmentQuery {
     };
 }
 
+import useKizunaStore from "@/context/store";
+
 // Hook pour récupérer tous les départements
 export function useDepartmentsQuery(companyId?: string, enabled: boolean = true) {
+    const storeCompanyId = useKizunaStore((state) => state.selectedCompanyId);
+    const activeCompanyId = storeCompanyId === "all" ? companyId : storeCompanyId;
+
     const departmentQuery = new DepartmentQuery();
     return useQuery({
-        queryKey: queryKeys.departments.all(companyId),
-        queryFn: () => departmentQuery.getAll(companyId),
-        enabled: enabled && companyId !== undefined,
+        queryKey: queryKeys.departments.all(activeCompanyId),
+        queryFn: () => departmentQuery.getAll(activeCompanyId),
+        enabled: enabled,
     });
 }
 

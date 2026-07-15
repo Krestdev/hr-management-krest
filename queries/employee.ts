@@ -27,7 +27,7 @@ export default class UserQuery {
   }
 
   // get all employee with pagination and filters
-  getAll = async (page: number, limit: number, companyId: string, departmentId?: string, positionUuid?: string, status: string = "ACTIVE", search?: string, includeInactive?: boolean, includeSensitive: boolean = false): Promise<{ data: Employee[]; meta: { total: number, page: number, limit: number, totalPages: number, includeSensitive: boolean } }> => {
+  getAll = async (page: number, limit: number, companyId: string, departmentId?: string, positionUuid?: string, status: string = "ACTIVE", search?: string, includeInactive?: boolean, includeSensitive: boolean = false): Promise<{ data: Employee[]; meta: { total: number, totalAssigned: number, page: number, limit: number, totalPages: number, includeSensitive: boolean } }> => {
     try {
       const response = await api.get(`${this.route}?page=${page}&limit=${limit}&companyId=${companyId}&departmentId=${departmentId}&positionUuid=${positionUuid}&status=${status}&search=${search}&includeInactive=${includeInactive}&includeSensitive=${includeSensitive}`);
       return response.data;
@@ -68,6 +68,21 @@ export default class UserQuery {
           'Content-Type': 'multipart/form-data'
         }
       });
+      return response.data;
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message ??
+        error.message ??
+        "Une erreur s'est produite";
+
+      // On propage une erreur propre
+      throw new Error(message);
+    }
+  }
+
+  updatePassword = async (id: string, data: { newPassword: string }): Promise<{ data: Employee; token: string }> => {
+    try {
+      const response = await api.patch(`${this.route}/${id}/password`, data);
       return response.data;
     } catch (error: any) {
       const message =
@@ -183,6 +198,8 @@ export default class UserQuery {
   }
 }
 
+import useKizunaStore from "@/context/store";
+
 // Hook pour récupérer tous les employés
 export function useEmployeesQuery(
   page: number,
@@ -196,12 +213,15 @@ export function useEmployeesQuery(
   includeSensitive: boolean = false,
   enabled: boolean = true
 ) {
+  const storeCompanyId = useKizunaStore((state) => state.selectedCompanyId);
+  const activeCompanyId = storeCompanyId === "all" ? companyId : storeCompanyId;
+
   const userQuery = new UserQuery();
   return useQuery({
     queryKey: queryKeys.employees.all({
       page,
       limit,
-      companyId,
+      companyId: activeCompanyId,
       departmentId,
       positionUuid,
       status,
@@ -213,7 +233,7 @@ export function useEmployeesQuery(
       userQuery.getAll(
         page,
         limit,
-        companyId,
+        activeCompanyId,
         departmentId,
         positionUuid,
         status,
@@ -221,7 +241,7 @@ export function useEmployeesQuery(
         includeInactive,
         includeSensitive
       ),
-    enabled: enabled && companyId !== undefined,
+    enabled: enabled && activeCompanyId !== undefined,
   });
 }
 
@@ -254,9 +274,29 @@ export function useUpdateEmployeeMutation() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: FormData }) =>
       userQuery.update(id, data),
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["employees"] });
-      queryClient.invalidateQueries({ queryKey: queryKeys.employees.detail(data.data.uuid) });
+      const uuid = data?.data?.uuid || (data as any)?.uuid || variables.id;
+      if (uuid) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.employees.detail(uuid) });
+      }
+    },
+  });
+}
+
+// Hook pour mettre à jour le mot de passe d'un employé
+export function useUpdateEmployeePasswordMutation() {
+  const userQuery = new UserQuery();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { newPassword: string } }) =>
+      userQuery.updatePassword(id, data),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      const uuid = data?.data?.uuid || (data as any)?.uuid || variables.id;
+      if (uuid) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.employees.detail(uuid) });
+      }
     },
   });
 }
@@ -277,9 +317,12 @@ export function useDeleteEmployeeMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => userQuery.delete(id),
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["employees"] });
-      queryClient.invalidateQueries({ queryKey: queryKeys.employees.detail(data.data.uuid) });
+      const uuid = data?.data?.uuid || (data as any)?.uuid || variables;
+      if (uuid) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.employees.detail(uuid) });
+      }
     },
   });
 }
@@ -290,9 +333,12 @@ export function useReactivateEmployeeMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => userQuery.reactivate(id),
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["employees"] });
-      queryClient.invalidateQueries({ queryKey: queryKeys.employees.detail(data.data.uuid) });
+      const uuid = data?.data?.uuid || (data as any)?.uuid || variables;
+      if (uuid) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.employees.detail(uuid) });
+      }
     },
   });
 }

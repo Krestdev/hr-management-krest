@@ -7,9 +7,10 @@ export default class PresenceQuery {
   route = "/attendance";
 
   // ✅ GET ALL PRESENCES
-  getAll = async (): Promise<Presence[]> => {
+  getAll = async (month?: number, year?: number): Promise<Presence[]> => {
     try {
-      const response = await api.get(this.route);
+      const url = month && year ? `${this.route}?month=${month}&year=${year}` : this.route;
+      const response = await api.get(url);
       return response.data;
     } catch (error: any) {
       const message =
@@ -23,11 +24,15 @@ export default class PresenceQuery {
 
   // ✅ GET PRESENCES BY USER ID
   getByUserId = async (
-    userId: string
+    userId: string,
+    month?: number,
+    year?: number
   ): Promise<Presence[]> => {
     try {
-      console.log(userId);
-      const response = await api.get(`${this.route}/employee/${userId}`);
+      const url = month && year 
+        ? `${this.route}/employee/${userId}?month=${month}&year=${year}`
+        : `${this.route}/employee/${userId}`;
+      const response = await api.get(url);
       return response.data;
     } catch (error: any) {
       const message =
@@ -58,23 +63,46 @@ export default class PresenceQuery {
       throw new Error(message);
     }
   };
+
+  // ✅ CREATE MANY PRESENCES
+  postMany = async ({
+    data,
+    month,
+    year,
+  }: {
+    data: Omit<Presence, "id" | "createdAt" | "updatedAt">[];
+    month: number;
+    year: number;
+  }): Promise<any> => {
+    try {
+      const response = await api.post(`/attendance/batch?month=${month}&year=${year}`, data);
+      return response.data;
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message ??
+        error.message ??
+        "Erreur lors de la création en masse des présences";
+
+      throw new Error(message);
+    }
+  };
 }
 
 // Hook pour récupérer toutes les présences
-export function usePresencesQuery() {
+export function usePresencesQuery(month?: number, year?: number) {
   const presenceQuery = new PresenceQuery();
   return useQuery({
-    queryKey: queryKeys.presences.all(),
-    queryFn: presenceQuery.getAll,
+    queryKey: [...queryKeys.presences.all(), month, year],
+    queryFn: () => presenceQuery.getAll(month, year),
   });
 }
 
 // Hook pour récupérer les présences par id utilisateur
-export function usePresencesByUserIdQuery(userId: string, enabled: boolean = true) {
+export function usePresencesByUserIdQuery(userId: string, month?: number, year?: number, enabled: boolean = true) {
   const presenceQuery = new PresenceQuery();
   return useQuery({
-    queryKey: queryKeys.presences.byUserId(userId),
-    queryFn: () => presenceQuery.getByUserId(userId),
+    queryKey: [...queryKeys.presences.byUserId(userId), month, year],
+    queryFn: () => presenceQuery.getByUserId(userId, month, year),
     enabled: enabled && !!userId,
   });
 }
@@ -88,6 +116,18 @@ export function useCreatePresenceMutation() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.presences.all() });
       queryClient.invalidateQueries({ queryKey: queryKeys.presences.byUserId(variables.userId) });
+    },
+  });
+}
+
+// Hook pour créer plusieurs présences en masse
+export function useCreateManyPresencesMutation() {
+  const presenceQuery = new PresenceQuery();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: presenceQuery.postMany,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.presences.all() });
     },
   });
 }

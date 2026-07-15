@@ -5,10 +5,15 @@ import NavigationBreadcrumb from "./breadcrumb-main"
 import { Button } from "./ui/button"
 import useKizunaStore from "@/context/store"
 import { useRouter } from "next/navigation"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import { useCompaniesQuery } from "@/queries/company"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { logout } = useKizunaStore();
+  const { logout, selectedCompanyId, setSelectedCompanyId } = useKizunaStore();
   const router = useRouter();
+
+  const { data: companies, isLoading: isLoadingCompanies } = useCompaniesQuery();
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -16,9 +21,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="h-15 w-full px-4 bg-white flex justify-between items-center border-b">
           <div className="flex items-center gap-2">
             <SidebarTrigger>Menu</SidebarTrigger>
-            <NavigationBreadcrumb/>
+            <NavigationBreadcrumb />
           </div>
-          <Button onClick={()=>{logout(); router.push("/")}}>{"Déconnexion"}</Button>
+          <div className="flex items-center gap-2">
+            {/* Choisir la société */}
+            <Select value={selectedCompanyId} onValueChange={setSelectedCompanyId}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder={isLoadingCompanies ? "Chargement..." : "Tous"} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous</SelectItem>
+                {companies?.map((company) => (
+                  <SelectItem key={company.uuid} value={company.uuid}>
+                    {company.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <div className="flex-1 p-6">
           {children}

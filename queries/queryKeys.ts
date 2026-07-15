@@ -2,6 +2,10 @@ export const queryKeys = {
   auth: {
     login: () => ["auth", "login"] as const,
   },
+  companies: {
+    all: () => ["companies", "all"] as const,
+    detail: (id: string) => ["companies", "detail", id] as const,
+  },
   departments: {
     all: (companyId?: string) => ["departments", "all", companyId] as const,
     detail: (id: string, companyId?: string) => ["departments", "detail", id, companyId] as const,

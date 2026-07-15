@@ -1,0 +1,359 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<title>Untitled</title>
+<meta content='application/vnd.ms-excel;charset=UTF-8' http-equiv=Content-type />
+<meta name=ProgId content=Excel.Sheet />
+<meta name=Generator content="Microsoft Excel 11">
+<style type="text/css">
+<!--table
+@page{}
+-->
+</style>
+<!--[if gte mso 9]><xml>
+  <x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+    <x:Name>Sheet1</x:Name>
+    <x:WorksheetOptions><x:Panes>
+    </x:Panes></x:WorksheetOptions>
+    </x:ExcelWorksheet></x:ExcelWorksheets>
+  </x:ExcelWorkbook>
+</xml>
+<![endif]-->
+</head>
+<body>
+<!-- SECTION: detail1 -->
+<table border="1" class="detail1">
+<tr>
+<td align="center" colspan=8 style="vnd.ms-excel.numberformat:@"><b>Attendance Details</b></td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@"><b>Person ID</b></td>
+<td align="center" style="vnd.ms-excel.numberformat:@"><b>Name</b></td>
+<td align="center" style="vnd.ms-excel.numberformat:@"><b>Department</b></td>
+<td align="center" style="vnd.ms-excel.numberformat:@"><b>Date</b></td>
+<td align="center" style="vnd.ms-excel.numberformat:@"><b>Timetable</b></td>
+<td align="center" style="vnd.ms-excel.numberformat:@"><b>Attendance Status</b></td>
+<td align="center" style="vnd.ms-excel.numberformat:@"><b>Check-In</b></td>
+<td align="center" style="vnd.ms-excel.numberformat:@"><b>Check-out</b></td>
+</tr>
+</table>
+<!-- SECTION: Detail2 -->
+<table border="1" class="Detail2">
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-02</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">On Time</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">07:55:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">17:25:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-02 07:55:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-02 17:25:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:570 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-03</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">On Time</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">07:55:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">17:03:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-03 07:55:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-03 17:03:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:548 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-04</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">On Time</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">08:03:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">17:01:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-04 08:03:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-04 17:01:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:538 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-05</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">On Time</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">08:00:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">17:01:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-05 08:00:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-05 17:01:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:541 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-06</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">On Time</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">08:03:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">18:07:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-06 08:03:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-06 18:07:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:604 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-07</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Absence</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">-</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">-</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-09</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">On Time</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">08:03:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">17:43:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-09 08:03:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-09 17:43:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:580 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-10</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">On Time</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">08:04:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">17:25:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-10 08:04:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-10 17:25:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:561 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-11</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Late</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">08:05:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">18:27:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-11 08:05:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-11 18:27:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:622 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-12</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Late</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">08:32:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">17:33:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-12 08:32:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-12 17:33:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:541 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-13</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">On Time</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">07:58:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">17:03:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-13 07:58:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-13 17:03:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:545 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-14</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Absence</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">-</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">-</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-16</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Late</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">08:21:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">16:55:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-16 08:21:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-16 16:55:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:514 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-17</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">On Time</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">08:03:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">17:05:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-17 08:03:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-17 17:05:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:542 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-18</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Absence</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">-</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">-</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-19</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">On Time</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">08:03:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">17:27:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-19 08:03:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-19 17:27:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:564 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-20</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Late</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">08:28:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">18:03:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-20 08:28:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-20 18:03:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:575 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-21</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Absence</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">-</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">-</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-23</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">On Time</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">08:00:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">17:19:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-23 08:00:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-23 17:19:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:559 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-24</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Late</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">08:29:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">17:25:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-24 08:29:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-24 17:25:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:536 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-25</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">On Time</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">08:00:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">17:10:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-25 08:00:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-25 17:10:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:550 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-26</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">On Time</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">07:55:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">17:24:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-26 07:55:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-26 17:24:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:569 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-27</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">On Time</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">07:56:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">18:11:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-27 07:56:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-27 18:11:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:615 min</td>
+</tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">00000099</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">John Peter</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Test Department</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">2026-02-28</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Default Timetable(08:00:00-17:00:00)</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">On Time</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">07:57:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">17:38:00</td>
+</tr>
+<tr>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-In Time: 2026-02-28 07:57:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Check-Out Time: 2026-02-28 17:38:00</td>
+<td align="center" style="vnd.ms-excel.numberformat:@">Attended Duration:581 min</td>
+</tr>
+</table>
+</body>
+</html>

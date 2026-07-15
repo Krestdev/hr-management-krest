@@ -26,7 +26,7 @@ import { useDepartmentQuery, useDepartmentsQuery } from '@/queries/department'
 
 interface Props {
     employee?: Employee;
-    users: Array<Employee>;
+    users?: Array<Employee>;
 }
 
 const formSchema = z.object({
@@ -152,8 +152,8 @@ function EmployeeForm({ employee, users }: Props) {
             grade: employee?.grade ?? "",
             hireDate: employee?.hireDate ? new Date(employee.hireDate).toISOString().slice(0, 10) : "",
             endDate: employee?.endDate ? new Date(employee.endDate).toISOString().slice(0, 10) : undefined,
-            contract_type: employee?.contracts?.[0].contract_type ?? "",
-            baseSalary: employee?.contracts![0].baseSalary ?? 100000,
+            contract_type: employee?.contracts?.[0]?.contract_type ?? "",
+            baseSalary: employee?.contracts?.[0]?.baseSalary ?? 100000,
             paymentMode: employee?.paymentMode ?? "",
             workLocation: employee?.workLocation ?? "",
             workLocationName: employee?.workLocationName ?? "",
@@ -740,7 +740,7 @@ function EmployeeForm({ employee, users }: Props) {
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {
-                                                    users.map((user, id) =>
+                                                    users?.map((user, id) =>
                                                         <SelectItem key={user.uuid ?? id}
                                                             value={user.uuid ? String(user.uuid) : `user-${id}`}>
                                                             {user.firstName.concat(" ", user.lastName)}

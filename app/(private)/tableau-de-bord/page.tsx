@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/empty";
 import useKizunaStore from "@/context/store";
 import { useHolidaysStatsQuery, useHolidaysBalanceQuery } from "@/queries/holidays";
-import { useEmployeesQuery } from "@/queries/employee";
+import { useEmployeeQuery, useEmployeesQuery } from "@/queries/employee";
 import {
   AddSquareIcon,
   Calendar02Icon,
@@ -30,16 +30,17 @@ import { useRouter } from "next/navigation";
 
 function Page() {
   const { user } = useKizunaStore();
+  const userData = useEmployeeQuery(user?.employeeId!, true)
   const router = useRouter();
-  const stats = useHolidaysStatsQuery(user?.role !== "USER");
-  const employees = useEmployeesQuery(1, 20, user?.companyId || "", "", "", "ACTIVE", "", false, false, user?.role !== "USER");
+  const stats = useHolidaysStatsQuery(user?.role !== "EMPLOYEE");
+  const employees = useEmployeesQuery(1, 20, user?.companyId || "", "", "", "ACTIVE", "", false, false, user?.role !== "EMPLOYEE");
   const userHolidays = useHolidaysBalanceQuery(user?.uuid ?? "", undefined, !!user?.uuid);
 
 
   return (
     <div className="flex flex-col gap-4 sm:gap-6">
       <header className="flex flex-col">
-        <h2>{`Bonjour ${user?.firstName} 👋,`}</h2>
+        <h2>{`Bonjour ${userData.data?.firstName} 👋,`}</h2>
         <p className="text-neutral-600 text-sm">
           {"Bienvenue sur votre tableau de bord"}
         </p>
@@ -87,7 +88,7 @@ function Page() {
             </DropdownMenuItem>
           </StatisticCard>
         )}
-        {user?.role !== "USER" && (
+        {user?.role !== "EMPLOYEE" && (
           <StatisticCard
             title="Bulletins générés"
             value={487}
@@ -98,7 +99,7 @@ function Page() {
             </DropdownMenuItem>
           </StatisticCard>
         )}
-        {user?.role === "USER" && userHolidays.isSuccess && (
+        {user?.role === "EMPLOYEE" && userHolidays.isSuccess && (
           <StatisticCard
             variant={"grey"}
             title="Congés utilisés"
@@ -106,7 +107,7 @@ function Page() {
             advanced={{ value: `sur ${userHolidays.data.earnedDays} jour(s)` }}
           />
         )}
-        {user?.role === "USER" && (
+        {user?.role === "EMPLOYEE" && (
           <StatisticCard
             title="Dernier bulletin disponible"
             value={"Septembre 2025"}
@@ -136,7 +137,7 @@ function Page() {
             </h3>
           </div>
           <div className="w-full grid grid-cols-1 gap-2 @min-[260px]:grid-cols-2 @min-[340px]:grid-cols-3 @min-[460px]:grid-cols-4 @min-[578px]:grid-cols-5 @min-[760px]:grid-cols-6">
-            {user?.role !== "USER" && (
+            {user?.role !== "EMPLOYEE" && (
               <>
                 <Link
                   href={"/tableau-de-bord/conges"}
@@ -246,7 +247,7 @@ function Page() {
           </Empty>
         </div>
         {/**Awaiting leave requests for RH & ADMIN */}
-        {user?.role === "USER" ? (
+        {user?.role === "EMPLOYEE" ? (
           <div className="card-1 @min-[960px]/main:col-span-2">
             <div className="card-1-header">
               <h3 className="flex items-center gap-2">

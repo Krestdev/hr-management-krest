@@ -100,12 +100,17 @@ export default class PositionQuery {
   };
 }
 
+import useKizunaStore from "@/context/store";
+
 // Hook pour récupérer toutes les positions
 export function usePositionsQuery(companyId?: string, enabled: boolean = true) {
+  const storeCompanyId = useKizunaStore((state) => state.selectedCompanyId);
+  const activeCompanyId = storeCompanyId === "all" ? companyId : storeCompanyId;
+
   const positionQuery = new PositionQuery();
   return useQuery({
-    queryKey: queryKeys.positions.all(companyId),
-    queryFn: () => positionQuery.getAll(companyId),
+    queryKey: queryKeys.positions.all(activeCompanyId),
+    queryFn: () => positionQuery.getAll(activeCompanyId),
     enabled: enabled,
   });
 }

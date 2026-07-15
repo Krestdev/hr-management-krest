@@ -1,5 +1,7 @@
 import { string, uuid } from "zod";
 
+export type UserRole = "COMPANY_ADMIN" | "SUPER_ADMIN" | "ADMIN" | "EMPLOYEE";
+
 export type Employee = {
   uuid: string;
   employeeId?: string;
@@ -7,7 +9,7 @@ export type Employee = {
   createdAt?: string;
   photo?: string;
   password?: string;
-  role: "SUPER_ADMIN" | "ADMIN" | "USER";
+  role: UserRole;
   status: string;
   isActive: boolean;
   //Form
@@ -226,6 +228,8 @@ export type Presence = {
   userId: string;
   date: string;
   statut: PresenceFlag[];
+  checkIn?: string;
+  checkOut?: string;
   createdAt: string;
   updatedAt?: string;
 };
@@ -251,4 +255,46 @@ export type Position = {
   permissionUuids?: string[];
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+export type Contracts = {
+  uuid: string;
+  startDate: string;
+  endDate: string;
+  contract_type: string;
+  status: string;
+  baseSalary: string;
+  currency: string;
+  terminationReason: number;
+  expiryAlertSent: boolean;
+  employeeId: string;
+  companyId: string;
+  createdAt: string;
+  updatedAt: string
+}
+
+export type Company = {
+  uuid: string;
+  name: string;
+  description: string;
+  isActive: boolean;
+  departments: Department[];
+  contracts: Contracts[];
+  employees: Employee[];
+  createdAt: string;
+  updatedAt: string
+}
+
+export const roleColors: Record<string, string> = {
+  "SUPER_ADMIN": "bg-purple-600 hover:bg-purple-700 text-white border-transparent",
+  "ADMIN": "bg-purple-600 hover:bg-purple-700 text-white border-transparent",
+  "COMPANY_ADMIN": "bg-blue-600 hover:bg-blue-700 text-white border-transparent",
+  "EMPLOYEE": "bg-gray-100 hover:bg-gray-200 text-gray-800 border-transparent",
+}
+
+export const roleLabels: Record<string, string> = {
+  "SUPER_ADMIN": "Super Admin",
+  "ADMIN": "RH",
+  "COMPANY_ADMIN": "Admin Société",
+  "EMPLOYEE": "Employé",
 }

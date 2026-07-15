@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -48,7 +50,7 @@ import {
   UserUnlock01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { EllipsisIcon } from "lucide-react";
+import { EllipsisIcon, Search, Filter, ChevronRight, Loader2, UserSquare2, Users, Banknote, Briefcase, FileText } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import ViewProfile from "./view-profile";
 import { Department, Employee } from "@/types/types";
@@ -60,11 +62,12 @@ import AddDipe from "./add-dipe";
 import { useSalarialsQuery } from "@/queries/salarials";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useDepartmentsQuery } from "@/queries/department";
+import StatisticCard from "@/components/statistic-card";
 
 type LengthOfService = "under" | "over" | "equal" | "none";
 
 function matchYearsFilter(
-  startDate: Date | string,
+  startDate: Date | string | undefined | null,
   filterType: LengthOfService,
   filter: number,
 ): boolean {
@@ -76,7 +79,7 @@ function matchYearsFilter(
 }
 
 function Page() {
-  const { user } = useKizunaStore();
+  const { user, isHydrated } = useKizunaStore();
   // États pour les filtres backend
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [querySearchTerm, setQuerySearchTerm] = useState<string>("");
@@ -86,23 +89,33 @@ function Page() {
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(20);
 
+  // États appliqués
+  const [appliedDepartmentFilter, setAppliedDepartmentFilter] = useState<string>("all");
+  const [appliedStatusFilter, setAppliedStatusFilter] = useState<string>("ACTIVE");
+  const [appliedIncludeInactive, setAppliedIncludeInactive] = useState<boolean>(false);
+
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
   // États pour les filtres locaux (ancienneté)
   const [yearsFilter, setYearsFilter] = useState<LengthOfService>("none");
   const [years, setYears] = useState<number>(0);
+
+  const [appliedYearsFilter, setAppliedYearsFilter] = useState<LengthOfService>("none");
+  const [appliedYears, setAppliedYears] = useState<number>(0);
   const inclueSensitive = true
 
   // Récupérer les employés avec les filtres backend
-  const { data, isSuccess, isLoading, isError, error } = useEmployeesQuery(
+  const { data, isSuccess, isLoading, isPending, isError, error } = useEmployeesQuery(
     page,
     limit,
     user?.companyId || "",
-    departmentFilter !== "all" ? departmentFilter : "",
+    appliedDepartmentFilter !== "all" ? appliedDepartmentFilter : "",
     "",
-    statusFilter,
+    appliedStatusFilter,
     querySearchTerm,
-    includeInactive,
+    appliedIncludeInactive,
     inclueSensitive,
-    !!user?.companyId
+    isHydrated && !!user
   );
 
   const diactivate = useDeleteEmployeeMutation();
@@ -168,16 +181,30 @@ function Page() {
 
     return data.data
       .filter((employee) => {
+        if (!employee.companyId) return false;
+
         const matchYears = matchYearsFilter(
           employee.hireDate,
-          yearsFilter,
-          years,
+          appliedYearsFilter,
+          appliedYears,
         );
 
-        return matchYears;
+        if (!matchYears) return false;
+
+        if (querySearchTerm) {
+          const searchLower = querySearchTerm.toLowerCase();
+          const matchesSearch =
+            employee.firstName?.toLowerCase().includes(searchLower) ||
+            employee.lastName?.toLowerCase().includes(searchLower) ||
+            employee.email?.toLowerCase().includes(searchLower);
+
+          if (!matchesSearch) return false;
+        }
+
+        return true;
       })
       .sort((a, b) =>
-        a.lastName.localeCompare(b.lastName, "fr", { sensitivity: "base" }),
+        (a.lastName || "").localeCompare(b.lastName || "", "fr", { sensitivity: "base" }),
       );
   }, [isSuccess, data, yearsFilter, years]);
 
@@ -191,146 +218,252 @@ function Page() {
     setYearsFilter("none");
     setYears(0);
     setPage(1);
+
+    setAppliedDepartmentFilter("all");
+    setAppliedStatusFilter("ACTIVE");
+    setAppliedIncludeInactive(false);
+    setAppliedYearsFilter("none");
+    setAppliedYears(0);
   }
 
-  if (isLoading) {
-    return <LoadingComponent />;
-  }
+  const handleOpenSheet = (open: boolean) => {
+    setIsSheetOpen(open);
+    if (open) {
+      setDepartmentFilter(appliedDepartmentFilter);
+      setStatusFilter(appliedStatusFilter);
+      setIncludeInactive(appliedIncludeInactive);
+      setYearsFilter(appliedYearsFilter);
+      setYears(appliedYears);
+    }
+  };
+
+  const applyFilters = () => {
+    setAppliedDepartmentFilter(departmentFilter);
+    setAppliedStatusFilter(statusFilter);
+    setAppliedIncludeInactive(includeInactive);
+    setAppliedYearsFilter(yearsFilter);
+    setAppliedYears(years);
+    setPage(1);
+    setIsSheetOpen(false);
+  };
+
+  const activeFiltersCount = [
+    appliedDepartmentFilter !== "all",
+    appliedStatusFilter !== "ACTIVE",
+    appliedYearsFilter !== "none",
+    appliedIncludeInactive
+  ].filter(Boolean).length;
+
+  const validEmployees = useMemo(() => {
+    return (data?.data || []).filter((emp) => !!emp.companyId);
+  }, [data?.data]);
+
+  const totalMasseSalariale = useMemo(() => {
+    return validEmployees.reduce((acc, emp) => acc + (emp.contracts?.[0]?.baseSalary || 0), 0);
+  }, [validEmployees]);
+
+  const moyenneSalariale = useMemo(() => {
+    return validEmployees.length > 0 ? totalMasseSalariale / validEmployees.length : 0;
+  }, [validEmployees, totalMasseSalariale]);
+
+  const countCDI = useMemo(() => {
+    return validEmployees.filter((emp) => emp.contracts?.[0]?.contract_type === "CDI").length;
+  }, [validEmployees]);
+
+  const countCDD = useMemo(() => {
+    return validEmployees.filter((emp) => emp.contracts?.[0]?.contract_type === "CDD").length;
+  }, [validEmployees]);
+
   if (isError) {
     return <ErrorComponent description={error.message} />;
   }
   // if (isErrorSalarial) {
   //   return <ErrorComponent description={errorSalarial.message} />;
   // }
-  if (!isSuccess) {
-    return null;
-  }
+
 
   return (
-    <div className="grid gap-4 sm:gap-6">
-      <Header title="Gestion des Employés" variant={"primary"} />
-      <div className="card-1">
-        <div className="card-1-header2">
-          <h3>{"Liste des employés"}</h3>
-          <div className="filters">
-            {/* Recherche par nom - Backend */}
-            <div className="filter-group flex gap-2">
-              <Input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    setQuerySearchTerm(searchTerm);
-                  }
-                }}
-                type="search"
-                placeholder="Rechercher par nom"
-                className="min-w-60"
-              />
-              <Button variant="secondary" onClick={() => setQuerySearchTerm(searchTerm)}>
-                Rechercher
-              </Button>
-            </div>
+    <div className="grid gap-1.5 sm:gap-2.5">
+      {/* <Header title="Gestion des Employés" variant={"primary"} /> */}
+      {/* Bouton Ajouter */}
+      {/* Cartes de statistiques */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-2">
+        <StatisticCard
+          title="Employés"
+          value={validEmployees.length}
+          advanced={{ title: "Départements", value: departmentData.data?.length || 0 }}
+          isIcon={false}
+          iconBg="bg-[#630CF9]"
+        >
+          <Users className="text-white w-4 h-4" />
+        </StatisticCard>
+        <StatisticCard
+          title="Masse salariale"
+          value={formatSalary(totalMasseSalariale)}
+          advanced={{ title: "Moyenne", value: formatSalary(moyenneSalariale) }}
+          isIcon={false}
+          iconBg="bg-[#64BD16]"
+        >
+          <Banknote className="w-4 h-4 text-white" />
+        </StatisticCard>
+        <StatisticCard
+          title="CDI"
+          value={countCDI}
+          advanced={{ title: "CDD", value: countCDD }}
+          isIcon={false}
+          iconBg="bg-[#B416BD]"
+        >
+          <FileText className="w-4 h-4 text-white" />
+        </StatisticCard>
+      </div>
+      <Link className="ml-auto" href={"/tableau-de-bord/employes/ajouter"}>
+        <Button variant={"primary"}>
+          {"Enregistrer un employé"}
+          <HugeiconsIcon icon={PlusSignSquareIcon} strokeWidth={2} />
+        </Button>
+      </Link>
 
-            {/* Filtre département - Backend */}
-            <div className="filter-group">
-              <Label htmlFor="department">{"Département"}</Label>
-              <Select
-                name="department"
-                value={departmentFilter}
-                onValueChange={setDepartmentFilter}
-              >
-                <SelectTrigger className="min-w-32">
-                  <SelectValue placeholder="Tous" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{"Tous"}</SelectItem>
-                  {departments.map((item, id) => (
-                    <SelectItem key={id} value={item.uuid}>
-                      {item.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Filtre statut - Backend */}
-            <div className="filter-group">
-              <Label htmlFor="status">{"Statut"}</Label>
-              <Select
-                name="status"
-                value={statusFilter}
-                onValueChange={setStatusFilter}
-              >
-                <SelectTrigger className="min-w-32">
-                  <SelectValue placeholder="Statut" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ACTIVE">{"Actif"}</SelectItem>
-                  <SelectItem value="SUSPENDED">{"Suspendu"}</SelectItem>
-                  <SelectItem value="INACTIVE">{"Inactif"}</SelectItem>
-                  <SelectItem value="ALL">{"Tous"}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Filtre ancienneté - Local */}
-            <div className="filter-group">
-              <Label htmlFor="years">{"Ancienneté"}</Label>
-              <Select
-                name="years"
-                value={yearsFilter}
-                onValueChange={(val) => setYearsFilter(val as LengthOfService)}
-              >
-                <SelectTrigger className="min-w-32">
-                  <SelectValue placeholder="Sélectionner" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">{"Aucun filtre"}</SelectItem>
-                  <SelectItem value="over">{"Plus de"}</SelectItem>
-                  <SelectItem value="under">{"Moins de"}</SelectItem>
-                  <SelectItem value="equal">{"Egal à"}</SelectItem>
-                </SelectContent>
-              </Select>
-              {yearsFilter !== "none" && (
-                <Input
-                  type="number"
-                  value={years}
-                  onChange={(e) => setYears(Number(e.target.value))}
-                  placeholder="ex 1"
-                  className="w-20"
-                />
-              )}
-            </div>
-
-            {/* Bouton Ajouter */}
-            <Link href={"/tableau-de-bord/employes/ajouter"}>
-              <Button variant={"accent"}>
-                {"Ajouter un employé"}
-                <HugeiconsIcon icon={PlusSignSquareIcon} strokeWidth={2} />
-              </Button>
-            </Link>
+      {/* Barre de recherche & Boutons */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Search className="absolute top-3 left-2 text-[#9A9A9A] size-4" />
+            <Input
+              value={searchTerm}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSearchTerm(val);
+                if (val === "") {
+                  setQuerySearchTerm("");
+                  setPage(1);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setQuerySearchTerm(searchTerm);
+                  setPage(1);
+                }
+              }}
+              type="search"
+              placeholder="Rechercher par nom"
+              className="pl-8 max-w-[280px] w-full bg-white"
+            />
           </div>
-
-          {/* Boutons d'actions supplémentaires */}
-          <div className="flex gap-2 mt-2">
-            <Button variant="outline" size="sm" onClick={resetFilters}>
-              {"Réinitialiser les filtres"}
-            </Button>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="includeInactive"
-                checked={includeInactive}
-                onChange={(e) => setIncludeInactive(e.target.checked)}
-              />
-              <Label htmlFor="includeInactive" className="text-sm">
-                {`Inclure les inactifs`}
-              </Label>
-            </div>
-          </div>
+          <Button variant="primary" onClick={() => { setQuerySearchTerm(searchTerm); setPage(1); }}>
+            Rechercher
+          </Button>
         </div>
+        <div className="flex items-center gap-2">
+          {/* DRAWER DE FILTRES */}
+          <Sheet open={isSheetOpen} onOpenChange={handleOpenSheet}>
+            <SheetTrigger asChild>
+              <Button variant={"outline"} className="bg-white w-fit ml-auto">
+                {"Filtres"} ({activeFiltersCount})
+                <ChevronRight className="size-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="w-[400px] sm:w-[540px] p-4">
+              <SheetHeader>
+                <SheetTitle className="text-[18px]">{"Filtres"}</SheetTitle>
+                <SheetDescription>
+                  {"Configurer les filtres pour affiner les données"}
+                </SheetDescription>
+              </SheetHeader>
+              <div className="flex flex-col gap-6 mt-6">
+                {/* Département */}
+                <div className="space-y-2">
+                  <Label>{"Département"}</Label>
+                  <Select
+                    value={departmentFilter}
+                    onValueChange={setDepartmentFilter}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Tous" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{"Tous les départements"}</SelectItem>
+                      {departments.map((item, id) => (
+                        <SelectItem key={id} value={item.uuid}>
+                          {item.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
+                {/* Statut */}
+                <div className="space-y-2">
+                  <Label>{"Statut"}</Label>
+                  <Select
+                    value={statusFilter}
+                    onValueChange={setStatusFilter}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Statut" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ACTIVE">{"Actif"}</SelectItem>
+                      <SelectItem value="SUSPENDED">{"Suspendu"}</SelectItem>
+                      <SelectItem value="INACTIVE">{"Inactif"}</SelectItem>
+                      <SelectItem value="ALL">{"Tous les statuts"}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Ancienneté */}
+                <div className="space-y-2">
+                  <Label>{"Ancienneté"}</Label>
+                  <div className="flex gap-2">
+                    <Select
+                      value={yearsFilter}
+                      onValueChange={(val) => setYearsFilter(val as LengthOfService)}
+                    >
+                      <SelectTrigger className="flex-1">
+                        <SelectValue placeholder="Sélectionner" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">{"Aucun filtre"}</SelectItem>
+                        <SelectItem value="over">{"Plus de"}</SelectItem>
+                        <SelectItem value="under">{"Moins de"}</SelectItem>
+                        <SelectItem value="equal">{"Egal à"}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {yearsFilter !== "none" && (
+                      <Input
+                        type="number"
+                        value={years}
+                        onChange={(e) => setYears(Number(e.target.value))}
+                        placeholder="ex: 1"
+                        className="w-24"
+                      />
+                    )}
+                  </div>
+                </div>
+
+                {/* Include Inactive */}
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-1">
+                    <Label>{"Inclure les inactifs"}</Label>
+                    <span className="text-sm text-gray-500">{"Afficher également les employés désactivés"}</span>
+                  </div>
+                  <Switch checked={includeInactive} onCheckedChange={(val) => setIncludeInactive(val)} />
+                </div>
+
+                <div className="mt-4 flex justify-end gap-2">
+                  <Button variant="outline" onClick={resetFilters}>
+                    {"Réinitialiser"}
+                  </Button>
+                  <Button variant="primary" onClick={applyFilters}>
+                    {"Appliquer"}
+                  </Button>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+
+      <div className="card-1">
         <Table>
           <TableHeader>
             <TableRow>
@@ -344,7 +477,13 @@ function Page() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredData.length === 0 ? (
+            {isPending || isLoading ? (
+              <TableRow>
+                <TableCell colSpan={7} className="h-24 text-center">
+                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />
+                </TableCell>
+              </TableRow>
+            ) : filteredData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="p-6">
                   <Empty>
@@ -390,7 +529,7 @@ function Page() {
                     </span>
                   </TableCell>
                   <TableCell>{formatSeniority(employee.hireDate)}</TableCell>
-                  <TableCell>{formatSalary(employee?.contracts![0].baseSalary!)}</TableCell>
+                  <TableCell>{formatSalary(employee.contracts?.[0]?.baseSalary ?? 0)}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -448,7 +587,7 @@ function Page() {
         </Table>
 
         {/* Pagination - Backend */}
-        {data && data.meta.totalPages > 1 && (
+        {data?.meta && data.meta.totalPages > 1 && (
           <div className="flex items-center justify-between px-2 py-4">
             <div className="text-sm text-muted-foreground">
               {data.meta.total} employés au total
@@ -486,13 +625,13 @@ function Page() {
             isOpen={openProfile}
             openChange={setOpenProfile}
             employee={selected}
-            users={data.data}
+            users={data?.data}
           />
           <EditProfile
             isOpen={viewEdit}
             openChange={setViewEdit}
             employee={selected}
-            users={data.data}
+            users={data?.data}
           />
           {/* <AddDipe
             isOpen={openAddDipe}

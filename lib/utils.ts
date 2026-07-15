@@ -31,7 +31,18 @@ export function getInitials(name?: string): string {
 
 export function formatDate(value: string | Date) {
   const d = value instanceof Date ? value : new Date(value);
-  return d.toLocaleDateString("fr-FR");
+
+  const day = d.getDate();
+  const month = d.toLocaleString("fr-FR", { month: "long" });
+  const year = d.getFullYear();
+  const time = d.toLocaleString("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+  const monthCapitalized = month.charAt(0).toUpperCase() + month.slice(1);
+
+  return `${day} ${monthCapitalized} ${year}, ${time}`;
 }
 
 export const PRESENCE_FLAGS: { value: PresenceFlag; label: string }[] = [
@@ -43,23 +54,29 @@ export const PRESENCE_FLAGS: { value: PresenceFlag; label: string }[] = [
   { value: "ON_LEAVE", label: "Congé" },
 ];
 
-export function getYearsOfService(startDate: Date | string): number {
-  const start = typeof startDate === "string" ? new Date(startDate) : startDate;
+export function getYearsOfService(startDate: Date | string | undefined | null): number {
+  if (!startDate) return 0;
+  const start = typeof startDate === "string" ? new Date(startDate) : new Date(startDate);
+  if (isNaN(start.getTime())) return 0;
   const now = new Date();
   const diff = now.getTime() - start.getTime();
   const years = diff / (1000 * 60 * 60 * 24 * 365.25);
   return Math.max(0, years);
 }
 
-export function formatSeniority(startDate: Date | string): string {
-const years = getYearsOfService(startDate);
+export function formatSeniority(startDate: Date | string | undefined | null): string {
+  if (!startDate) return "--";
+  const start = typeof startDate === "string" ? new Date(startDate) : new Date(startDate);
+  if (isNaN(start.getTime())) return "--";
 
-if (years < 1) return "Moins d'un an";
-if (years < 2) return "1 an";
-if (years < 3) return "2 ans";
-if (years < 5) return `${Math.floor(years)} ans`;
-if (years < 10) return "Entre 5 et 10 ans";
-return "Plus de 10 ans";
+  const years = getYearsOfService(startDate);
+
+  if (years < 1) return "Moins d'un an";
+  if (years < 2) return "1 an";
+  if (years < 3) return "2 ans";
+  if (years < 5) return `${Math.floor(years)} ans`;
+  if (years < 10) return "Entre 5 et 10 ans";
+  return "Plus de 10 ans";
 }
 
 export function formatSalary(amount: number): string {

@@ -20,11 +20,11 @@ type Props = {
   isOpen: boolean;
   openChange: React.Dispatch<React.SetStateAction<boolean>>;
   employee: Employee;
-  users: Array<Employee>;
+  users?: Array<Employee>;
 };
 
 function ViewProfile({ isOpen, openChange, employee, users }: Props) {
-  const supervisor = users.find((x) => x.uuid === employee.supervisorId);
+  const supervisor = users?.find((x) => x.uuid === employee.supervisorId);
 
   const positionData = usePositionsQuery();
   const departmentData = useDepartmentsQuery();
@@ -165,11 +165,11 @@ function ViewProfile({ isOpen, openChange, employee, users }: Props) {
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Contrat"}</span>
-                <span className="font-medium">{employee?.contracts![0].contract_type}</span>
+                <span className="font-medium">{employee?.contracts?.[0]?.contract_type ?? "--"}</span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Salaire de base"}</span>
-                <span className="font-medium">{formatSalary(employee?.contracts![0].baseSalary!)}</span>
+                <span className="font-medium">{formatSalary(employee?.contracts?.[0]?.baseSalary ?? 0)}</span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-600">{"Ancienneté"}</span>

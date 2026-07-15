@@ -31,6 +31,8 @@ interface Props {
   title: string;
   value: number | string;
   advanced?: { title?: string; value: string | number };
+  isIcon?: boolean
+  iconBg?: string
 }
 
 function StatisticCard({
@@ -40,6 +42,8 @@ function StatisticCard({
   children,
   value,
   advanced,
+  isIcon = true,
+  iconBg
 }: Props & VariantProps<typeof cardVariants>) {
   return (
     <div className={cn(cardVariants({ variant, className }))}>
@@ -48,8 +52,8 @@ function StatisticCard({
           className={cn(
             "text-sm leading-[150%] font-medium",
             variant === "default"
-                ? "text-gray-700"
-                : !variant
+              ? "text-gray-700"
+              : !variant
                 ? "text-gray-700"
                 : "text-gray-200"
           )}
@@ -57,14 +61,17 @@ function StatisticCard({
           {title}
         </span>
         {children && (
-          <DropdownMenu>
+          isIcon ? <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant={"ghost"} size={"icon"}>
                 <HugeiconsIcon icon={MoreHorizontalIcon} />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>{children}</DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> :
+            <div className={`w-6 h-6 rounded-[6px] flex items-center justify-center ${iconBg}`}>
+              {children}
+            </div>
         )}
       </div>
       <span className="text-[32px] leading-[120%] tracking-[-2%] font-medium">
@@ -78,12 +85,12 @@ function StatisticCard({
               !variant
                 ? "border-neutral-200"
                 : variant === "default"
-                ? "border-neutral-200"
-                : variant === "dark"
-                ? "border-neutral-500"
-                : variant === "grey"
-                ? "border-neutral-400"
-                : "border-primary-200"
+                  ? "border-neutral-200"
+                  : variant === "dark"
+                    ? "border-neutral-500"
+                    : variant === "grey"
+                      ? "border-neutral-400"
+                      : "border-primary-200"
             )}
           />
           <p
@@ -92,8 +99,8 @@ function StatisticCard({
               variant === "default"
                 ? "text-gray-700"
                 : !variant
-                ? "text-gray-700"
-                : "text-gray-200"
+                  ? "text-gray-700"
+                  : "text-gray-200"
             )}
           >
             {advanced.title && `${advanced.title}: `}

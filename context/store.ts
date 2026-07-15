@@ -6,6 +6,7 @@ interface store {
     user?: Employee;
     token?: string;
     isHydrated: boolean;
+    selectedCompanyId: string;
 }
 
 interface actions {
@@ -14,12 +15,14 @@ interface actions {
     setToken: (token: string) => void;  // Nouvelle fonction pour setter le token
     login: (user: Employee, token: string) => void; // Gardé pour compatibilité
     setIsHydrated: (v: boolean) => void;
+    setSelectedCompanyId: (id: string) => void;
 }
 
 const initialValue: store = {
     user: undefined,
     token: undefined,
-    isHydrated: false
+    isHydrated: false,
+    selectedCompanyId: "all"
 }
 
 const useKizunaStore = create<store & actions>()(
@@ -30,7 +33,8 @@ const useKizunaStore = create<store & actions>()(
             setUser: (user) => { set({ user: user }) },
             setToken: (token) => { set({ token: token }) },
             login: (user, token) => { set({ user: user, token: token }) },
-            setIsHydrated: (v) => { set({ isHydrated: v }) }
+            setIsHydrated: (v) => { set({ isHydrated: v }) },
+            setSelectedCompanyId: (id) => { set({ selectedCompanyId: id }) }
         }),
         {
             name: "kizuna-store",
