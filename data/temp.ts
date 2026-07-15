@@ -66,7 +66,7 @@ export const demoUsers: Array<Employee> = [
     lastName: "Nkem",
     email: "employee@example.com",
     password: "employee123",
-    role: "USER",
+    role: "EMPLOYEE",
     gender: "FEMALE",
     birthday: new Date("1995-10-25").toISOString().split("T")[0],
     nationality: "Cameroun",

@@ -17,7 +17,7 @@ const Page = () => {
 
   // 🔁 Redirection auto si USER → ses documents directement
   useEffect(() => {
-    if (user?.role === "USER") {
+    if (user?.role === "EMPLOYEE") {
       router.replace(`/tableau-de-bord/documents/${user.uuid}`);
     }
   }, [user, router]);
@@ -27,7 +27,7 @@ const Page = () => {
   if (!isSuccess || !data) return null;
 
   // ⚠️ USER ne voit pas la page
-  if (user?.role === "USER") return null;
+  if (user?.role === "EMPLOYEE") return null;
 
   return (
     <div className="grid gap-4 sm:gap-6">

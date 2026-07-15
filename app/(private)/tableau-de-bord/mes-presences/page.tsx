@@ -44,7 +44,7 @@ function Page() {
   const { user } = useKizunaStore();
   const { data, isLoading, isError, error, isSuccess } = usePresencesByUserIdQuery(
     user?.uuid ?? "",
-    !!user
+    // !!user
   );
 
   const [away, setAway] = useState<boolean>(false);
