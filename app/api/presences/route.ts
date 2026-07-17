@@ -14,11 +14,11 @@ export async function GET() {
 /* ✅ CREATE PRESENCE */
 export async function POST(req: Request) {
   try {
-    const body: Omit<Presence, "id" | "createdAt"> = await req.json();
+    const body: Omit<Presence, "uuid" | "createdAt"> = await req.json();
 
     const newPresence: Presence = {
       ...body,
-      id: presencesData.length + 1,
+      uuid: String(presencesData.length + 1),
       createdAt: (new Date()).toISOString(),
     };
 

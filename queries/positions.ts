@@ -110,7 +110,7 @@ export function usePositionsQuery(companyId?: string, enabled: boolean = true) {
   const positionQuery = new PositionQuery();
   return useQuery({
     queryKey: queryKeys.positions.all(activeCompanyId),
-    queryFn: () => positionQuery.getAll(activeCompanyId),
+    queryFn: () => positionQuery.getAll(activeCompanyId === "all" ? undefined : activeCompanyId),
     enabled: enabled,
   });
 }

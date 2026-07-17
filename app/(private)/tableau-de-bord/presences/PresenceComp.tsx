@@ -21,8 +21,8 @@ export default function PresenceComp({
 }: Props) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-[100vh]! p-0">
-        <DialogHeader>
+      <DialogContent className="max-w-[530px]! max-h-[90vh]! p-0 flex flex-col gap-0 overflow-hidden">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b bg-white">
           <DialogTitle>{userName}</DialogTitle>
           <DialogDescription>{`Etat de présence de ${userName} du mois de ${monthLabel}`}</DialogDescription>
         </DialogHeader>

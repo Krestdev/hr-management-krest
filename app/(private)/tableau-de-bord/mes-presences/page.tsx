@@ -64,14 +64,14 @@ function Page() {
           const matchStatus =
             statusFilter === "all"
               ? true
-              : presence.statut.includes(statusFilter);
+              : presence.status.includes(statusFilter);
 
           // ----- filtre dates -----
           const from = dateRange?.from;
           const to = dateRange?.to;
 
           // attention si ton API renvoie des string, pense à caster :
-          const start = new Date(presence.date);
+          const start = new Date(presence.checkIn);
 
           let matchDate = true;
 
@@ -94,7 +94,7 @@ function Page() {
   }, [isSuccess, data, statusFilter, dateRange]);
 
   function hasFlag(p: Presence, flag: PresenceFlag) {
-    return p.statut.includes(flag);
+    return p.status.includes(flag);
   }
 
   const handleResetFilters = () => {
@@ -224,12 +224,12 @@ function Page() {
                 ) : (
                   filteredData.map((presence) => {
                     const isLate = hasFlag(presence, "LATE");
-                    const checkInDisplay = getTime(presence.date) ?? "--:--";
+                    const checkInDisplay = getTime(presence.checkIn) ?? "--:--";
 
                     return (
-                      <TableRow key={presence.id}>
+                      <TableRow key={presence.uuid}>
                         <TableCell>
-                          {format(presence.date, "eee d LLL y", { locale: fr })}
+                          {format(presence.checkIn, "eee d LLL y", { locale: fr })}
                         </TableCell>
                         <TableCell className="text-center">
                           <span
@@ -307,7 +307,7 @@ function Page() {
                           <span
                             className={cn(
                               "font-semibold",
-                              !getTime(presence.date)
+                              !getTime(presence.checkIn)
                                 ? "text-muted-foreground"
                                 : isLate
                                   ? "text-red-500"

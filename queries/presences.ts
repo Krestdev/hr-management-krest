@@ -11,6 +11,28 @@ export default class PresenceQuery {
     try {
       const url = month && year ? `${this.route}?month=${month}&year=${year}` : this.route;
       const response = await api.get(url);
+      
+      if (response.data && Array.isArray(response.data.data)) {
+        const allPresences: Presence[] = [];
+        response.data.data.forEach((emp: any) => {
+          if (Array.isArray(emp.attendances)) {
+            emp.attendances.forEach((att: any) => {
+              allPresences.push({
+                ...att,
+                employee: {
+                  uuid: emp.uuid,
+                  firstName: emp.firstName,
+                  lastName: emp.lastName,
+                  position: emp.position,
+                  user: emp.user,
+                }
+              });
+            });
+          }
+        });
+        return allPresences;
+      }
+      
       return response.data;
     } catch (error: any) {
       const message =
@@ -29,10 +51,32 @@ export default class PresenceQuery {
     year?: number
   ): Promise<Presence[]> => {
     try {
-      const url = month && year 
+      const url = month && year
         ? `${this.route}/employee/${userId}?month=${month}&year=${year}`
         : `${this.route}/employee/${userId}`;
       const response = await api.get(url);
+      
+      if (response.data && Array.isArray(response.data.data)) {
+        const allPresences: Presence[] = [];
+        response.data.data.forEach((emp: any) => {
+          if (Array.isArray(emp.attendances)) {
+            emp.attendances.forEach((att: any) => {
+              allPresences.push({
+                ...att,
+                employee: {
+                  uuid: emp.uuid,
+                  firstName: emp.firstName,
+                  lastName: emp.lastName,
+                  position: emp.position,
+                  user: emp.user,
+                }
+              });
+            });
+          }
+        });
+        return allPresences;
+      }
+      
       return response.data;
     } catch (error: any) {
       const message =
@@ -46,7 +90,7 @@ export default class PresenceQuery {
 
   // ✅ CREATE PRESENCE
   post = async (
-    data: Omit<Presence, "id" | "createdAt" | "updatedAt">
+    data: Omit<Presence, "uuid" | "createdAt" | "updatedAt">
   ): Promise<{
     success: boolean;
     item: Presence;
@@ -64,18 +108,35 @@ export default class PresenceQuery {
     }
   };
 
+  // ✅ UPDATE PRESENCE
+  update = async (
+    id: string,
+    data: Partial<Omit<Presence, "uuid" | "createdAt" | "updatedAt">>
+  ): Promise<{
+    success: boolean;
+    item: Presence;
+  }> => {
+    try {
+      const response = await api.patch(`${this.route}/${id}`, data);
+      return response.data;
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message ??
+        error.message ??
+        "Erreur lors de la modification de la présence";
+
+      throw new Error(message);
+    }
+  };
+
   // ✅ CREATE MANY PRESENCES
   postMany = async ({
     data,
-    month,
-    year,
   }: {
-    data: Omit<Presence, "id" | "createdAt" | "updatedAt">[];
-    month: number;
-    year: number;
+    data: Omit<Presence, "uuid" | "createdAt" | "updatedAt">[];
   }): Promise<any> => {
     try {
-      const response = await api.post(`/attendance/batch?month=${month}&year=${year}`, data);
+      const response = await api.post(`/attendance/batch`, data);
       return response.data;
     } catch (error: any) {
       const message =
@@ -115,7 +176,23 @@ export function useCreatePresenceMutation() {
     mutationFn: presenceQuery.post,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.presences.all() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.presences.byUserId(variables.userId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.presences.byUserId(variables.employeeId) });
+    },
+  });
+}
+
+// Hook pour mettre à jour une présence
+export function useUpdatePresenceMutation() {
+  const presenceQuery = new PresenceQuery();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Presence, "uuid" | "createdAt" | "updatedAt">> }) =>
+      presenceQuery.update(id, data),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.presences.all() });
+      if (variables.data.employeeId || response?.item?.employeeId) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.presences.byUserId(variables.data.employeeId || response?.item?.employeeId as string) });
+      }
     },
   });
 }

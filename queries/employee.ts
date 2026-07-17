@@ -27,9 +27,13 @@ export default class UserQuery {
   }
 
   // get all employee with pagination and filters
-  getAll = async (page: number, limit: number, companyId: string, departmentId?: string, positionUuid?: string, status: string = "ACTIVE", search?: string, includeInactive?: boolean, includeSensitive: boolean = false): Promise<{ data: Employee[]; meta: { total: number, totalAssigned: number, page: number, limit: number, totalPages: number, includeSensitive: boolean } }> => {
+  getAll = async (page: number, limit: number, companyId?: string, departmentId?: string, positionUuid?: string, status: string = "ACTIVE", search?: string, includeInactive?: boolean, includeSensitive: boolean = false): Promise<{ data: Employee[]; meta: { total: number, totalAssigned: number, page: number, limit: number, totalPages: number, includeSensitive: boolean } }> => {
     try {
-      const response = await api.get(`${this.route}?page=${page}&limit=${limit}&companyId=${companyId}&departmentId=${departmentId}&positionUuid=${positionUuid}&status=${status}&search=${search}&includeInactive=${includeInactive}&includeSensitive=${includeSensitive}`);
+      const response = await api.get(`${this.route}`, {
+        params: {
+          page, limit, companyId, departmentId, positionUuid, status, search, includeInactive, includeSensitive
+        }
+      });
       return response.data;
     } catch (error: any) {
       const message =
@@ -233,7 +237,7 @@ export function useEmployeesQuery(
       userQuery.getAll(
         page,
         limit,
-        activeCompanyId,
+        activeCompanyId === "all" ? "" : activeCompanyId,
         departmentId,
         positionUuid,
         status,

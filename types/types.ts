@@ -224,14 +224,30 @@ export type Leaves = {
 };
 
 export type Presence = {
-  id: number;
-  userId: string;
-  date: string;
-  statut: PresenceFlag[];
-  checkIn?: string;
-  checkOut?: string;
+  uuid: string;
+  checkIn: string;
+  checkOut?: string | null;
+  latitude?: number;
+  longitude?: number;
+  workedHour?: number;
+  overtimes?: number;
+  status: PresenceFlag[];
+  location?: string | null;
+  mission?: string | null;
+  observations?: string | null;
   createdAt: string;
   updatedAt?: string;
+  employeeId: string;
+  payrollUuid?: string | null;
+  employee?: {
+    uuid: string;
+    firstName: string;
+    lastName: string;
+    position: string;
+    user: {
+      email: string;
+    };
+  };
 };
 
 export type Department = {
@@ -283,6 +299,41 @@ export type Company = {
   employees: Employee[];
   createdAt: string;
   updatedAt: string
+}
+
+export type Recruitment = {
+  uuid: string;
+  title: string;
+  description?: string;
+  status: string;
+  criteria: string[];
+  tags: string[];
+  companyId: string;
+  imageUrl: string;
+  place: string;
+  deadline: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface Candidacy {
+  uuid?: string;
+
+  fullName: string;
+  phone: string;
+  email: string;
+  address: string;
+  recruitmentUuid: string;
+
+  identityCard: string;
+  cv: string;
+  degree?: string;
+  coverLetter?: string;
+
+  status?: "PENDING" | "UNDER_REVIEW" | "ACCEPTED" | "REJECTED";
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export const roleColors: Record<string, string> = {

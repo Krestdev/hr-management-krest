@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import Header from "@/components/header";
 import LoadingComponent from "@/components/loading-comp";
 import ErrorComponent from "@/components/error-comp";
@@ -39,8 +41,7 @@ import PresenceComp from "./PresenceComp";
 import { format, isSameDay, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, Download, MoreHorizontal, Eye, Edit2, UploadCloudIcon, Loader2 } from "lucide-react";
+import { CalendarIcon, Download, MoreHorizontal, Eye, Edit2, UploadCloudIcon, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -57,15 +58,13 @@ import {
 
 /* ================= TYPES ================= */
 
-type DailyPresenceRow = {
+type AggregatedPresenceRow = {
   userId: string;
   name: string;
   role: string;
   photo?: string;
-  statuts: PresenceFlag[];
-  checkInOut: string;
-  retards30j: number;
-  modifieLe: string;
+  stats: Record<PresenceFlag, number>;
+  joursTravailles: number;
 };
 
 type ParsedPresence = {
@@ -83,10 +82,23 @@ type ParsedPresence = {
 
 /* ================= PAGE ================= */
 
-export default function Page() {
+export default function AttendancePage() {
+  const router = useRouter();
+  const selectedCompanyId = useKizunaStore((state) => state.selectedCompanyId);
   const [search, setSearch] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [pickerYear, setPickerYear] = useState<number>(new Date().getFullYear());
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [openDetail, setOpenDetail] = useState(false);
+
+  const handleOpenDatePicker = (open: boolean) => {
+    setIsDatePickerOpen(open);
+    if (open && selectedDate) {
+      setPickerYear(selectedDate.getFullYear());
+    } else if (open && !selectedDate) {
+      setPickerYear(new Date().getFullYear());
+    }
+  };
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [parsedPresences, setParsedPresences] = useState<ParsedPresence[]>([]);
@@ -109,9 +121,11 @@ export default function Page() {
   // Synchroniser la date sélectionnée avec le mois du dernier ajout par défaut
   useEffect(() => {
     if (!selectedDate && isSuccessPresence && presenceRes && presenceRes.length > 0) {
-      const latestDateStr = presenceRes[0].date;
+      const latestDateStr = presenceRes[0].checkIn;
       if (latestDateStr) {
-        setSelectedDate(new Date(latestDateStr));
+        const d = new Date(latestDateStr);
+        setSelectedDate(d);
+        setPickerYear(d.getFullYear());
       }
     }
   }, [selectedDate, isSuccessPresence, presenceRes]);
@@ -128,76 +142,73 @@ export default function Page() {
   const createManyPresences = useCreateManyPresencesMutation();
 
   /* ===== BUILD TABLE ===== */
-  const dailyPresences = useMemo(() => {
+  const aggregatedPresences = useMemo(() => {
     if (!isSuccessPresence || !isSuccessUsers) return [];
 
-    // On filtre par le mois de la date sélectionnée (s'il y en a une)
     const monthStr = selectedDate ? format(selectedDate, "yyyy-MM") : "";
 
-    const rows = presenceRes
-      .filter((p: Presence) => monthStr ? p.date.startsWith(monthStr) : true)
-      .map((p: Presence) => {
-        const user = usersRes.data.find((u: Employee) => u.uuid === p.userId);
-        if (!user) return null;
+    const userMap = new Map<string, AggregatedPresenceRow>();
 
-        const roleDisplay = user.position?.[0] || user.category || "Employé";
+    presenceRes
+      .filter((p: Presence) => monthStr ? p.checkIn?.startsWith(monthStr) : true)
+      .forEach((p: Presence) => {
+        const user = usersRes.data.find((u: Employee) => u.uuid === p.employeeId);
+        if (!user) return;
 
-        return {
-          id: p.id,
-          userId: user.uuid,
-          name: `${user.firstName} ${user.lastName}`,
-          role: roleDisplay,
-          date: p.date,
-          statuts: p.statut,
-          checkInOut: p.checkIn && p.checkOut ? `${p.checkIn} - ${p.checkOut}` : p.checkIn ? p.checkIn : "--/--",
-          modifieLe: format(new Date(p.createdAt), "dd MMM yyyy, HH:mm", { locale: fr }),
-          presenceOriginal: p
-        };
-      })
-      .filter(Boolean) as any[];
+        if (!userMap.has(user.uuid)) {
+          const roleDisplay = user.position?.[0] || user.category || "Employé";
+          userMap.set(user.uuid, {
+            userId: user.uuid,
+            name: `${user.firstName} ${user.lastName}`,
+            role: roleDisplay,
+            stats: {
+              PRESENT: 0, EXCEPTIONAL: 0, VALID: 0, ABSENT: 0, LATE: 0, FIELD: 0, EXCUSED: 0, ON_LEAVE: 0
+            },
+            joursTravailles: 0,
+          });
+        }
 
-    // Apply search filter
+        const row = userMap.get(user.uuid)!;
+
+        let workedDay = false;
+        p.status.forEach((flag) => {
+          if (row.stats[flag] !== undefined) {
+            row.stats[flag]++;
+          }
+          if (["PRESENT", "EXCEPTIONAL", "VALID", "LATE", "FIELD"].includes(flag)) {
+            workedDay = true;
+          }
+        });
+
+        if (workedDay) {
+          row.joursTravailles++;
+        }
+      });
+
+    let rows = Array.from(userMap.values());
+
     if (search.trim()) {
       const searchLower = search.toLowerCase();
-      return rows.filter((r) => r.name.toLowerCase().includes(searchLower));
+      rows = rows.filter((r) => r.name.toLowerCase().includes(searchLower));
     }
 
-    // Sort by date (descending) and then name
-    return rows.sort((a, b) => {
-      const dateA = new Date(a.date).getTime();
-      const dateB = new Date(b.date).getTime();
-      if (dateA !== dateB) return dateB - dateA;
-      return a.name.localeCompare(b.name);
-    });
+    return rows.sort((a, b) => a.name.localeCompare(b.name));
   }, [isSuccessPresence, isSuccessUsers, presenceRes, usersRes, selectedDate, search]);
 
-  const stats = useMemo(() => {
-    let absences = 0;
-    let presences = 0;
-    let retards = 0;
+  console.log("presenceRes", presenceRes);
 
-    dailyPresences.forEach(row => {
-      if (row.statuts.includes("ABSENT") || row.statuts.includes("ON_LEAVE")) {
-        absences++;
-      } else {
-        presences++;
-      }
-      if (row.statuts.includes("LATE")) {
-        retards++;
-      }
-    });
 
-    return { absences, presences, retards };
-  }, [dailyPresences]);
+
 
   const onSelectPresence = (userId: string) => {
-    setSelectedUserId(userId);
-    setOpenDetail(true);
+    const month = selectedDate ? selectedDate.getMonth() + 1 : new Date().getMonth() + 1;
+    const year = selectedDate ? selectedDate.getFullYear() : new Date().getFullYear();
+    router.push(`/tableau-de-bord/presences/${userId}?month=${month}&year=${year}`);
   };
 
   const selectedPresences = useMemo(() => {
     if (!selectedUserId || !isSuccessPresence) return [];
-    return presenceRes.filter((p: Presence) => p.userId === selectedUserId);
+    return presenceRes.filter((p: Presence) => p.employeeId === selectedUserId);
   }, [selectedUserId, isSuccessPresence, presenceRes]);
 
   const selectedUserName = useMemo(() => {
@@ -270,7 +281,7 @@ export default function Page() {
             error = "Employé non trouvé";
           } else {
             exists = !!presenceRes?.find((p: Presence) =>
-              p.userId === employee.uuid && p.date.startsWith(dateStr)
+              p.employeeId === employee.uuid && p.checkIn?.startsWith(dateStr)
             );
             if (exists) error = "Déjà importé";
           }
@@ -314,11 +325,10 @@ export default function Page() {
     const validItems = parsedPresences
       .filter((item) => item.employeeId && !item.exists)
       .map((item) => ({
-        userId: item.employeeId as string,
-        date: new Date(item.dateStr).toISOString(),
-        statut: item.flags,
-        checkIn: item.checkIn || undefined,
-        checkOut: item.checkOut || undefined
+        employeeId: item.employeeId as string,
+        checkIn: item.dateStr ? new Date(item.dateStr).toISOString() : new Date().toISOString(),
+        status: item.flags,
+        checkOut: item.checkOut ? new Date(`${item.dateStr}T${item.checkOut}:00`).toISOString() : undefined
       }));
 
     if (validItems.length === 0) {
@@ -330,14 +340,8 @@ export default function Page() {
     }
 
     try {
-      const firstDate = new Date(validItems[0].date);
-      const month = firstDate.getMonth() + 1; // 1-12
-      const year = firstDate.getFullYear();
-
       await createManyPresences.mutateAsync({
-        data: validItems,
-        month,
-        year
+        data: validItems
       });
       toast.success(`Importation terminée ! ${validItems.length} présences ajoutées.`);
       setParsedPresences([]);
@@ -369,28 +373,6 @@ export default function Page() {
         <Header title="Présences" variant="primary" />
       </div>
 
-      {/* ===== STATS CARDS ===== */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <StatisticCard
-          title="Absences"
-          value={stats.absences.toString().padStart(2, '0')}
-          advanced={{ title: "Absences justifiées", value: "0" }}
-          isIcon={false}
-          iconBg="bg-red-100"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-500"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
-        </StatisticCard>
-
-        <StatisticCard
-          title="Présences"
-          value={stats.presences.toString().padStart(2, '0')}
-          advanced={{ title: "Retards", value: stats.retards.toString().padStart(2, '0') }}
-          isIcon={false}
-          iconBg="bg-green-100"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-500"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-        </StatisticCard>
-      </div>
 
       {/* ===== FILTER BAR ===== */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-2">
@@ -406,7 +388,7 @@ export default function Page() {
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Popover>
+          <Popover open={isDatePickerOpen} onOpenChange={handleOpenDatePicker}>
             <PopoverTrigger asChild>
               <Button
                 variant={"outline"}
@@ -420,12 +402,36 @@ export default function Page() {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="end">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={(d) => d && setSelectedDate(d)}
-                initialFocus
-              />
+              <div className="p-3 w-[280px]">
+                <div className="flex items-center justify-between pt-1 relative pb-4">
+                  <Button variant="outline" size="icon" className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100" onClick={() => setPickerYear(y => y - 1)}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <div className="text-sm font-medium">{pickerYear}</div>
+                  <Button variant="outline" size="icon" className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100" onClick={() => setPickerYear(y => y + 1)}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {Array.from({ length: 12 }).map((_, i) => {
+                    const monthDate = new Date(pickerYear, i, 1);
+                    const isSelected = selectedDate?.getMonth() === i && selectedDate?.getFullYear() === pickerYear;
+                    return (
+                      <Button
+                        key={i}
+                        variant={isSelected ? "default" : "ghost"}
+                        className={cn("h-9 w-full", isSelected ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground" : "")}
+                        onClick={() => {
+                          setSelectedDate(monthDate);
+                          setIsDatePickerOpen(false);
+                        }}
+                      >
+                        {format(monthDate, "MMM", { locale: fr }).charAt(0).toUpperCase() + format(monthDate, "MMM", { locale: fr }).slice(1)}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
             </PopoverContent>
           </Popover>
 
@@ -434,7 +440,7 @@ export default function Page() {
             setImportDialogOpen(val);
           }}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="bg-white">
+              <Button variant="primary">
                 <UploadCloudIcon className="w-4 h-4 mr-2" />
                 Importer CSV/XLS
               </Button>
@@ -500,10 +506,6 @@ export default function Page() {
               )}
             </DialogContent>
           </Dialog>
-
-          <Button variant="outline" className="bg-white">
-            Filtres (0)
-          </Button>
         </div>
       </div>
 
@@ -512,19 +514,23 @@ export default function Page() {
         <Table>
           <TableHeader className="bg-muted/30">
             <TableRow className="border-none hover:bg-transparent">
-              <TableHead className="font-medium text-muted-foreground">Employé</TableHead>
-              <TableHead className="font-medium text-muted-foreground">Date</TableHead>
-              <TableHead className="font-medium text-muted-foreground">Statut</TableHead>
-              <TableHead className="font-medium text-muted-foreground">Check in - out</TableHead>
-              <TableHead className="font-medium text-muted-foreground">Modifié le</TableHead>
-              <TableHead className="font-medium text-muted-foreground text-right">Actions</TableHead>
+              <TableHead className="font-medium bg-cyan-700 text-white sticky top-0">Employé</TableHead>
+              <TableHead className="font-medium bg-cyan-700 text-white sticky top-0 text-center">Présent</TableHead>
+              <TableHead className="font-medium bg-cyan-700 text-white sticky top-0 text-center">Exceptionnel</TableHead>
+              <TableHead className="font-medium bg-cyan-700 text-white sticky top-0 text-center">Valide</TableHead>
+              <TableHead className="font-medium bg-cyan-700 text-white sticky top-0 text-center">Absent</TableHead>
+              <TableHead className="font-medium bg-cyan-700 text-white sticky top-0 text-center">Terrain</TableHead>
+              <TableHead className="font-medium bg-cyan-700 text-white sticky top-0 text-center">Excuse</TableHead>
+              <TableHead className="font-medium bg-cyan-700 text-white sticky top-0 text-center">Congé</TableHead>
+              <TableHead className="font-medium bg-cyan-700 text-white sticky top-0 text-center">Jours travaillés</TableHead>
+              <TableHead className="font-medium bg-cyan-700 text-white sticky top-0 text-center">Action</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
-            {dailyPresences.length === 0 ? (
+            {aggregatedPresences.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="p-6">
+                <TableCell colSpan={9} className="p-6">
                   <Empty>
                     <EmptyHeader>
                       <EmptyMedia variant={"icon"}>
@@ -539,9 +545,9 @@ export default function Page() {
                 </TableCell>
               </TableRow>
             ) : (
-              dailyPresences.map((row) => (
+              aggregatedPresences.map((row) => (
                 <TableRow
-                  key={row.id}
+                  key={row.userId}
                   className="hover:bg-muted/30 border-b border-muted/50"
                 >
                   <TableCell>
@@ -558,40 +564,20 @@ export default function Page() {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm font-medium text-gray-700">
-                    {format(new Date(row.date), "dd MMM yyyy", { locale: fr })}
+                  <TableCell className="text-center">{row.stats.PRESENT}</TableCell>
+                  <TableCell className="text-center">{row.stats.EXCEPTIONAL}</TableCell>
+                  <TableCell className="text-center">{row.stats.VALID}</TableCell>
+                  <TableCell className="text-center">{row.stats.ABSENT}</TableCell>
+                  <TableCell className="text-center">{row.stats.FIELD}</TableCell>
+                  <TableCell className="text-center">{row.stats.EXCUSED}</TableCell>
+                  <TableCell className="text-center">{row.stats.ON_LEAVE}</TableCell>
+                  <TableCell className="text-center font-semibold">{row.joursTravailles}</TableCell>
+                  <TableCell className="text-center">
+                    <Button variant="ghost" size="icon" onClick={() => onSelectPresence(row.userId)}>
+                      <Eye className="w-4 h-4" />
+                    </Button>
                   </TableCell>
-                  <TableCell>
-                    {getStatusBadge(row.statuts)}
-                  </TableCell>
-                  <TableCell className="text-sm text-gray-600">
-                    {row.checkInOut}
-                  </TableCell>
-                  <TableCell className="text-sm text-gray-600">
-                    {row.retards30j.toString().padStart(2, '0')}
-                  </TableCell>
-                  <TableCell className="text-sm text-gray-600">
-                    {row.modifieLe}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onSelectPresence(row.userId)}>
-                          <Eye className="mr-2 h-4 w-4" />
-                          Historique
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Edit2 className="mr-2 h-4 w-4" />
-                          Modifier
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+
                 </TableRow>
               ))
             )}

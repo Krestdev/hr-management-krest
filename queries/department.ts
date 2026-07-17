@@ -110,7 +110,7 @@ export function useDepartmentsQuery(companyId?: string, enabled: boolean = true)
     const departmentQuery = new DepartmentQuery();
     return useQuery({
         queryKey: queryKeys.departments.all(activeCompanyId),
-        queryFn: () => departmentQuery.getAll(activeCompanyId),
+        queryFn: () => departmentQuery.getAll(activeCompanyId === "all" ? undefined : activeCompanyId),
         enabled: enabled,
     });
 }

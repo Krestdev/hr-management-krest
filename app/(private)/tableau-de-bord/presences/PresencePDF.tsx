@@ -134,6 +134,18 @@ const styles = StyleSheet.create({
   totalCell: {
     fontWeight: "bold",
   },
+  
+  textSuccess: {
+    color: "#059669",
+  },
+
+  textError: {
+    color: "#ef4444",
+  },
+  
+  textMuted: {
+    color: "#6b7280",
+  },
 });
 
 /* =========================
@@ -151,7 +163,7 @@ export default function PresencePDF({
   }, {} as Record<PresenceFlag, number>);
 
   presences.forEach((p) => {
-    p.statut.forEach((s) => stats[s]++);
+    p.status.forEach((s) => stats[s]++);
   });
 
   return (
@@ -169,7 +181,9 @@ export default function PresencePDF({
         <View style={styles.table}>
           {/* HEADER ROW */}
           <View style={styles.row}>
-            <Text style={styles.cellHeader}>Jour</Text>
+            <Text style={[styles.cellHeader, { flex: 1.4 }]}>Jour</Text>
+            <Text style={styles.cellHeader}>Arrivée</Text>
+            <Text style={styles.cellHeader}>Départ</Text>
             {FLAGS.map((f) => (
               <Text key={f} style={styles.cellHeader}>
                 {flagLabel[f]}
@@ -179,15 +193,36 @@ export default function PresencePDF({
 
           {/* DATA ROWS */}
           {presences.map((p) => {
-            const d = new Date(p.date).toLocaleDateString("fr-FR");
+            const d = new Date(p.checkIn).toLocaleDateString("fr-FR");
+
+            let arrivalStr = "--:--";
+            let arrivalStyle = styles.textMuted;
+            if (p.checkIn) {
+              const arrDate = new Date(p.checkIn);
+              arrivalStr = arrDate.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+              const isLate = arrDate.getHours() > 8 || (arrDate.getHours() === 8 && arrDate.getMinutes() > 0);
+              arrivalStyle = isLate ? styles.textError : styles.textSuccess;
+            }
+
+            let depStr = "--:--";
+            let depStyle = styles.textMuted;
+            if (p.checkOut) {
+              const depDate = new Date(p.checkOut);
+              depStr = depDate.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+              const isEarly = depDate.getHours() < 17;
+              depStyle = isEarly ? styles.textError : styles.textSuccess;
+            }
 
             return (
-              <View style={styles.row} key={p.id}>
+              <View style={styles.row} key={p.uuid}>
                 <Text style={styles.dateCell}>{d}</Text>
+                
+                <Text style={[styles.cell, arrivalStyle, { fontWeight: "bold" }]}>{arrivalStr}</Text>
+                <Text style={[styles.cell, depStyle, { fontWeight: "bold" }]}>{depStr}</Text>
 
                 {FLAGS.map((f) => (
-                  <Text key={f} style={styles.cell}>
-                    {p.statut.includes(f) ? "✔" : "✘"}
+                  <Text key={f} style={[styles.cell, p.status.includes(f) ? styles.textSuccess : { color: "#ec4899" }]}>
+                    {p.status.includes(f) ? "✔" : "✘"}
                   </Text>
                 ))}
               </View>
@@ -199,6 +234,9 @@ export default function PresencePDF({
             <Text style={[styles.dateCell, styles.totalCell]}>
               Total
             </Text>
+            
+            <Text style={[styles.cell, styles.totalCell]}>-</Text>
+            <Text style={[styles.cell, styles.totalCell]}>-</Text>
 
             {FLAGS.map((f) => (
               <Text key={f} style={[styles.cell, styles.totalCell]}>
