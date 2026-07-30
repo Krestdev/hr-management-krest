@@ -38,7 +38,6 @@ import {
 } from "@/components/ui/table";
 import useKizunaStore from "@/context/store";
 import { formatSalary, formatSeniority, getYearsOfService } from "@/lib/utils";
-import { useEmployeesQuery, useDeleteEmployeeMutation, useReactivateEmployeeMutation } from "@/queries/employee";
 import {
   AddSquareIcon,
   PlusSignSquareIcon,
@@ -59,10 +58,8 @@ import Link from "next/link";
 import WarningModal from "@/components/WarningModal";
 import { toast } from "sonner";
 import AddDipe from "./add-dipe";
-import { useSalarialsQuery } from "@/queries/salarials";
-import { useDebounce } from "@/hooks/useDebounce";
-import { useDepartmentsQuery } from "@/queries/department";
 import StatisticCard from "@/components/statistic-card";
+import { useDeleteEmployeeMutation, useDepartmentsQuery, useEmployeesQuery, useReactivateEmployeeMutation } from "@/hooks/queries-hooks";
 
 type LengthOfService = "under" | "over" | "equal" | "none";
 

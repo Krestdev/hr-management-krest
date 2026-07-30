@@ -2,8 +2,6 @@
 
 import { useState, useMemo } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
-import { useEmployeeQuery } from "@/queries/employee";
-import { usePresencesByUserIdQuery } from "@/queries/presences";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import Header from "@/components/header";
@@ -31,6 +29,7 @@ import {
 import EditPresenceModal from "./EditPresenceModal";
 import PresenceComp from "../PresenceComp";
 import { Presence } from "@/types/types";
+import { useEmployeeQuery, usePresencesByUserIdQuery } from "@/hooks/queries-hooks";
 
 export default function EmployeePresencePage() {
   const params = useParams();

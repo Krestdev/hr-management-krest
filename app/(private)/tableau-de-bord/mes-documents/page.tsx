@@ -5,7 +5,7 @@ import Header from "@/components/header";
 import LoadingComponent from "@/components/loading-comp";
 import { Input } from "@/components/ui/input";
 import useKizunaStore from "@/context/store";
-import { useMyDocumentsQuery } from "@/queries/documents";
+import { useMyDocumentsQuery } from "@/hooks/queries-hooks";
 import Link from "next/link";
 import React, { useState } from "react";
 

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useEmployeeQuery, useUpdateEmployeeMutation } from "@/queries/employee"
 import useKizunaStore from "@/context/store"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -21,6 +20,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { roleLabels } from "@/types/types"
+import { useEmployeeQuery, useUpdateEmployeeMutation } from "@/hooks/queries-hooks"
 
 const formSchema = z.object({
     email: z.string().email({ message: "Veuillez entrer une adresse mail valide." }),

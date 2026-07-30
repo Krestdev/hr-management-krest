@@ -2,12 +2,12 @@
 
 import Header from "@/components/header";
 import useKizunaStore from "@/context/store";
-import { useEmployeesQuery } from "@/queries/employee";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import LoadingComponent from "@/components/loading-comp";
 import ErrorComponent from "@/components/error-comp";
+import { useEmployeesQuery } from "@/hooks/queries-hooks";
 
 const Page = () => {
   const { user } = useKizunaStore();

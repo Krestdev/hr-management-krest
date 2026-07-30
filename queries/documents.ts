@@ -1,7 +1,5 @@
 import api from "@/context/api";
-import { Files } from "@/types/types"; // adapte le chemin si besoin
-import { useQuery } from "@tanstack/react-query";
-import { queryKeys } from "./queryKeys";
+import { Files } from "@/types/types";
 
 export default class DocumentQuery {
   route = "/documents";
@@ -62,35 +60,5 @@ export default class DocumentQuery {
       throw new Error(message);
     }
   };
-}
-
-// Hook pour récupérer tous les documents
-export function useDocumentsQuery(companyId?: string, enabled: boolean = true) {
-  const documentQuery = new DocumentQuery();
-  return useQuery({
-    queryKey: queryKeys.documents.all(companyId),
-    queryFn: () => documentQuery.getAll(companyId),
-    enabled: enabled && companyId !== undefined,
-  });
-}
-
-// Hook pour récupérer les documents d'un utilisateur
-export function useMyDocumentsQuery(userId: string, companyId?: string, enabled: boolean = true) {
-  const documentQuery = new DocumentQuery();
-  return useQuery({
-    queryKey: queryKeys.documents.mine(userId, companyId),
-    queryFn: () => documentQuery.getMine(userId, companyId),
-    enabled: enabled && !!userId && companyId !== undefined,
-  });
-}
-
-// Hook pour récupérer un document par son id
-export function useDocumentByIdQuery(id: number, companyId?: string, enabled: boolean = true) {
-  const documentQuery = new DocumentQuery();
-  return useQuery({
-    queryKey: queryKeys.documents.detail(id, companyId),
-    queryFn: () => documentQuery.getById(id, companyId),
-    enabled: enabled && !!id && companyId !== undefined,
-  });
 }
 

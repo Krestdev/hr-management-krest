@@ -6,13 +6,16 @@ import { Button } from "./ui/button"
 import useKizunaStore from "@/context/store"
 import { useRouter } from "next/navigation"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
-import { useCompaniesQuery } from "@/queries/company"
+import { useCompaniesQuery } from "@/hooks/queries-hooks"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { logout, selectedCompanyId, setSelectedCompanyId } = useKizunaStore();
   const router = useRouter();
 
   const { data: companies, isLoading: isLoadingCompanies } = useCompaniesQuery();
+
+  // Ensure companies is always an array
+  const companiesArray = Array.isArray(companies) ? companies : [];
 
   return (
     <SidebarProvider>
@@ -26,12 +29,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="flex items-center gap-2">
             {/* Choisir la société */}
             <Select value={selectedCompanyId} onValueChange={setSelectedCompanyId}>
-              <SelectTrigger className="w-[160px]">
+              <SelectTrigger className="w-40">
                 <SelectValue placeholder={isLoadingCompanies ? "Chargement..." : "Tous"} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tous</SelectItem>
-                {companies?.map((company) => (
+                {companiesArray.map((company) => (
                   <SelectItem key={company.uuid} value={company.uuid}>
                     {company.name}
                   </SelectItem>

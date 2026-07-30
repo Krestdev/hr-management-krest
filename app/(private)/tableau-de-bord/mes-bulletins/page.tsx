@@ -17,13 +17,15 @@ import {
   Calendar02Icon,
 } from "@hugeicons/core-free-icons";
 import PaySlipCard from "@/components/pay-slip";
-import { usePayslipsQuery } from "@/queries/payslips";
 import LoadingComponent from "@/components/loading-comp";
 import ErrorComponent from "@/components/error-comp";
+import useKizunaStore from "@/context/store";
+import { usePayslipsQuery } from "@/hooks/queries-hooks";
 
 
 function Page() {
-  const {data, isLoading, isSuccess, isError} = usePayslipsQuery();
+  const companyId = useKizunaStore((state) => state.selectedCompanyId);
+  const { data, isLoading, isSuccess, isError } = usePayslipsQuery(companyId);
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: undefined,
     to: undefined,
@@ -34,7 +36,7 @@ function Page() {
   }
 
   const filteredPayslips = useMemo(() => {
-    if(!data || !isSuccess) return [];
+    if (!data || !isSuccess) return [];
     if (!dateRange?.from && !dateRange?.to) return data;
 
     const from = dateRange.from;
@@ -49,13 +51,13 @@ function Page() {
     });
   }, [dateRange, data, isSuccess]);
 
-  if(isLoading){
+  if (isLoading) {
     return (
-      <LoadingComponent/>
+      <LoadingComponent />
     )
   }
-  if(isError){
-    return <ErrorComponent/>
+  if (isError) {
+    return <ErrorComponent />
   }
   return (
     <div className="grid gap-4 sm:gap-6">

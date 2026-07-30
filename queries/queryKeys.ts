@@ -56,7 +56,10 @@ export const queryKeys = {
     all: (companyId?: string) => ["notifications", companyId] as const,
   },
   payslips: {
-    all: (companyId?: string) => ["payslips", companyId] as const,
+    all: (companyId?: string) => ["payslips", "all", companyId] as const,
+    one: (uuid: string) => ["payslips", uuid] as const,
+    byEmployeeUuid: (employeeUuid: string) => ["payslips", "employee", employeeUuid] as const,
+    download: (uuid: string) => ["payslips", "download", uuid] as const,
   },
   recruitments: {
     all: (companyId?: string) => ["recruitments", "all", companyId] as const,

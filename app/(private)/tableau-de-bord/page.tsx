@@ -9,8 +9,8 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import useKizunaStore from "@/context/store";
-import { useHolidaysStatsQuery, useHolidaysBalanceQuery } from "@/queries/holidays";
-import { useEmployeeQuery, useEmployeesQuery } from "@/queries/employee";
+import { useEmployeeQuery, useEmployeesQuery } from "@/hooks/queries-hooks";
+import { useHolidaysBalanceQuery, useHolidaysStatsQuery } from "@/queries/holidays";
 import {
   AddSquareIcon,
   Calendar02Icon,

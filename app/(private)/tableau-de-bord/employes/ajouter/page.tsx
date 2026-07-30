@@ -4,12 +4,12 @@ import EmployeeForm from "@/components/employee-form";
 import ErrorComponent from "@/components/error-comp";
 import LoadingComponent from "@/components/loading-comp";
 import useKizunaStore from "@/context/store";
-import { useEmployeesQuery } from "@/queries/employee";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UserPlus, Users, ArrowLeft } from "lucide-react";
 import Header from "@/components/header";
+import { useEmployeesQuery } from "@/hooks/queries-hooks";
 
 const Page = () => {
   const { user, isHydrated } = useKizunaStore();

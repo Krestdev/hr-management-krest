@@ -1,7 +1,5 @@
 import api from "@/context/api";
 import { Presence } from "@/types/types";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "./queryKeys";
 
 export default class PresenceQuery {
   route = "/attendance";
@@ -11,7 +9,7 @@ export default class PresenceQuery {
     try {
       const url = month && year ? `${this.route}?month=${month}&year=${year}` : this.route;
       const response = await api.get(url);
-      
+
       if (response.data && Array.isArray(response.data.data)) {
         const allPresences: Presence[] = [];
         response.data.data.forEach((emp: any) => {
@@ -32,7 +30,7 @@ export default class PresenceQuery {
         });
         return allPresences;
       }
-      
+
       return response.data;
     } catch (error: any) {
       const message =
@@ -55,7 +53,7 @@ export default class PresenceQuery {
         ? `${this.route}/employee/${userId}?month=${month}&year=${year}`
         : `${this.route}/employee/${userId}`;
       const response = await api.get(url);
-      
+
       if (response.data && Array.isArray(response.data.data)) {
         const allPresences: Presence[] = [];
         response.data.data.forEach((emp: any) => {
@@ -76,7 +74,7 @@ export default class PresenceQuery {
         });
         return allPresences;
       }
-      
+
       return response.data;
     } catch (error: any) {
       const message =
@@ -148,64 +146,3 @@ export default class PresenceQuery {
     }
   };
 }
-
-// Hook pour récupérer toutes les présences
-export function usePresencesQuery(month?: number, year?: number) {
-  const presenceQuery = new PresenceQuery();
-  return useQuery({
-    queryKey: [...queryKeys.presences.all(), month, year],
-    queryFn: () => presenceQuery.getAll(month, year),
-  });
-}
-
-// Hook pour récupérer les présences par id utilisateur
-export function usePresencesByUserIdQuery(userId: string, month?: number, year?: number, enabled: boolean = true) {
-  const presenceQuery = new PresenceQuery();
-  return useQuery({
-    queryKey: [...queryKeys.presences.byUserId(userId), month, year],
-    queryFn: () => presenceQuery.getByUserId(userId, month, year),
-    enabled: enabled && !!userId,
-  });
-}
-
-// Hook pour créer une présence
-export function useCreatePresenceMutation() {
-  const presenceQuery = new PresenceQuery();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: presenceQuery.post,
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.presences.all() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.presences.byUserId(variables.employeeId) });
-    },
-  });
-}
-
-// Hook pour mettre à jour une présence
-export function useUpdatePresenceMutation() {
-  const presenceQuery = new PresenceQuery();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Presence, "uuid" | "createdAt" | "updatedAt">> }) =>
-      presenceQuery.update(id, data),
-    onSuccess: (response, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.presences.all() });
-      if (variables.data.employeeId || response?.item?.employeeId) {
-        queryClient.invalidateQueries({ queryKey: queryKeys.presences.byUserId(variables.data.employeeId || response?.item?.employeeId as string) });
-      }
-    },
-  });
-}
-
-// Hook pour créer plusieurs présences en masse
-export function useCreateManyPresencesMutation() {
-  const presenceQuery = new PresenceQuery();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: presenceQuery.postMany,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.presences.all() });
-    },
-  });
-}
-

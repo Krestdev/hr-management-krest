@@ -26,11 +26,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRecruitmentQuery, useUpdateRecruitmentMutation } from "@/queries/recruitment";
-import { useCompaniesQuery } from "@/queries/company";
 import { toast } from "sonner";
 import LoadingComponent from "@/components/loading-comp";
 import ErrorComponent from "@/components/error-comp";
+import { useCompaniesQuery, useRecruitmentQuery, useUpdateRecruitmentMutation } from "@/hooks/queries-hooks";
 
 const formSchema = z.object({
   title: z.string().min(2, "Le titre est requis"),
@@ -71,7 +70,7 @@ export default function EditRecruitmentPage(props: { params: Promise<{ id: strin
     if (offer) {
       // Format datetime-local requires YYYY-MM-DDTHH:mm format
       const formattedDeadline = offer.deadline ? new Date(offer.deadline).toISOString().slice(0, 16) : "";
-      
+
       form.reset({
         title: offer.title || "",
         description: offer.description || "",

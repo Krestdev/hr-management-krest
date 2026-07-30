@@ -6,7 +6,6 @@ import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import Header from "@/components/header";
 import StatisticCard from "@/components/statistic-card";
-import { candidaciesQueryOptions } from "@/queries/candidacy";
 import { useQueries } from "@tanstack/react-query";
 import useKizunaStore from "@/context/store";
 import LoadingComponent from "@/components/loading-comp";
@@ -24,6 +23,16 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import {
   BriefcaseBusiness,
   Clock,
   Search,
@@ -32,7 +41,8 @@ import {
   Eye
 } from "lucide-react";
 import { Recruitment, Candidacy } from "@/types/types";
-import { useRecruitmentsQuery } from "@/queries/recruitment";
+import { useCreateCandidacyMutation, useRecruitmentsQuery } from "@/hooks/queries-hooks";
+import { candidaciesQueryOptions } from "@/queries/candidacy";
 
 // Types factices pour les besoins de l'UI (en attendant que l'API renvoie ces champs)
 type ExtendedRecruitment = Recruitment & {
@@ -47,6 +57,26 @@ export default function RecruitmentPage() {
   const [search, setSearch] = useState("");
   const [selectedOffer, setSelectedOffer] = useState<ExtendedRecruitment | null>(null);
   const [selectedOfferForCandidacies, setSelectedOfferForCandidacies] = useState<ExtendedRecruitment | null>(null);
+  const [isCandidacyDialogOpen, setIsCandidacyDialogOpen] = useState(false);
+  const createCandidacyMutation = useCreateCandidacyMutation();
+
+  const handleCreateCandidacy = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!selectedOffer) return;
+
+    const formData = new FormData(e.currentTarget);
+    formData.append("recruitmentUuid", selectedOffer.uuid);
+
+    createCandidacyMutation.mutate(formData, {
+      onSuccess: () => {
+        toast.success("Candidature créée avec succès");
+        setIsCandidacyDialogOpen(false);
+      },
+      onError: (error) => {
+        toast.error(error.message || "Erreur lors de la création de la candidature");
+      }
+    });
+  };
 
   const { data: recruitmentsData, isLoading: isLoadingRecruitments, isError: isErrorRecruitments } = useRecruitmentsQuery(selectedCompanyId);
   const offersList: ExtendedRecruitment[] = Array.isArray(recruitmentsData) ? recruitmentsData : (recruitmentsData?.data || []);
@@ -184,7 +214,7 @@ export default function RecruitmentPage() {
         )}>
           <div className={cn(
             "grid gap-4",
-            selectedOffer ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+            selectedOffer ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
           )}>
             {filteredOffers.map((offer: ExtendedRecruitment) => (
               <div
@@ -304,6 +334,60 @@ export default function RecruitmentPage() {
               >
                 Voir les candidatures
               </Button>
+              <Dialog open={isCandidacyDialogOpen} onOpenChange={setIsCandidacyDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="border-[#1289A7] text-[#1289A7] hover:bg-[#1289A7]/10 px-6">
+                    Créer une candidature
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px] overflow-y-auto max-h-[90vh]">
+                  <DialogHeader>
+                    <DialogTitle>Nouvelle candidature - {selectedOffer.title}</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleCreateCandidacy} className="flex flex-col gap-4 mt-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="fullName">Nom complet *</Label>
+                      <Input id="fullName" name="fullName" required />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="phone">Téléphone *</Label>
+                      <Input id="phone" name="phone" required />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="email">Email *</Label>
+                      <Input id="email" name="email" type="email" required />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="address">Adresse *</Label>
+                      <Input id="address" name="address" required />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="identityCard">Carte d'identité *</Label>
+                      <Input id="identityCard" name="identityCard" type="file" required />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="cv">CV *</Label>
+                      <Input id="cv" name="cv" type="file" required />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="degree">Diplôme</Label>
+                      <Input id="degree" name="degree" type="file" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="coverLetter">Lettre de motivation</Label>
+                      <Input id="coverLetter" name="coverLetter" type="file" />
+                    </div>
+                    <DialogFooter className="mt-4">
+                      <Button type="button" variant="outline" onClick={() => setIsCandidacyDialogOpen(false)}>
+                        Annuler
+                      </Button>
+                      <Button type="submit" disabled={createCandidacyMutation.isPending} className="bg-[#1289A7] hover:bg-[#0E6C84] text-white">
+                        {createCandidacyMutation.isPending ? "Création..." : "Créer"}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         )}

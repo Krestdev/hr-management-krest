@@ -1,6 +1,4 @@
 import { Notification } from "@/types/types";
-import { useQuery } from "@tanstack/react-query";
-import { queryKeys } from "./queryKeys";
 import { demoNotifications } from "@/data/temp";
 
 export class NotificationQuery {
@@ -8,13 +6,4 @@ export class NotificationQuery {
   getAll = async (): Promise<Notification[]> => {
     return demoNotifications;
   };
-}
-
-// Hook pour récupérer toutes les notifications
-export function useNotificationsQuery() {
-  const notificationQuery = new NotificationQuery();
-  return useQuery({
-    queryKey: queryKeys.notifications.all(),
-    queryFn: notificationQuery.getAll,
-  });
 }

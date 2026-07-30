@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Presence } from "@/types/types";
-import { useUpdatePresenceMutation } from "@/queries/presences";
 import { toast } from "sonner";
 import { setHours, setMinutes, parseISO, formatISO } from "date-fns";
 import { Loader2 } from "lucide-react";
+import { useUpdatePresenceMutation } from "@/hooks/queries-hooks";
 
 type Props = {
   open: boolean;
@@ -58,7 +58,7 @@ export default function EditPresenceModal({ open, onClose, presence }: Props) {
       const [h, m] = checkIn.split(":").map(Number);
       newCheckIn = formatISO(setMinutes(setHours(baseDate, h), m));
     }
-    
+
     if (checkOut) {
       const [h, m] = checkOut.split(":").map(Number);
       newCheckOut = formatISO(setMinutes(setHours(baseDate, h), m));

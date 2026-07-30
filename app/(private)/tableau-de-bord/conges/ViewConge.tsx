@@ -12,11 +12,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { useLeavesTypesQuery } from "@/queries/leaves-type";
-import { useEmployeesQuery } from "@/queries/employee";
-import { useLeavesByUserIdQuery } from "@/queries/leaves";
-import { Employee, LeavesType, Leaves } from "@/types/types";
+import { Employee, LeaveType, Leaves } from "@/types/types";
 import React, { useMemo, useState } from "react";
+import { useEmployeesQuery, useLeavesByUserIdQuery, useLeaveTypesQuery } from "@/hooks/queries-hooks";
+import useKizunaStore from "@/context/store";
 
 type Props = {
   isOpen: boolean;
@@ -30,18 +29,19 @@ type LeaveFormState = {
     days: number;
     authorized: boolean;
     isAnnualLeave: boolean;
-    id?: number; // Ajout de l'ID du type de congé
+    uuid?: string; // Ajout de l'UUID du type de congé
     label?: string; // Ajout du label pour référence
-    code?: string; // Ajout du code pour référence
   };
 };
 
 function ViewConge({ isOpen, openChange, employeeId }: Props) {
+  const companyId = useKizunaStore((state) => state.selectedCompanyId);
+
   // USERS
   const { data: usersData, isSuccess: isSuccessUsers } = useEmployeesQuery(1, 20, "");
 
   // LEAVES TYPES
-  const { data: leavesTypeData, isSuccess: isLeavesTypeSuccess } = useLeavesTypesQuery();
+  const { data: leavesTypeData, isSuccess: isLeavesTypeSuccess } = useLeaveTypesQuery(companyId);
 
   // USER LEAVES
   const { data: leavesData, isSuccess: isLeavesSuccess } = useLeavesByUserIdQuery(employeeId);
@@ -59,18 +59,17 @@ function ViewConge({ isOpen, openChange, employeeId }: Props) {
     if (isLeavesTypeSuccess && employee) {
       const initial: LeaveFormState = {};
 
-      leavesTypeData.items.forEach((t: LeavesType) => {
-        const isAuthorized = employee.autorizedLeaves.includes(t.id);
-        const isAnnualLeave = t.code === "ANNUAL" || t.label.toLowerCase().includes("annuel");
+      leavesTypeData?.forEach((t: LeaveType) => {
+        const isAuthorized = (employee.autorizedLeaves as any).includes(t.uuid);
+        const isAnnualLeave = t.label.toLowerCase().includes("annuel");
 
-        initial[t.code] = {
+        initial[t.uuid] = {
           checked: isAuthorized,
           days: 0,
           authorized: isAuthorized,
           isAnnualLeave: isAnnualLeave,
-          id: t.id,
+          uuid: t.uuid,
           label: t.label,
-          code: t.code,
         };
       });
 
@@ -136,8 +135,8 @@ function ViewConge({ isOpen, openChange, employeeId }: Props) {
           <div className="grid gap-3">
             <h3 className="font-semibold">Types de congés</h3>
 
-            {leavesTypeData.items.map((type: LeavesType) => {
-              const state = formState[type.code];
+            {leavesTypeData.map((type: LeaveType) => {
+              const state = formState[type.uuid];
               if (!state) return null;
 
               // Déterminer si la checkbox doit être désactivée
@@ -148,7 +147,7 @@ function ViewConge({ isOpen, openChange, employeeId }: Props) {
 
               return (
                 <div
-                  key={type.id}
+                  key={type.uuid}
                   className="grid grid-cols-[1fr_auto] gap-4 items-center"
                 >
                   <div className="flex items-center gap-3">
@@ -158,8 +157,8 @@ function ViewConge({ isOpen, openChange, employeeId }: Props) {
                       onCheckedChange={(val) => {
                         setFormState((prev) => ({
                           ...prev,
-                          [type.code]: {
-                            ...prev[type.code],
+                          [type.uuid]: {
+                            ...prev[type.uuid],
                             checked: !!val,
                           },
                         }));
@@ -182,8 +181,8 @@ function ViewConge({ isOpen, openChange, employeeId }: Props) {
                         const value = Number(e.target.value);
                         setFormState((prev) => ({
                           ...prev,
-                          [type.code]: {
-                            ...prev[type.code],
+                          [type.uuid]: {
+                            ...prev[type.uuid],
                             days: value,
                           },
                         }));
@@ -213,7 +212,7 @@ function ViewConge({ isOpen, openChange, employeeId }: Props) {
                 // Construction du payload avec TOUS les types de congés
                 const allLeaveTypes = Object.entries(formState).map(([code, v]) => ({
                   userId: employeeId,
-                  leaveTypeId: v.id,
+                  leaveTypeId: v.uuid,
                   leaveTypeCode: code,
                   leaveTypeLabel: v.label,
                   checked: v.checked,

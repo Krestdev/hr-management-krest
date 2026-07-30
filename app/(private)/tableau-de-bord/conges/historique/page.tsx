@@ -20,9 +20,6 @@ import {
 } from "@hugeicons/core-free-icons";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-
-import { useLeavesQuery } from "@/queries/leaves";
-import { useEmployeesQuery } from "@/queries/employee";
 import { Leaves, Employee } from "@/types/types";
 import WarningModal from "@/components/WarningModal";
 import { toast } from "sonner";
@@ -47,6 +44,8 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { DateRange } from "react-day-picker";
+import useKizunaStore from "@/context/store";
+import { useEmployeesQuery, useLeavesQuery } from "@/hooks/queries-hooks";
 
 function getStatusBadge(status: string) {
   if (status === "APPROVED")
@@ -115,6 +114,7 @@ function Page() {
   // Deux périodes distinctes
   const [startPeriod, setStartPeriod] = useState<DateRange | undefined>();
   const [endPeriod, setEndPeriod] = useState<DateRange | undefined>();
+  const companyId = useKizunaStore((state) => state.selectedCompanyId);
 
   const {
     data: leavesData,

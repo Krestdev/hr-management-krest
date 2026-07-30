@@ -33,8 +33,6 @@ import {
 import { useMemo, useState, useRef, useEffect } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { UserGroupIcon } from "@hugeicons/core-free-icons";
-import { usePresencesQuery, useCreatePresenceMutation, useCreateManyPresencesMutation } from "@/queries/presences";
-import { useEmployeesQuery } from "@/queries/employee";
 import useKizunaStore from "@/context/store";
 import { Employee, Presence, PresenceFlag } from "@/types/types";
 import PresenceComp from "./PresenceComp";
@@ -55,6 +53,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useCreateManyPresencesMutation, useCreatePresenceMutation, useEmployeesQuery, usePresencesQuery } from "@/hooks/queries-hooks";
 
 /* ================= TYPES ================= */
 

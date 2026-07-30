@@ -18,11 +18,9 @@ import countries from '@/data/countries'
 import departmentsSample from '@/data/departments'
 import { employeeCategories } from '@/data/categories'
 import TableUpload from './table-upload'
-import { usePositionsQuery } from '@/queries/positions'
-import { useCreateEmployeeMutation, useUpdateEmployeeMutation } from '@/queries/employee'
 import { toast } from 'sonner'
 import useKizunaStore from '@/context/store'
-import { useDepartmentQuery, useDepartmentsQuery } from '@/queries/department'
+import { useCreateEmployeeMutation, useDepartmentsQuery, usePositionsQuery, useUpdateEmployeeMutation } from '@/hooks/queries-hooks'
 
 interface Props {
     employee?: Employee;

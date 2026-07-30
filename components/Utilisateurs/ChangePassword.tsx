@@ -5,12 +5,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useUpdateEmployeePasswordMutation } from "@/queries/employee";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Input } from "../ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Button } from "../ui/button";
+import { useUpdateEmployeePasswordMutation } from "@/hooks/queries-hooks";
 
 interface Props {
     open: boolean;

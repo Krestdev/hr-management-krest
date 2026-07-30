@@ -28,14 +28,13 @@ import {
   UserGroupIcon,
 } from "@hugeicons/core-free-icons";
 
-import { useLeavesQuery } from "@/queries/leaves";
-import { useEmployeesQuery } from "@/queries/employee";
 import { Leaves, Employee } from "@/types/types";
 import WarningModal from "@/components/WarningModal";
 import { toast } from "sonner";
 import Link from "next/link";
 import ViewConge from "./ViewConge";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import { useLeavesQuery, useEmployeesQuery } from "@/hooks/queries-hooks";
 
 const TOTAL_ANNUAL_DAYS = 30; // règle RH annuelle
 

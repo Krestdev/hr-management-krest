@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { useCompaniesQuery, useDeleteCompanyMutation } from "@/queries/company"
 import { UserGroupIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Building2, MoreVertical, PlusSquare, Search } from "lucide-react"
@@ -18,6 +17,7 @@ import { CompanyDialog } from "./company-dialog"
 import { Company } from "@/types/types"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { useCompaniesQuery, useDeleteCompanyMutation } from "@/hooks/queries-hooks"
 
 const Page = () => {
     const router = useRouter()

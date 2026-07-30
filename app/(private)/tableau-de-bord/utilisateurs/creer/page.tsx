@@ -2,7 +2,6 @@
 
 import React, { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useCreateEmployeeMutation } from "@/queries/employee"
 import useKizunaStore from "@/context/store"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -13,6 +12,7 @@ import { toast } from "sonner"
 import * as z from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useCreateEmployeeMutation } from "@/hooks/queries-hooks"
 
 const roleLabels: Record<string, string> = {
     "COMPANY_ADMIN": "Administrateur",

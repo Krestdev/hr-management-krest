@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/table";
 import useKizunaStore from "@/context/store";
 import { cn, PRESENCE_FLAGS } from "@/lib/utils";
-import { usePresencesByUserIdQuery } from "@/queries/presences";
 import { Presence, PresenceFlag } from "@/types/types";
 import { Calendar02Icon, SearchVisualIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -39,6 +38,7 @@ import Remotely from "./remotely";
 import Header from "@/components/header";
 import LoadingComponent from "@/components/loading-comp";
 import ErrorComponent from "@/components/error-comp";
+import { usePresencesByUserIdQuery } from "@/hooks/queries-hooks";
 
 function Page() {
   const { user } = useKizunaStore();

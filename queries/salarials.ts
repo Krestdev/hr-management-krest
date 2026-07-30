@@ -1,7 +1,5 @@
 import api from "@/context/api";
 import { Salarial } from "@/types/types";
-import { useQuery } from "@tanstack/react-query";
-import { queryKeys } from "./queryKeys";
 
 export default class SalarialQuery {
   route = "/salarial";
@@ -35,24 +33,5 @@ export default class SalarialQuery {
       throw new Error(message);
     }
   };
-}
-
-// Hook pour récupérer tous les salaires
-export function useSalarialsQuery() {
-  const salarialQuery = new SalarialQuery();
-  return useQuery({
-    queryKey: queryKeys.salarials.all(),
-    queryFn: salarialQuery.getAll,
-  });
-}
-
-// Hook pour récupérer un salaire par son id
-export function useSalarialQuery(id: number, enabled: boolean = true) {
-  const salarialQuery = new SalarialQuery();
-  return useQuery({
-    queryKey: queryKeys.salarials.detail(id),
-    queryFn: () => salarialQuery.getById(id),
-    enabled: enabled && !!id,
-  });
 }
 

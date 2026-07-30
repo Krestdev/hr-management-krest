@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useState, useEffect } from "react"
-import { useCreateCompanyMutation, useUpdateCompanyMutation } from "@/queries/company"
 import { Company } from "@/types/types"
 import { Loader2 } from "lucide-react"
+import { useCreateCompanyMutation, useUpdateCompanyMutation } from "@/hooks/queries-hooks"
 
 interface CompanyDialogProps {
     open: boolean

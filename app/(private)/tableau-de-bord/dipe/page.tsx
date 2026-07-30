@@ -26,8 +26,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSalarialsQuery } from "@/queries/salarials";
-import { useEmployeesQuery } from "@/queries/employee";
 import { EllipsisIcon, HistoryIcon } from "lucide-react";
 import Link from "next/link";
 import React, { useMemo } from "react";
@@ -49,6 +47,7 @@ import {
 import AddDipe from "../employes/add-dipe";
 import { Employee } from "@/types/types";
 import ShowDipe from "./showDipe";
+import { useEmployeesQuery, useSalarialsQuery } from "@/hooks/queries-hooks";
 
 type Montant = {
   montant: number;

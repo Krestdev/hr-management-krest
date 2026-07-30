@@ -1,7 +1,5 @@
 import api from "@/context/api";
-import { Leaves } from "@/types/types";
-import { useQuery } from "@tanstack/react-query";
-import { queryKeys } from "./queryKeys";
+import { Leaves, LeaveType } from "@/types/types";
 
 export default class LeavesQuery {
   route = "/leaves";
@@ -89,44 +87,130 @@ export default class LeavesQuery {
       throw new Error(message);
     }
   };
-}
 
-// Hook pour récupérer toutes les demandes de congés
-export function useLeavesQuery() {
-  const leavesQuery = new LeavesQuery();
-  return useQuery({
-    queryKey: queryKeys.leaves.all(),
-    queryFn: leavesQuery.getAll,
-  });
-}
+  // ✅ CREATE LEAVE REQUEST
+  create = async (data: Partial<Leaves>): Promise<{ success: boolean; data: Leaves }> => {
+    try {
+      const response = await api.post(`${this.route}`, data);
+      return response.data;
+    } catch (error: any) {
+      const message = error.response?.data?.message ?? error.message ?? "Une erreur s'est produite";
+      throw new Error(message);
+    }
+  };
 
-// Hook pour récupérer toutes les demandes de congés d'un utilisateur
-export function useMyLeavesQuery(userId: number, enabled: boolean = true) {
-  const leavesQuery = new LeavesQuery();
-  return useQuery({
-    queryKey: queryKeys.leaves.mine(userId),
-    queryFn: () => leavesQuery.getMine(userId),
-    enabled: enabled && !!userId,
-  });
-}
+  // ✅ GET RECENT LEAVES
+  getRecent = async (): Promise<Leaves[]> => {
+    try {
+      const response = await api.get(`${this.route}/recent`);
+      return Array.isArray(response.data) ? response.data : response.data.data || [];
+    } catch (error: any) {
+      const message = error.response?.data?.message ?? error.message ?? "Une erreur s'est produite";
+      throw new Error(message);
+    }
+  };
 
-// Hook pour récupérer toutes les demandes de congés d'un utilisateur par son id
-export function useLeavesByUserIdQuery(userId: string, enabled: boolean = true) {
-  const leavesQuery = new LeavesQuery();
-  return useQuery({
-    queryKey: queryKeys.leaves.byUserId(userId),
-    queryFn: () => leavesQuery.getByUserId(userId),
-    enabled: enabled && !!userId,
-  });
-}
+  // ✅ GET LEAVES HISTORY
+  getHistory = async (): Promise<Leaves[]> => {
+    try {
+      const response = await api.get(`${this.route}/history`);
+      return Array.isArray(response.data) ? response.data : response.data.data || [];
+    } catch (error: any) {
+      const message = error.response?.data?.message ?? error.message ?? "Une erreur s'est produite";
+      throw new Error(message);
+    }
+  };
 
-// Hook pour récupérer une demande de congé par son id
-export function useLeaveByIdQuery(id: number, enabled: boolean = true) {
-  const leavesQuery = new LeavesQuery();
-  return useQuery({
-    queryKey: queryKeys.leaves.detail(id),
-    queryFn: () => leavesQuery.getById(id),
-    enabled: enabled && !!id,
-  });
-}
+  // ✅ APPROVE LEAVE
+  approve = async (id: number): Promise<{ success: boolean; data: Leaves }> => {
+    try {
+      const response = await api.patch(`${this.route}/${id}/approve`);
+      return response.data;
+    } catch (error: any) {
+      const message = error.response?.data?.message ?? error.message ?? "Une erreur s'est produite";
+      throw new Error(message);
+    }
+  };
 
+  // ✅ REJECT LEAVE
+  reject = async (id: number): Promise<{ success: boolean; data: Leaves }> => {
+    try {
+      const response = await api.patch(`${this.route}/${id}/reject`);
+      return response.data;
+    } catch (error: any) {
+      const message = error.response?.data?.message ?? error.message ?? "Une erreur s'est produite";
+      throw new Error(message);
+    }
+  };
+
+  // ✅ CANCEL LEAVE
+  cancel = async (id: number): Promise<{ success: boolean; data: Leaves }> => {
+    try {
+      const response = await api.patch(`${this.route}/${id}/cancel`);
+      return response.data;
+    } catch (error: any) {
+      const message = error.response?.data?.message ?? error.message ?? "Une erreur s'est produite";
+      throw new Error(message);
+    }
+  };
+
+  // ✅ CANCEL APPROVED LEAVE
+  cancelApproved = async (id: number): Promise<{ success: boolean; data: Leaves }> => {
+    try {
+      const response = await api.patch(`${this.route}/${id}/cancel-approved`);
+      return response.data;
+    } catch (error: any) {
+      const message = error.response?.data?.message ?? error.message ?? "Une erreur s'est produite";
+      throw new Error(message);
+    }
+  };
+
+  // ==========================================
+  // LEAVES TYPES
+  // ==========================================
+
+  // ✅ CREATE LEAVE TYPE
+  createType = async (data: Partial<LeaveType>): Promise<{ success: boolean; data: LeaveType }> => {
+    try {
+      const response = await api.post(`${this.route}/types`, data);
+      return response.data;
+    } catch (error: any) {
+      const message = error.response?.data?.message ?? error.message ?? "Une erreur s'est produite";
+      throw new Error(message);
+    }
+  };
+
+  // ✅ GET ALL LEAVE TYPES
+  getTypes = async (companyId: string): Promise<LeaveType[]> => {
+    try {
+      const response = await api.get(`${this.route}/types/${companyId}`);
+      // Assurer que les données retournées sont bien un tableau, sinon extraire depuis .data
+      return Array.isArray(response.data) ? response.data : response.data.data || [];
+    } catch (error: any) {
+      const message = error.response?.data?.message ?? error.message ?? "Une erreur s'est produite";
+      throw new Error(message);
+    }
+  };
+
+  // ✅ UPDATE LEAVE TYPE
+  updateType = async (uuid: string, data: Partial<LeaveType>): Promise<{ success: boolean; data: LeaveType }> => {
+    try {
+      const response = await api.patch(`${this.route}/types/${uuid}`, data);
+      return response.data;
+    } catch (error: any) {
+      const message = error.response?.data?.message ?? error.message ?? "Une erreur s'est produite";
+      throw new Error(message);
+    }
+  };
+
+  // ✅ DELETE LEAVE TYPE
+  deleteType = async (uuid: string): Promise<{ success: boolean }> => {
+    try {
+      const response = await api.delete(`${this.route}/types/${uuid}`);
+      return response.data;
+    } catch (error: any) {
+      const message = error.response?.data?.message ?? error.message ?? "Une erreur s'est produite";
+      throw new Error(message);
+    }
+  };
+}

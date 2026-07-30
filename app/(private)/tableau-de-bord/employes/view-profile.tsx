@@ -9,9 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useDepartmentsQuery, usePositionsQuery } from "@/hooks/queries-hooks";
 import { formatSalary, formatSeniority, getInitials } from "@/lib/utils";
-import { useDepartmentsQuery } from "@/queries/department";
-import { usePositionsQuery } from "@/queries/positions";
 import { Employee } from "@/types/types";
 import { format } from "date-fns";
 import React from "react";

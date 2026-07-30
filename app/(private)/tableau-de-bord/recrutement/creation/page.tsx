@@ -26,10 +26,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCreateRecruitmentMutation } from "@/queries/recruitment";
-import { useCompaniesQuery } from "@/queries/company";
 import useKizunaStore from "@/context/store";
 import { toast } from "sonner";
+import { useCompaniesQuery, useCreateRecruitmentMutation } from "@/hooks/queries-hooks";
 
 const formSchema = z.object({
   title: z.string().min(2, "Le titre est requis"),

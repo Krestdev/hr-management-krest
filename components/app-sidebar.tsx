@@ -30,10 +30,10 @@ import {
 import { MoreVerticalIcon } from "@hugeicons/core-free-icons";
 import useKizunaStore from "@/context/store";
 import { getInitials } from "@/lib/utils";
-import { useEmployeeQuery } from "@/queries/employee";
 import { Button } from "./ui/button";
 import { EllipsisVertical } from "lucide-react";
 import { Badge } from "./ui/badge";
+import { useEmployeeQuery } from "@/hooks/queries-hooks";
 
 export function AppSidebar() {
   const path = usePathname();

@@ -5,7 +5,7 @@ import Header from "@/components/header";
 import LoadingComponent from "@/components/loading-comp";
 import { Input } from "@/components/ui/input";
 import { filesData } from "@/data/temp";
-import { useEmployeesQuery } from "@/queries/employee";
+import { useEmployeesQuery } from "@/hooks/queries-hooks";
 import Link from "next/link";
 import React, { useState } from "react";
 

@@ -4,12 +4,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import useKizunaStore from '@/context/store'
 import { formatSeniority, getInitials, getYearsOfService } from '@/lib/utils';
-import { useEmployeeQuery } from '@/queries/employee';
 import { Edit03Icon, FileAttachmentIcon, Profile02Icon, UserAccountIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { format } from 'date-fns';
 import React, { useState } from 'react'
 import UpdatePhoto from './update-photo';
+import { useEmployeeQuery } from '@/hooks/queries-hooks';
 
 function Page() {
   const { user } = useKizunaStore();

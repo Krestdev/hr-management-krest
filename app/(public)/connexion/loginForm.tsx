@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import useKizunaStore from '@/context/store';
-import { useLoginMutation } from '@/queries/auth';
+import { useLoginMutation } from '@/hooks/queries-hooks';
 import UserQuery from '@/queries/employee';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight } from 'lucide-react';

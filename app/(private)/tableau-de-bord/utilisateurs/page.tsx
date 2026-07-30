@@ -2,10 +2,6 @@
 
 import useKizunaStore from "@/context/store"
 import StatisticCard from "@/components/statistic-card"
-import { useDeleteEmployeeMutation, useEmployeesQuery, useReactivateEmployeeMutation } from "@/queries/employee"
-import { useCompaniesQuery } from "@/queries/company"
-import { useDepartmentsQuery } from "@/queries/department"
-import { usePositionsQuery } from "@/queries/positions"
 import { UserSquare2, Search, PlusSquare, MoreVertical, Loader2, ChevronLeft, ChevronRight, Filter } from "lucide-react"
 import React, { useMemo, useState } from "react"
 import { Input } from "@/components/ui/input"
@@ -29,6 +25,7 @@ import ViewUserDialog from "@/components/Utilisateurs/ViewUser"
 import EditUserDialog from "@/components/Utilisateurs/EditUser"
 import { Employee, roleColors, roleLabels } from "@/types/types"
 import ChangePassword from "@/components/Utilisateurs/ChangePassword"
+import { useCompaniesQuery, useDeleteEmployeeMutation, useDepartmentsQuery, useEmployeesQuery, usePositionsQuery, useReactivateEmployeeMutation } from "@/hooks/queries-hooks"
 
 const Page = () => {
     const [search, setSearch] = useState("")

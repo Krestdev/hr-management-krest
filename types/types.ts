@@ -336,6 +336,16 @@ export interface Candidacy {
   updatedAt?: Date;
 }
 
+export type LeaveType = {
+  uuid: string;
+  label: string;
+  daysAllowed: number;
+  isActive: boolean;
+  companyId: string;
+  createdAt: Date;
+  updatedAt: Date
+}
+
 export const roleColors: Record<string, string> = {
   "SUPER_ADMIN": "bg-purple-600 hover:bg-purple-700 text-white border-transparent",
   "ADMIN": "bg-purple-600 hover:bg-purple-700 text-white border-transparent",

@@ -1,7 +1,5 @@
 import api from "@/context/api";
 import { Position } from "@/types/types";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "./queryKeys";
 
 export default class PositionQuery {
   route = "/positions";
@@ -100,66 +98,4 @@ export default class PositionQuery {
   };
 }
 
-import useKizunaStore from "@/context/store";
-
-// Hook pour récupérer toutes les positions
-export function usePositionsQuery(companyId?: string, enabled: boolean = true) {
-  const storeCompanyId = useKizunaStore((state) => state.selectedCompanyId);
-  const activeCompanyId = storeCompanyId === "all" ? companyId : storeCompanyId;
-
-  const positionQuery = new PositionQuery();
-  return useQuery({
-    queryKey: queryKeys.positions.all(activeCompanyId),
-    queryFn: () => positionQuery.getAll(activeCompanyId === "all" ? undefined : activeCompanyId),
-    enabled: enabled,
-  });
-}
-
-// Hook pour récupérer une position par son id
-export function usePositionQuery(id: string, companyId?: string, enabled: boolean = true) {
-  const positionQuery = new PositionQuery();
-  return useQuery({
-    queryKey: queryKeys.positions.detail(id, companyId),
-    queryFn: () => positionQuery.getById(id, companyId),
-    enabled: enabled && !!id && companyId !== undefined,
-  });
-}
-
-// Hook pour créer une position
-export function useCreatePositionMutation() {
-  const positionQuery = new PositionQuery();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: positionQuery.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.positions.all() });
-    },
-  });
-}
-
-// Hook pour modifier une position
-export function useUpdatePositionMutation() {
-  const positionQuery = new PositionQuery();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Position, "uuid" | "createdAt" | "updatedAt">> }) =>
-      positionQuery.update(id, data),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.positions.all() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.positions.detail(data.uuid) });
-    },
-  });
-}
-
-// Hook pour supprimer une position
-export function useDeletePositionMutation() {
-  const positionQuery = new PositionQuery();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: positionQuery.delete,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.positions.all() });
-    },
-  });
-}
 
